@@ -1,0 +1,103 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  
+  <groupId>eu.celar.decision-making</groupId>
+  <artifactId>decision-making-pom</artifactId>
+  <version>0.1-SNAPSHOT</version>
+  <name>CELAR Decision-Making Module (DMM) main POM</name>
+
+  <prerequisites>
+    <maven>2.0.6</maven>
+  </prerequisites>
+
+  <url>https://github.com/CELAR/decision-module</url>
+
+  <description>
+    CELAR c-Eclipse.
+  </description>
+
+  <packaging>pom</packaging>
+
+  <modules>
+    <module>data-processing-unit</module>
+    <module>analysis-engine</module>
+    <module>planning-engine</module>
+    <module>learning-engine</module>
+    <module>cloud-interaction-unit</module>
+  </modules>
+
+  <organization>
+    <name>CELAR</name>
+    <url>http://celarcloud.eu/</url>
+  </organization>
+
+  <issueManagement>
+    <system>GitHub Issues</system>
+    <url>https://github.com/CELAR/decision-module/issues</url>
+  </issueManagement>
+
+  <ciManagement>
+    <system>Jenkins</system>
+    <url>https://vm091.grnet.stratuslab.eu/</url>
+  </ciManagement>
+
+  <scm>
+    <connection>scm:git:ssh://git@github.com:CELAR/decision-module.git</connection>
+    <developerConnection>scm:git:ssh://git@github.com:CELAR/decision-module.git</developerConnection>
+  </scm>
+
+  <repositories>
+
+    <repository>
+      <releases>
+        <enabled>true</enabled>
+      </releases>
+      <snapshots>
+        <enabled>false</enabled>
+      </snapshots>
+      <id>POMReleases</id>
+      <name>POM Releases</name>
+      <url>https://vm091.grnet.stratuslab.eu/nexus/content/repositories/releases</url>
+    </repository>
+
+    <repository>
+      <releases>
+        <enabled>false</enabled>
+      </releases>
+      <snapshots>
+        <enabled>true</enabled>
+      </snapshots>
+      <id>POMSnapshots</id>
+      <name>POM Snapshots</name>
+      <url>https://vm091.grnet.stratuslab.eu/nexus/content/repositories/snapshots</url>
+    </repository>
+
+  </repositories>
+
+  <dependencyManagement>
+    <dependencies>
+    <!--  Add CELAR dependencies here. -->
+    </dependencies>
+  </dependencyManagement>
+
+  <distributionManagement>
+
+    <repository>
+      <id>celar.releases</id>
+      <name>Releases</name>
+      <url>https://vm091.grnet.stratuslab.eu/nexus/content/repositories/releases</url>
+    </repository>
+
+    <snapshotRepository>
+      <id>celar.snapshots</id>
+      <name>Snapshots</name>
+      <url>https://vm091.grnet.stratuslab.eu/nexus/content/repositories/snapshots</url>
+    </snapshotRepository>
+
+  </distributionManagement>
+
+<!-- up to here into celar-discribution POM.  -->
+
+</project>
+
