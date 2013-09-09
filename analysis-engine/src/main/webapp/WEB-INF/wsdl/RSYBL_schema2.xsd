@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<xs:schema version="1.0" xmlns:ns1="http://main.analysisEngine.rSybl.dsg.tuwien.ac.at/" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+
+  <xs:import namespace="http://main.analysisEngine.rSybl.dsg.tuwien.ac.at/" schemaLocation="RSYBL_schema1.xsd"/>
+
+  <xs:element name="arg0" nillable="true" type="xs:string"/>
+
+  <xs:element name="arg1" nillable="true" type="ns1:syblAnnotation"/>
+</xs:schema>
+

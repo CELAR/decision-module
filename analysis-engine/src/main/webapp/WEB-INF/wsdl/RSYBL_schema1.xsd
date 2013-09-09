@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<xs:schema version="1.0" targetNamespace="http://main.analysisEngine.rSybl.dsg.tuwien.ac.at/" xmlns:tns="http://main.analysisEngine.rSybl.dsg.tuwien.ac.at/" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+
+  <xs:complexType name="syblAnnotation">
+    <xs:sequence>
+      <xs:element name="annotationType" type="tns:annotationType" minOccurs="0"/>
+      <xs:element name="constraints" type="xs:string" minOccurs="0"/>
+      <xs:element name="entityID" type="xs:string" minOccurs="0"/>
+      <xs:element name="monitoring" type="xs:string" minOccurs="0"/>
+      <xs:element name="priorities" type="xs:string" minOccurs="0"/>
+      <xs:element name="strategies" type="xs:string" minOccurs="0"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:simpleType name="annotationType">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="CLOUD_SERVICE"/>
+      <xs:enumeration value="SERVICE_UNIT"/>
+      <xs:enumeration value="SERVICE_TOPOLOGY"/>
+      <xs:enumeration value="CODE_REGION"/>
+      <xs:enumeration value="RELATIONSHIP"/>
+    </xs:restriction>
+  </xs:simpleType>
+</xs:schema>
+

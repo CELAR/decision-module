@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<DeploymentDescription CloudServiceID="CloudService">
+	<DeploymentUnit serviceUnitID="LoadBalancerServiceUnit"
+		defaultFlavor="m1.tiny" defaultImage="0f344e97-76ef-43ae-b868-6fce6bed0f77" />
+	<DeploymentUnit serviceUnitID="EventProcessingServiceUnit"
+		defaultFlavor="m1.tiny" defaultImage="fb6e50ab-f2c3-4089-8cd2-0cbfaba2d6b4" />
+	<DeploymentUnit serviceUnitID="DataControllerServiceUnit"
+		defaultFlavor="m1.tiny" defaultImage="e2f10d3a-f471-4716-8f63-de7e1a425f0c" />
+	<DeploymentUnit serviceUnitID="DataNodeServiceUnit"
+		defaultFlavor="m1.tiny" defaultImage="1d8c91dc-b15c-4bfb-a733-6dbf6fa55b4e" />
+</DeploymentDescription>

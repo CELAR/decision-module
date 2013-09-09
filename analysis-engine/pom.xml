@@ -7,12 +7,87 @@
   <name>CELAR DMM Analysis Engine</name>
   <description>CELAR DMM Analysis Engine</description>
 
-  <packaging>pom</packaging>
+  <packaging>war</packaging>
 
   <parent>
     <groupId>eu.celar.decision-making</groupId>
     <artifactId>decision-making-pom</artifactId>
     <version>0.1-SNAPSHOT</version>
   </parent>
+  <dependencies>
+		<dependency>
+			<groupId>junit</groupId>
+			<artifactId>junit</artifactId>
+			<version>4.4</version>
+		</dependency>
+		<dependency>
+			<groupId>log4j</groupId>
+			<artifactId>log4j</artifactId>
+			<version>1.2.16</version>
+		</dependency>
 
+		<dependency>
+			<groupId>eu.celar.decision-making</groupId>
+			<artifactId>cloud-application-dependency-graph</artifactId>
+			<version>0.1-SNAPSHOT</version>
+		</dependency>
+		<dependency>
+			<groupId>eu.celar.decision-making</groupId>
+			<artifactId>data-processing-unit</artifactId>
+			<version>0.1-SNAPSHOT</version>
+		</dependency>
+		<dependency>
+			<groupId>eu.celar.decision-making</groupId>
+			<artifactId>planning-engine</artifactId>
+			<version>0.1-SNAPSHOT</version>
+		</dependency>
+		<dependency>
+			<groupId>eu.celar.decision-making</groupId>
+			<artifactId>cloud-interaction-unit</artifactId>
+			<version>0.1-SNAPSHOT</version>
+		</dependency>
+		<dependency>
+			<groupId>eu.celar.decision-making</groupId>
+			<artifactId>sybl-processing-unit</artifactId>
+			<version>0.1-SNAPSHOT</version>
+		</dependency>
+		<dependency>
+			<groupId>com.sun.xml.ws</groupId>
+			<artifactId>jaxws-rt</artifactId>
+			<version>2.2.6</version>
+		</dependency>
+	</dependencies>
+	<build>
+    <plugins>
+			<plugin>
+				<groupId>org.jvnet.jax-ws-commons</groupId>
+				<artifactId>jaxws-maven-plugin</artifactId>
+				<version>2.2</version>
+				<executions>
+					<execution>
+						<goals>
+							<goal>wsgen</goal>
+						</goals>
+						<configuration>
+							<sei>at.ac.tuwien.dsg.rSybl.analysisEngine.main.SyblControlWebService</sei>
+							<genWsdl>true</genWsdl>
+							<keep>true</keep>
+							<verbose>true</verbose>
+							<includeDependencies>true</includeDependencies>
+
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-compiler-plugin</artifactId>
+				<version>2.1</version>
+				<configuration>
+					<source>1.7</source>
+					<target>1.7</target>
+				</configuration>
+			</plugin>
+		</plugins>
+  </build>
 </project>

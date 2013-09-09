@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<CloudService id="CloudService">
+	<ServiceTopology id="DataEndServiceTopology">
+		<Relationship>
+			<Master>DataControllerServiceUnit</Master>
+			<Slave>DataNodeServiceUnit</Slave>
+		</Relationship>
+		<ServiceUnit id="DataControllerServiceUnit" />
+		<ServiceUnit id="DataNodeServiceUnit" />
+	</ServiceTopology>
+	<ServiceTopology id="EventProcessingServiceTopology">
+		<Relationship>
+			<Master>LoadBalancerServiceUnit</Master>
+			<Slave>EventProcessingServiceUnit</Slave>
+		</Relationship>
+		<ServiceUnit id="LoadBalancerServiceUnit" />
+		<ServiceUnit id="EventProcessingServiceUnit" >
+		<SYBLDirective Constraints="Co3:CONSTRAINT responseTime &lt; 450 ms" />
+		</ServiceUnit>
+	</ServiceTopology>
+</CloudService>

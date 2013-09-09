@@ -25,24 +25,11 @@
     <module>planning-engine</module>
     <module>learning-engine</module>
     <module>cloud-interaction-unit</module>
+    <module>cloud-application-dependency-graph</module>
+    <module>sybl-processing-unit</module>
   </modules>
 
-  <organization>
-    <name>CELAR</name>
-    <url>http://celarcloud.eu/</url>
-  </organization>
-
-  <issueManagement>
-    <system>GitHub Issues</system>
-    <url>https://github.com/CELAR/decision-module/issues</url>
-  </issueManagement>
-
-  <ciManagement>
-    <system>Jenkins</system>
-    <url>https://vm091.grnet.stratuslab.eu/</url>
-  </ciManagement>
-
-  <scm>
+<scm>
     <connection>scm:git:ssh://git@github.com:CELAR/decision-module.git</connection>
     <developerConnection>scm:git:ssh://git@github.com:CELAR/decision-module.git</developerConnection>
   </scm>
