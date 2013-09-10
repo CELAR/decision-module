@@ -36,7 +36,8 @@ import javax.xml.bind.annotation.XmlRootElement;
 public class DeploymentDescription {
 	@XmlElement(name = "DeploymentUnit")
 	private List<DeploymentUnit> deployments = new ArrayList<DeploymentUnit>();
-	
+	@XmlAttribute(name="AccessIP")
+	private String accessIP="";
 	@XmlAttribute(name="CloudServiceID")
 	private String cloudServiceID="";
 	public List<DeploymentUnit> getDeployments() {
@@ -53,5 +54,13 @@ public class DeploymentDescription {
 
 	public void setCloudServiceID(String cloudServiceID) {
 		this.cloudServiceID = cloudServiceID;
+	}
+
+	public String getAccessIP() {
+		return accessIP;
+	}
+
+	public void setAccessIP(String accessIP) {
+		this.accessIP = accessIP;
 	}
 }

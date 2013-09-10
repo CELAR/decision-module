@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<DeploymentDescription CloudServiceID="CloudService">
+<DeploymentDescription CloudServiceID="CloudService" AccessIP="128.1.2.2">
 	<DeploymentUnit serviceUnitID="LoadBalancerServiceUnit"
 		defaultFlavor="m1.tiny" defaultImage="0f344e97-76ef-43ae-b868-6fce6bed0f77" />
 	<DeploymentUnit serviceUnitID="EventProcessingServiceUnit"
