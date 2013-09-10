@@ -583,7 +583,28 @@ public class MELA_API implements MonitoringInterface{
                         MonitoredElement serviceUnitElement = new MonitoredElement();
                         serviceUnitElement.setId(serviceUnit.getId());
                         serviceUnitElement.setLevel(MonitoredElement.MonitoredElementLevel.SERVICE_UNIT);
+                        for (Node vm: serviceUnit.getAllRelatedNodesOfType(RelationshipType.HOSTED_ON_RELATIONSHIP,NodeType.VIRTUAL_MACHINE)){
+                        	 MonitoredElement virtualMachine = new MonitoredElement();
+                        	 virtualMachine.setId(vm.getId());
+                        	 virtualMachine.setLevel(MonitoredElement.MonitoredElementLevel.VM);
+                        	 serviceUnitElement.addElement(virtualMachine);
+                        }
+                        for (Node vm: serviceUnit.getAllRelatedNodesOfType(RelationshipType.ASSOCIATED_AT_RUNTIME_RELATIONSHIP,NodeType.VIRTUAL_MACHINE)){
+                        	MonitoredElement virtualMachine = new MonitoredElement();
+	                       	 virtualMachine.setId(vm.getId());
+	                       	 boolean alreadyContained=false;
+	                       	 virtualMachine.setLevel(MonitoredElement.MonitoredElementLevel.VM);
+	                       	 for (MonitoredElement el:serviceUnitElement.getContainedElements())
+	                       	 { 
+	                       		 if (el.getId().equalsIgnoreCase(vm.getId())){
+	                       			alreadyContained=true;
+	                       		 }
+	                       	 }
+	                       	 if (!alreadyContained)
+	                       		 serviceUnitElement.addElement(virtualMachine);
+                        }
                         serviceTopologyElement.addElement(serviceUnitElement);
+
                     }
                 }
             }
@@ -599,6 +620,7 @@ public class MELA_API implements MonitoringInterface{
             }
             serviceTopologies.remove(0);
             }
+            
         }
 
         public static MonitoredElement.MonitoredElementLevel getElementLevelFromEntity(Node entity) {
