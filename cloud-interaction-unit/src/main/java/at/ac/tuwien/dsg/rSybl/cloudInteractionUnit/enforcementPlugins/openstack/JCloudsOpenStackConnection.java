@@ -530,15 +530,7 @@ public class JCloudsOpenStackConnection {
 	     }
 	    
 	public static void main(String[] args){
-   		try {
-			JCloudsOpenStackConnection cloudsOpenStackConnection=new JCloudsOpenStackConnection(null);
-   			System.out.println("Got here "+Configuration.getAccessIP()+" "+Configuration.getCertificatePath());
-			cloudsOpenStackConnection.execute(Configuration.getAccessIP(), Configuration.getCertificatePath(), "decomissionWS 10.99.0.88");
-		} catch (JSchException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-
+   		
 	}
 	public void scaleIn(Node toBeScaled) {
 	
@@ -561,9 +553,9 @@ public class JCloudsOpenStackConnection {
 		        		   cmd = "decomissionCassandra "+ip;
 		        	  
 
-		               if (!Configuration.getAccessIP().equalsIgnoreCase("localhost"))
+		               if (!(controlledService.getStaticInformation("AccessIP").equals("localhost")))
 		           	try {
-		           		 executeAndExpectNothing(Configuration.getAccessIP(), Configuration.getCertificatePath(), cmd);
+		           		 executeAndExpectNothing((String)controlledService.getStaticInformation("AccessIP"), Configuration.getCertificatePath(), cmd);
 		           	} catch (JSchException e1) {
 		           		// TODO Auto-generated catch block
 		           		e1.printStackTrace();

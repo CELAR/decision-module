@@ -291,14 +291,15 @@ public class InputProcessing {
 		cloudService.addNode(entry.getKey(), entry.getValue());
 		}
 		graph.setCloudService(cloudService);
-		
+		cloudService.getStaticInformation().put("AccessIP",deploymentDescription.getAccessIP());
+
 		//Populate with deployment information
 		for (DeploymentUnit deploymentUnit :deploymentDescription.getDeployments()){
 			
-			Node string = graph.getNodeWithID(deploymentUnit.getServiceUnitID());
-			if (string!=null){
-			string.getStaticInformation().put("DefaultFlavor", deploymentUnit.getDefaultFlavor());
-			string.getStaticInformation().put("DefaultImage", deploymentUnit.getDefaultImage());
+			Node node = graph.getNodeWithID(deploymentUnit.getServiceUnitID());
+			if (node!=null){
+				node.getStaticInformation().put("DefaultFlavor", deploymentUnit.getDefaultFlavor());
+				node.getStaticInformation().put("DefaultImage", deploymentUnit.getDefaultImage());
 			}else{
 				GraphLogger.logger.error("Cannot find node "+deploymentUnit.getServiceUnitID()+". Current graph is "+graph.graphToString());
 				

@@ -58,7 +58,7 @@ public class MonitoringGangliaAPI implements Runnable,MonitoringInterface{
 	     List <String> ips =controlledService.getAssociatedIps();
 	     String certificatePath = Configuration.getCertificatePath();
 	    	try {
-				clusterInfo = gangliaMonitor.monitorGangliaNodesIndirectly(ips,Configuration.getGangliaIP(),certificatePath,Configuration.getGangliaPort()+"");
+				clusterInfo = gangliaMonitor.monitorGangliaNodesIndirectly(ips,(String)controlledService.getStaticInformation("AccessIP"),certificatePath,Configuration.getGangliaPort()+"");
 			} catch (JAXBException e) {
 				// TODO Auto-generated catch block
 				RuntimeLogger.logger.error("Error when creating new cluster info"+e.toString()+" "+e.getMessage());
