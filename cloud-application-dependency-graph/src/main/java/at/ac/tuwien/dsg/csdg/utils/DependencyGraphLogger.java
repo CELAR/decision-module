@@ -22,6 +22,8 @@
 
 package at.ac.tuwien.dsg.csdg.utils;
 
+import java.io.BufferedWriter;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.util.Date;
 
@@ -36,9 +38,8 @@ public class DependencyGraphLogger {
 		      SimpleLayout layout = new SimpleLayout();    
 			   FileAppender appender=null;
 			   Date date = new Date();
-			   
 			try {
-				appender = new FileAppender(layout,"./logs/DependencyGraphLogger_"+date.getHours()+"_"+date.getMinutes()+".txt",false);
+				appender = new FileAppender(layout,"../webapps/logs/DependencyGraphLogger_"+date.getHours()+"_"+date.getMinutes()+".txt",false);
 			} catch (IOException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();

@@ -13,7 +13,7 @@
         <init-param>
             <description>Multiple packages, separated by semicolon(;), can be specified in param-value</description>
             <param-name>com.sun.jersey.config.property.packages</param-name>
-            <param-value>at.ac.tuwien.dsg.rSYBL.analysisEngine.main</param-value>
+            <param-value>at.ac.tuwien.dsg.rSYBL.analysisEngine.webAPI</param-value>
         </init-param>
         <load-on-startup>1</load-on-startup>
     </servlet>
