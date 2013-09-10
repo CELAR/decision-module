@@ -29,7 +29,7 @@ import at.ac.tuwien.dsg.csdg.Relationship.RelationshipType;
 import at.ac.tuwien.dsg.csdg.elasticityInformation.ElasticityRequirement;
 import at.ac.tuwien.dsg.csdg.elasticityInformation.elasticityRequirements.SYBLAnnotation;
 import at.ac.tuwien.dsg.csdg.inputProcessing.multiLevelModel.InputProcessing;
-import at.ac.tuwien.dsg.csdg.input_processing.tosca.TOSCAProcessing;
+import at.ac.tuwien.dsg.csdg.inputProcessing.tosca.TOSCAProcessing;
 
 
 
@@ -138,7 +138,7 @@ public class Main {
 		//System.out.println(fromTosca.graphToString());
 		
 		InputProcessing inputProcessing=new InputProcessing();
-		System.out.println(inputProcessing.loadDependencyGraph().graphToString());
+		System.out.println(inputProcessing.loadDependencyGraphFromFile().graphToString());
 	}
 	
 	}

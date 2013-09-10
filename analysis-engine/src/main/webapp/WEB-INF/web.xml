@@ -7,18 +7,22 @@
             com.sun.xml.ws.transport.http.servlet.WSServletContextListener
     </listener-class>
 </listener>
-<servlet>
-    <servlet-name>rSYBL</servlet-name>
-    <servlet-class>
-        com.sun.xml.ws.transport.http.servlet.WSServlet
-    </servlet-class>
-    <load-on-startup>1</load-on-startup>
-</servlet>
-  <servlet-mapping>
-    <servlet-name>rSYBL</servlet-name>
-    <url-pattern>/rSYBL</url-pattern>
-  </servlet-mapping>
+ <servlet>
+        <servlet-name>ServletAdaptor</servlet-name>
+        <servlet-class>com.sun.jersey.spi.container.servlet.ServletContainer</servlet-class>
+        <init-param>
+            <description>Multiple packages, separated by semicolon(;), can be specified in param-value</description>
+            <param-name>com.sun.jersey.config.property.packages</param-name>
+            <param-value>at.ac.tuwien.dsg.rSYBL.analysisEngine.main</param-value>
+        </init-param>
+        <load-on-startup>1</load-on-startup>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>ServletAdaptor</servlet-name>
+        <url-pattern>/REST_WS/*</url-pattern>
+    </servlet-mapping>
   <session-config>
     <session-timeout>120</session-timeout>
   </session-config>
 </web-app>
+   

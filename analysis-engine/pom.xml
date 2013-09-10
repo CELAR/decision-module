@@ -25,7 +25,23 @@
 			<artifactId>log4j</artifactId>
 			<version>1.2.16</version>
 		</dependency>
-
+ <dependency>
+            <groupId>javax.servlet</groupId>
+            <artifactId>servlet-api</artifactId>
+            <version>2.5</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>javax.servlet.jsp</groupId>
+            <artifactId>jsp-api</artifactId>
+            <version>2.1</version>
+            <scope>provided</scope>
+        </dependency>
+         <dependency>
+            <groupId>javax.ws.rs</groupId>
+            <artifactId>jsr311-api</artifactId>
+            <version>1.1.1</version>
+        </dependency>
 		<dependency>
 			<groupId>eu.celar.decision-making</groupId>
 			<artifactId>cloud-application-dependency-graph</artifactId>
@@ -51,34 +67,30 @@
 			<artifactId>sybl-processing-unit</artifactId>
 			<version>0.1-SNAPSHOT</version>
 		</dependency>
-		<dependency>
-			<groupId>com.sun.xml.ws</groupId>
-			<artifactId>jaxws-rt</artifactId>
-			<version>2.2.6</version>
-		</dependency>
+	
 	</dependencies>
 	<build>
     <plugins>
-			<plugin>
-				<groupId>org.jvnet.jax-ws-commons</groupId>
-				<artifactId>jaxws-maven-plugin</artifactId>
-				<version>2.2</version>
-				<executions>
-					<execution>
-						<goals>
-							<goal>wsgen</goal>
-						</goals>
-						<configuration>
-							<sei>at.ac.tuwien.dsg.rSybl.analysisEngine.main.SyblControlWebService</sei>
-							<genWsdl>true</genWsdl>
-							<keep>true</keep>
-							<verbose>true</verbose>
-							<includeDependencies>true</includeDependencies>
+<!-- 			<plugin> -->
+<!-- 				<groupId>org.jvnet.jax-ws-commons</groupId> -->
+<!-- 				<artifactId>jaxws-maven-plugin</artifactId> -->
+<!-- 				<version>2.2</version> -->
+<!-- 				<executions> -->
+<!-- 					<execution> -->
+<!-- 						<goals> -->
+<!-- 							<goal>wsgen</goal> -->
+<!-- 						</goals> -->
+<!-- 						<configuration> -->
+<!-- 							<sei>at.ac.tuwien.dsg.rSybl.analysisEngine.main.SyblControlWebService</sei> -->
+<!-- 							<genWsdl>true</genWsdl> -->
+<!-- 							<keep>true</keep> -->
+<!-- 							<verbose>true</verbose> -->
+<!-- 							<includeDependencies>true</includeDependencies> -->
 
-						</configuration>
-					</execution>
-				</executions>
-			</plugin>
+<!-- 						</configuration> -->
+<!-- 					</execution> -->
+<!-- 				</executions> -->
+<!-- 			</plugin> -->
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-compiler-plugin</artifactId>

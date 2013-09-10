@@ -52,7 +52,10 @@ public class Configuration {
         //return configuration.getProperty("SYBLLanguageDescription");
      }
     
- 
+    
+    public static String getApplicationSpecificInformation(){
+    	return configuration.getProperty("ApplicationSpecificInformation");
+    }
     public static String getDirectivesPath(){
     	return configuration.getProperty("SYBLDirectives");
     }

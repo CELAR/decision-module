@@ -37,6 +37,8 @@ import at.ac.tuwien.dsg.csdg.elasticityInformation.elasticityRequirements.SYBLAn
 import at.ac.tuwien.dsg.csdg.elasticityInformation.elasticityRequirements.SYBLSpecification;
 import at.ac.tuwien.dsg.csdg.inputProcessing.multiLevelModel.InputProcessing;
 import at.ac.tuwien.dsg.csdg.inputProcessing.multiLevelModel.abstractModelXML.SYBLDirectiveMappingFromXML;
+import at.ac.tuwien.dsg.csdg.inputProcessing.tosca.TOSCAProcessing;
+import at.ac.tuwien.dsg.rSybl.analysisEngine.utils.Configuration;
 import at.ac.tuwien.dsg.rSybl.cloudInteractionUnit.api.EnforcementAPI;
 import at.ac.tuwien.dsg.rSybl.cloudInteractionUnit.api.EnforcementAPIInterface;
 import at.ac.tuwien.dsg.rSybl.dataProcessingUnit.api.MonitoringAPI;
@@ -52,18 +54,22 @@ import at.ac.tuwien.dsg.sybl.syblProcessingUnit.utils.SYBLDirectivesEnforcementL
 
 
 public class ControlService{
-	SYBLService syblService;
-	MonitoringAPIInterface monitoringAPI ;
-	EnforcementAPIInterface enforcementAPI;
+	private SYBLService syblService;
+	private MonitoringAPIInterface monitoringAPI ;
+	private EnforcementAPIInterface enforcementAPI;
 
-	DependencyGraph dependencyGraph ;
-	PlanningGreedyAlgorithm planningGreedyAlgorithm;
-
+	private DependencyGraph dependencyGraph ;
+	private PlanningGreedyAlgorithm planningGreedyAlgorithm;
+	
 	
 	public ControlService(){
-		InputProcessing input = new InputProcessing();
-		dependencyGraph=input.loadDependencyGraph();
+		if (Configuration.getApplicationSpecificInformation().equalsIgnoreCase("files")){
+			loadEverythingFromConfigurationFiles();
+			startSYBLProcessingAndPlanning();
+		}
+    		}
 	
+	public void startSYBLProcessingAndPlanning(){
 		try {
 			//SYBLDirectivesEnforcementLogger.logger.info("Current graph is "+dependencyGraph.graphToString());
 
@@ -84,23 +90,34 @@ public class ControlService{
 			syblService=new SYBLService(dependencyGraph,monitoringAPI,enforcementAPI);
 			    //CloudService cloudService, ArrayList<SYBLSpecification> syblSpecifications
 		    disableConflictingConstraints();
-		    PlanningLogger.logger.info("1 Number of elasticity requirements are "+dependencyGraph.getAllElasticityRequirements().size());
 
     	for (ElasticityRequirement syblSpecification:dependencyGraph.getAllElasticityRequirements()){
 		    SYBLAnnotation annotation = syblSpecification.getAnnotation();
-		    SYBLDirectivesEnforcementLogger.logger.info("Processing annotations for entity "+syblSpecification.getAnnotation().getEntityID() + " the annotations are "+annotation);
 		    syblService.processAnnotations(syblSpecification.getAnnotation().getEntityID(), annotation);
 
 		}
- 	    PlanningLogger.logger.info("2 Number of elasticity requirements are "+dependencyGraph.getAllElasticityRequirements().size());
 
     	planningGreedyAlgorithm = new PlanningGreedyAlgorithm(dependencyGraph,monitoringAPI,enforcementAPI);
 	   
- 	    PlanningLogger.logger.info("3 Number of elasticity requirements are "+dependencyGraph.getAllElasticityRequirements().size());
-
 		    planningGreedyAlgorithm.start();
-    		}
+	}
+	public void setApplicationDescriptionInfoInternalModel(String applicationDescriptionXML, String elasticityRequirementsXML, String deploymentInfoXML){
+		InputProcessing inputProcessing = new InputProcessing();
+		dependencyGraph=inputProcessing.loadDependencyGraphFromStrings(applicationDescriptionXML, elasticityRequirementsXML, deploymentInfoXML);
+		startSYBLProcessingAndPlanning();
+	}
+	public void setApplicationDescriptionInfoTOSCABased(String tosca){
+		//TODO : continue this, parse tosca and start planning and stuff
+		TOSCAProcessing toscaProcessing = new TOSCAProcessing();
+		dependencyGraph=toscaProcessing.toscaDescriptionToDependencyGraph();
+		startSYBLProcessingAndPlanning();
+	}
+	public void loadEverythingFromConfigurationFiles(){
+		InputProcessing input = new InputProcessing();
+		dependencyGraph=input.loadDependencyGraphFromFile();
 	
+		startSYBLProcessingAndPlanning();
+	}
 	public void writeCurrentDirectivesToFile(String file){
     	BufferedWriter out = null;
    	 try {

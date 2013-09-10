@@ -24,6 +24,7 @@ package at.ac.tuwien.dsg.csdg.inputProcessing.multiLevelModel;
 
 import java.io.File;
 import java.io.InputStream;
+import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -67,7 +68,7 @@ public class InputProcessing {
 	private  SYBLElasticityRequirementsDescription syblSpecifications;
 	private DeploymentDescription deploymentDescription;
 	private CloudServiceXML cloudServiceXML;
-	private void loadDeploymentDescription(){
+	private void loadDeploymentDescriptionFromFile(){
 		try {		
 			//load deployment description and populate the dependency graph
 			
@@ -90,7 +91,30 @@ public class InputProcessing {
 		}
 		
 	}
-	private void loadModel(){
+	private void loadDeploymentDescriptionFromString(String deploymentDescr){
+		try {		
+			//load deployment description and populate the dependency graph
+			
+			JAXBContext a = JAXBContext.newInstance( DeploymentDescription.class );
+			Unmarshaller u  = a.createUnmarshaller();
+			String deploymentDescriptionPath = Configuration.getDeploymentDescriptionPath();
+		//	RuntimeLogger.logger.info("Got here "+deploymentDescriptionPath);
+		//	RuntimeLogger.logger.info("Got here "+this.getClass().getClassLoader().getResourceAsStream(deploymentDescriptionPath));
+			
+			if (deploymentDescriptionPath!=null){
+				//deploymentDescription = (DeploymentDescription) u.unmarshal(new File(deploymentDescriptionPath));
+				deploymentDescription = (DeploymentDescription) u.unmarshal( new StringReader(deploymentDescr)) ;
+			}
+			//RuntimeLogger.logger.info("Read deployment Descrption"+deploymentDescription.toString());
+
+		} catch (Exception e) {
+			DependencyGraphLogger.logger.error("Error in reading deployment description"+e.toString());
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+	}
+	private void loadModelFromFile(){
 		 JAXBContext jc;
 		    cloudServiceXML = null;
 		try {			
@@ -132,11 +156,51 @@ public class InputProcessing {
 			}
 			
 	}
-	public DependencyGraph loadDependencyGraph(){
+	private void loadModelFromString(String applicationDescr, String elasticityReq){
+		 JAXBContext jc;
+		    cloudServiceXML = null;
+		try {			
+			jc = JAXBContext.newInstance( CloudServiceXML.class );
+			Unmarshaller u = jc.createUnmarshaller();
+			
+
+
+			//JAXBElement element=  u.unmarshal( new File(Configuration.getModelDescrFile()));
+			// cloudS = (CloudServiceXML) element.getValue();
+			 cloudServiceXML = (CloudServiceXML) u.unmarshal(new StringReader(applicationDescr));
+			//File f = new File(Configuration.getModelDescrFile());
+			//cloudServiceXML = (CloudServiceXML) u.unmarshal(new File(Configuration.getModelDescrFile()));
+		} catch (JAXBException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		//populate ips for above levels
+		//populateIps();
+		
+			try {			
+				JAXBContext a = JAXBContext.newInstance( SYBLElasticityRequirementsDescription.class );
+				Unmarshaller u  = a.createUnmarshaller();
+				String directivePath = Configuration.getDirectivesPath();
+				if (directivePath!=null){
+			     syblSpecifications = (SYBLElasticityRequirementsDescription) u.unmarshal( new StringReader(elasticityReq)) ;
+			    // syblSpecifications = (SYBLElasticityRequirementsDescription) u.unmarshal(new File(directivePath));
+				}
+				for (SYBLAnnotation syblAnnotation:parseXMLInjectedAnnotations(cloudServiceXML)){
+					if (syblSpecifications==null)
+						syblSpecifications=new SYBLElasticityRequirementsDescription();
+					//SYBLDirectivesEnforcementLogger.logger.info("FOUND HERE THE STRATEGY "+syblAnnotation.getStrategies());
+					//if (syblAnnotation.getStrategies()!=null && syblAnnotation.getStrategies()!="")
+			    	syblSpecifications.getSyblSpecifications().add(SYBLDirectiveMappingFromXML.mapFromSYBLAnnotation(syblAnnotation));
+			    }
+			} catch (JAXBException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			
+	}
+	public DependencyGraph constructDependencyGraph(){
 		DependencyGraph graph = new DependencyGraph();
 		Node cloudService = new Node();
-		loadModel();
-		loadDeploymentDescription();
 		cloudService.setId(cloudServiceXML.getId());
 		cloudService.setNodeType(NodeType.CLOUD_SERVICE);
 		if (cloudServiceXML.getAnnotation()!=null){
@@ -250,10 +314,24 @@ public class InputProcessing {
 			else
 				GraphLogger.logger.error("Specification targets entity which is not found: "+specification.getComponentId());
 		}
-		
 		return graph;
 	}
-	
+	public DependencyGraph loadDependencyGraphFromFile(){
+
+		loadModelFromFile();
+		loadDeploymentDescriptionFromFile();
+		
+		
+		return constructDependencyGraph();
+	}
+	public DependencyGraph loadDependencyGraphFromStrings(String applicationDescription, String additionalElasticityRequirements, String deploymentInfo){
+
+		loadModelFromString(applicationDescription,additionalElasticityRequirements);
+		loadDeploymentDescriptionFromString(deploymentInfo);
+		
+		
+		return constructDependencyGraph();
+	}
 	public SYBLAnnotation mapFromXMLAnnotationToSYBLAnnotation(String entityID,SYBLAnnotationXML syblAnnotationXML,SYBLAnnotation.AnnotationType annotationType){
 		SYBLAnnotation syblannotation = new SYBLAnnotation();
 

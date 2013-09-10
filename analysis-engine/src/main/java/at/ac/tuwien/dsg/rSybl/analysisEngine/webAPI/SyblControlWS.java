@@ -21,27 +21,33 @@
  */
 
 
-package at.ac.tuwien.dsg.rSybl.analysisEngine.main;
+package at.ac.tuwien.dsg.rSybl.analysisEngine.webAPI;
 
 import java.rmi.RemoteException;
 
-import javax.jws.WebMethod;
-import javax.jws.WebService;
-import javax.jws.soap.SOAPBinding;
+import javax.ws.rs.Consumes;
+import javax.ws.rs.PUT;
+import javax.ws.rs.Path;
+import javax.ws.rs.core.Context;
+import javax.ws.rs.core.UriInfo;
 
 import at.ac.tuwien.dsg.csdg.elasticityInformation.elasticityRequirements.SYBLAnnotation;
+import at.ac.tuwien.dsg.rSybl.analysisEngine.main.ControlService;
 
 
 
-
-@WebService(serviceName="rSYBL")//, endpointInterface ="at.ac.tuwien.dsg.sybl.monitorandenforcement.runtimeAPI.SYBLAPIInterface")
-@SOAPBinding(style = SOAPBinding.Style.RPC)
-public class SyblControlWebService {
+@Path("/")
+public class SyblControlWS {
+        @Context
+        private UriInfo context;
 	private ControlService controlService;
-	public SyblControlWebService(){
-		controlService=new ControlService();
+	public SyblControlWS(){
+		controlService=ControlServiceFactory.getControlServiceInstance();
+		
 	}
-	@WebMethod
+	 @PUT
+	 @Path("/processAnotation")
+	 @Consumes("application/xml")
 	public void processAnnotation(String entity,SYBLAnnotation annotation){
 		try {
 			controlService.processAnnotation(entity, annotation);
@@ -50,5 +56,16 @@ public class SyblControlWebService {
 			e.printStackTrace();
 	}
 	}
-
+	 @PUT
+	 @Path("/setApplicationDescriptionInfoInternalModel")
+	 @Consumes("application/xml")
+	public void setApplicationDescriptionInfoInternalModel(String applicationDescriptionXML, String elasticityRequirementsXML, String deploymentInfoXML){
+		controlService.setApplicationDescriptionInfoInternalModel(applicationDescriptionXML, elasticityRequirementsXML, deploymentInfoXML);
+	}
+	 @PUT
+	 @Path("/setApplicationDescriptionInfoTOSCABased")
+	 @Consumes("application/xml")
+	public void setApplicationDescriptionInfoTOSCABased(String tosca){
+		controlService.setApplicationDescriptionInfoTOSCABased(tosca);
+	}
 }

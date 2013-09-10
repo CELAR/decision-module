@@ -20,10 +20,11 @@
  *  Author : Georgiana Copil - e.copil@dsg.tuwien.ac.at
  */
 
-package at.ac.tuwien.dsg.csdg.input_processing.tosca;
+package at.ac.tuwien.dsg.csdg.inputProcessing.tosca;
 
 import java.io.File;
 import java.io.FileReader;
+import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -65,6 +66,25 @@ public class TOSCAProcessing {
 			//Definitions	def = (Definitions) u.unmarshal(new File(Configuration.getCloudServiceTOSCADescription()));
    
 			 Definitions def = (Definitions) u.unmarshal( InputProcessing.class.getClassLoader().getResourceAsStream(Configuration.getCloudServiceTOSCADescription())) ;
+
+			    return def;			
+		} catch (JAXBException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			return null;
+		}
+		
+
+	}
+	public Definitions readTOSCADescriptionsString(String tosca){
+		   
+		try {	 
+			 
+			 JAXBContext a = JAXBContext.newInstance( Definitions.class );
+			 Unmarshaller u  = a.createUnmarshaller();
+			//Definitions	def = (Definitions) u.unmarshal(new File(Configuration.getCloudServiceTOSCADescription()));
+   
+			 Definitions def = (Definitions) u.unmarshal(new StringReader(tosca)) ;
 
 			    return def;			
 		} catch (JAXBException e) {
@@ -186,5 +206,19 @@ public class TOSCAProcessing {
 				dependencyGraph.setCloudService(n);
 		return dependencyGraph;
 	}
+	
+	public DependencyGraph toscaDescriptionToDependencyGraph(String tosca){
+		DependencyGraph dependencyGraph = new DependencyGraph();
+		HashMap<String,Node> nodes = new HashMap<String,Node>();//String - id of the node, for easier access and modification of its relationships
+		Relationship rel = new Relationship();
+		//TODO: take each construct present in TOSCA and transform it to our model
+		Definitions definitions = readTOSCADescriptionsString(tosca);
+		parseTOSCAGraph(nodes, definitions.getServiceTemplateOrNodeTypeOrNodeTypeImplementation(), "");
+		for (Node n:nodes.values())
+			if (n.getNodeType()==NodeType.CLOUD_SERVICE)
+				dependencyGraph.setCloudService(n);
+		return dependencyGraph;
+	}
+	
 
 }

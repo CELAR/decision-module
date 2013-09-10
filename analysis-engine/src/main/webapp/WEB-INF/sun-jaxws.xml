@@ -1,8 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<endpoints xmlns="http://java.sun.com/xml/ns/jax-ws/ri/runtime" version="2.0">
-<endpoint
-      name="DecisionModule"
-      implementation="at.ac.tuwien.dsg.rSybl.analysisEngine.main.SyblControlWebService"
-             wsdl="WEB-INF/wsdl/RSYBL.wsdl"
-      url-pattern="/rSYBL"/>
-</endpoints>
