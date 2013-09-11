@@ -38,16 +38,14 @@ import at.ac.tuwien.dsg.csdg.elasticityInformation.elasticityRequirements.SYBLSp
 import at.ac.tuwien.dsg.csdg.inputProcessing.multiLevelModel.InputProcessing;
 import at.ac.tuwien.dsg.csdg.inputProcessing.multiLevelModel.abstractModelXML.SYBLDirectiveMappingFromXML;
 import at.ac.tuwien.dsg.csdg.inputProcessing.tosca.TOSCAProcessing;
+import at.ac.tuwien.dsg.rSybl.analysisEngine.utils.AnalysisLogger;
+import at.ac.tuwien.dsg.rSybl.analysisEngine.utils.Configuration;
 import at.ac.tuwien.dsg.rSybl.cloudInteractionUnit.api.EnforcementAPI;
 import at.ac.tuwien.dsg.rSybl.cloudInteractionUnit.api.EnforcementAPIInterface;
 import at.ac.tuwien.dsg.rSybl.dataProcessingUnit.api.MonitoringAPI;
 import at.ac.tuwien.dsg.rSybl.dataProcessingUnit.api.MonitoringAPIInterface;
-import at.ac.tuwien.dsg.rSybl.analysisEngine.utils.AnalysisLogger;
-import at.ac.tuwien.dsg.rSybl.analysisEngine.utils.Configuration;
 import at.ac.tuwien.dsg.rSybl.planningEngine.PlanningGreedyAlgorithm;
-import at.ac.tuwien.dsg.rSybl.planningEngine.utils.PlanningLogger;
 import at.ac.tuwien.dsg.sybl.syblProcessingUnit.utils.SYBLDirectivesEnforcementLogger;
-
 
 
 
@@ -81,7 +79,6 @@ public class ControlService{
 			enforcementAPI = new EnforcementAPI();
     
 			enforcementAPI.setControlledService(node);
-    		
 
 			enforcementAPI.setMonitoringPlugin(monitoringAPI);
   
