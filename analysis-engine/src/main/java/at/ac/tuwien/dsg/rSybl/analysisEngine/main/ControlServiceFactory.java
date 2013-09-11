@@ -8,6 +8,7 @@ public class ControlServiceFactory {
 	public static ControlService getControlServiceInstance(){
 
 		if (controlService==null){
+			AnalysisLogger.logger.info("Instantiating control service ... ");
 			controlService=new ControlService();
 		}
 		

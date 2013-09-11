@@ -45,6 +45,7 @@ import at.ac.tuwien.dsg.rSybl.dataProcessingUnit.api.MonitoringAPIInterface;
 import at.ac.tuwien.dsg.rSybl.analysisEngine.utils.AnalysisLogger;
 import at.ac.tuwien.dsg.rSybl.analysisEngine.utils.Configuration;
 import at.ac.tuwien.dsg.rSybl.planningEngine.PlanningGreedyAlgorithm;
+import at.ac.tuwien.dsg.rSybl.planningEngine.utils.PlanningLogger;
 import at.ac.tuwien.dsg.sybl.syblProcessingUnit.utils.SYBLDirectivesEnforcementLogger;
 
 
@@ -64,7 +65,6 @@ public class ControlService{
 
 		if (Configuration.getApplicationSpecificInformation().equalsIgnoreCase("files")){
 			loadEverythingFromConfigurationFiles();
-			startSYBLProcessingAndPlanning();
 		}
     		}
 	
@@ -77,12 +77,16 @@ public class ControlService{
 			node = dependencyGraph.getCloudService();
 			monitoringAPI = new MonitoringAPI();
 			monitoringAPI.setControlledService(node);
+    
 			enforcementAPI = new EnforcementAPI();
+    
 			enforcementAPI.setControlledService(node);
-			enforcementAPI.setMonitoringPlugin(monitoringAPI);
+    		
 
+			enforcementAPI.setMonitoringPlugin(monitoringAPI);
+  
     	} catch (Exception e) {
-    		SYBLDirectivesEnforcementLogger.logger.error( "Control service Instantiation "+e.toString());
+    		AnalysisLogger.logger.error( "Control service Instantiation "+e.toString());
     		e.printStackTrace();
 		}
 		
@@ -95,9 +99,9 @@ public class ControlService{
 		    syblService.processAnnotations(syblSpecification.getAnnotation().getEntityID(), annotation);
 
 		}
-
+    	
     	planningGreedyAlgorithm = new PlanningGreedyAlgorithm(dependencyGraph,monitoringAPI,enforcementAPI);
-	   
+    	
 		    planningGreedyAlgorithm.start();
 	}
 	public void setApplicationDescriptionInfoInternalModel(String applicationDescriptionXML, String elasticityRequirementsXML, String deploymentInfoXML){

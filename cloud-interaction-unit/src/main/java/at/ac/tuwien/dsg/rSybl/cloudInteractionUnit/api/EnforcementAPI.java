@@ -49,7 +49,6 @@ public class EnforcementAPI implements EnforcementAPIInterface{
 	
 	public void setControlledService(Node controlledService) {
 		this.controlledService = controlledService;
-	    RuntimeLogger.logger.info("Set the service "+ controlledService.toString());
 		offeredCapabilities = OfferedEnforcementCapabilities.getInstance(this.controlledService);
 	}
 	

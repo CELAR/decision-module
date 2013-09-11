@@ -112,7 +112,6 @@ for (File f:files){
 
 		    if(c== MonitoringInterface.class) //Need something in this if statement
 		    {
-		        System.out.println(clazz.getName() +" is instance of MonitoringInterface");
 		        try {
 					plugins.add((MonitoringInterface) Class.forName(clazz.getName()).newInstance());
 				} catch (InstantiationException e) {

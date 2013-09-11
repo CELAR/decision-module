@@ -132,7 +132,7 @@ public class MonitoringAPI implements MonitoringAPIInterface{
 	    RuntimeLogger.logger.info("Set the service "+ controlledService.toString());
 		offeredMonitoringMetrics  = OfferedMonitoredMetrics.getInstance(this.controlledService);
 		offeredMonitoringMetrics.submitServiceConfiguration(this.controlledService);
-	    RuntimeLogger.logger.info("Set the service "+ controlledService.toString());
+	//    RuntimeLogger.logger.info("Set the service "+ controlledService.toString());
 
 	}
 	
@@ -306,6 +306,7 @@ try{
 				e1.printStackTrace();
 			}
 		try{
+			RuntimeLogger.logger.info("The value of offered monitoring metrics " + offeredMonitoringMetrics);
 		return offeredMonitoringMetrics.getMetricValue(metricName, e);
 		}catch(Exception ex){
 			RuntimeLogger.logger.error("Current "+metricName +ex.toString()+"for node "+e.getId());

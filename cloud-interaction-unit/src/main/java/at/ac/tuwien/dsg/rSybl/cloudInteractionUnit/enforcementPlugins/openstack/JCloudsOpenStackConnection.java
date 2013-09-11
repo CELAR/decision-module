@@ -76,6 +76,8 @@ public class JCloudsOpenStackConnection {
 
 	public JCloudsOpenStackConnection(Node controlledService){
 		this.controlledService = controlledService;
+        RuntimeLogger.logger.info("Started instantiating JClouds");
+
 		Iterable<Module> modules = ImmutableSet.<Module>of(
                 new SLF4JLoggingModule());
 		ComputeServiceContext context = ContextBuilder.newBuilder(Configuration.getCloudAPIType())
@@ -94,7 +96,7 @@ public class JCloudsOpenStackConnection {
         final String region = "myregion";
 
         serverApi = client.getServerApiForZone(region);
-
+        RuntimeLogger.logger.info("Finished instantiating JClouds");
 	}
 	/**
 	 * 

@@ -41,6 +41,7 @@ import at.ac.tuwien.dsg.csdg.inputProcessing.multiLevelModel.abstractModelXML.SY
 import at.ac.tuwien.dsg.rSybl.dataProcessingUnit.api.MonitoringAPIInterface;
 import at.ac.tuwien.dsg.rSybl.dataProcessingUnit.monitoringPlugins.interfaces.MonitoringInterface;
 import at.ac.tuwien.dsg.rSybl.planningEngine.staticData.ActionEffect;
+import at.ac.tuwien.dsg.rSybl.planningEngine.utils.PlanningLogger;
 import at.ac.tuwien.dsg.sybl.syblProcessingUnit.languageDescription.SYBLDescriptionParser;
 import at.ac.tuwien.dsg.sybl.syblProcessingUnit.utils.SYBLDirectivesEnforcementLogger;
 
@@ -239,24 +240,29 @@ public class ContextRepresentation {
 		}
 
 		List<MonitoredComponentTopology> topologies =new ArrayList<MonitoredComponentTopology>();
+		if (monitoredCloudService.getMonitoredTopologies()!=null)
 		topologies.addAll(monitoredCloudService.getMonitoredTopologies());
 		
 		List<MonitoredComponent> componentsToExplore = new ArrayList<MonitoredComponent>();
 		while (!found && !topologies.isEmpty()){
 			MonitoredComponentTopology currentTopology = topologies.get(0);
-			
+			if (currentTopology!=null){
+				PlanningLogger.logger.info("id "+id+" current topology "+currentTopology+ "  "+ currentTopology.getId()+" ");
+				
 			if (currentTopology.getId().equalsIgnoreCase(id)){
 				found=true;
 				return currentTopology;
 			}else{
-				if (currentTopology.getMonitoredTopologies().size()>0)
+				if (currentTopology.getMonitoredTopologies()!=null && currentTopology.getMonitoredTopologies().size()>0)
 					topologies.addAll(currentTopology.getMonitoredTopologies());
-					componentsToExplore.addAll(currentTopology.getMonitoredComponents());
-			}
-			if (currentTopology.getMonitoredComponents()!=null)
+				if (currentTopology.getMonitoredComponents()!=null && currentTopology.getMonitoredComponents().size()>0)
 				componentsToExplore.addAll(currentTopology.getMonitoredComponents());
-			topologies.remove(0);
+			}
+			if (currentTopology.getMonitoredComponents()!=null && currentTopology.getMonitoredComponents().size()>0)
+				componentsToExplore.addAll(currentTopology.getMonitoredComponents());
 		}
+			topologies.remove(0);
+}
 		
 		while (!found && !componentsToExplore.isEmpty()){
 			MonitoredComponent component =componentsToExplore.get(0);

@@ -30,7 +30,6 @@ public class OfferedMonitoredMetrics {
 
 	public static MonitoringInterface getInstance(Node cloudService){
 		String className = Configuration.getMonitoringPlugin();
-		System.out.println(className);
 		Class monitoringClass=null;
 		try {
 			monitoringClass = Class.forName(className);
