@@ -14,6 +14,7 @@
     <artifactId>decision-making-pom</artifactId>
     <version>0.1-SNAPSHOT</version>
   </parent>
+
   <dependencies>
 		<dependency>
 			<groupId>junit</groupId>
@@ -25,23 +26,20 @@
 			<artifactId>log4j</artifactId>
 			<version>1.2.16</version>
 		</dependency>
- <dependency>
-            <groupId>javax.servlet</groupId>
-            <artifactId>servlet-api</artifactId>
-            <version>2.5</version>
-            <scope>provided</scope>
-        </dependency>
+	<dependency>
+			<groupId>com.sun.jersey</groupId>
+			<artifactId>jersey-server</artifactId>
+			<version>1.8</version>
+		</dependency>
         <dependency>
             <groupId>javax.servlet.jsp</groupId>
             <artifactId>jsp-api</artifactId>
             <version>2.1</version>
             <scope>provided</scope>
         </dependency>
-         <dependency>
-            <groupId>javax.ws.rs</groupId>
-            <artifactId>jsr311-api</artifactId>
-            <version>1.1.1</version>
-        </dependency>
+        
+
+
 		<dependency>
 			<groupId>eu.celar.decision-making</groupId>
 			<artifactId>cloud-application-dependency-graph</artifactId>

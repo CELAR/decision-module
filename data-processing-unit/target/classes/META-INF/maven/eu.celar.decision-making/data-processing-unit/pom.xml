@@ -14,10 +14,10 @@
   </parent>
   <artifactId>data-processing-unit</artifactId>
   <dependencies>
-     <dependency>
-            <groupId>at.ac.tuwien.dsg</groupId>
+   <dependency>
+            <groupId>eu.celar.multilevel-metrics-evaluation</groupId>
             <artifactId>MELA-Common</artifactId>
-            <version>1.0</version>
+            <version>0.1-SNAPSHOT</version>
             <type>jar</type>
         </dependency>
 	<dependency>

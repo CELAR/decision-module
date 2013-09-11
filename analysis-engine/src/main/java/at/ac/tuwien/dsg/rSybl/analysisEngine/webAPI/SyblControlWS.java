@@ -24,33 +24,48 @@
 package at.ac.tuwien.dsg.rSybl.analysisEngine.webAPI;
 
 import java.rmi.RemoteException;
+import java.util.logging.Logger;
 
 import javax.ws.rs.Consumes;
+import javax.ws.rs.GET;
 import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
+import javax.ws.rs.Produces;
 import javax.ws.rs.core.Context;
+import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.UriInfo;
+
+import com.sun.jersey.spi.resource.Singleton;
 
 import at.ac.tuwien.dsg.csdg.elasticityInformation.elasticityRequirements.SYBLAnnotation;
 import at.ac.tuwien.dsg.rSybl.analysisEngine.main.ControlService;
+import at.ac.tuwien.dsg.rSybl.analysisEngine.main.ControlServiceFactory;
+import at.ac.tuwien.dsg.rSybl.analysisEngine.utils.AnalysisLogger;
 
 
-
-@Path("/")
+@Singleton
+@Path("/rSYBL")
 public class SyblControlWS {
         @Context
         private UriInfo context;
 	private ControlService controlService;
+	
 	public SyblControlWS(){
-		controlService=ControlServiceFactory.getControlServiceInstance();
-		
+		setControlService(ControlServiceFactory.getControlServiceInstance());	
 	}
+	@GET
+	@Path("/test")
+	@Produces(MediaType.TEXT_PLAIN)
+	public String test(){
+		return "Test working";
+	}
+	
 	 @PUT
 	 @Path("/processAnotation")
 	 @Consumes("application/xml")
 	public void processAnnotation(String entity,SYBLAnnotation annotation){
 		try {
-			controlService.processAnnotation(entity, annotation);
+			getControlService().processAnnotation(entity, annotation);
 		} catch (RemoteException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -60,12 +75,28 @@ public class SyblControlWS {
 	 @Path("/setApplicationDescriptionInfoInternalModel")
 	 @Consumes("application/xml")
 	public void setApplicationDescriptionInfoInternalModel(String applicationDescriptionXML, String elasticityRequirementsXML, String deploymentInfoXML){
-		controlService.setApplicationDescriptionInfoInternalModel(applicationDescriptionXML, elasticityRequirementsXML, deploymentInfoXML);
+		getControlService().setApplicationDescriptionInfoInternalModel(applicationDescriptionXML, elasticityRequirementsXML, deploymentInfoXML);
 	}
 	 @PUT
 	 @Path("/setApplicationDescriptionInfoTOSCABased")
 	 @Consumes("application/xml")
 	public void setApplicationDescriptionInfoTOSCABased(String tosca){
-		controlService.setApplicationDescriptionInfoTOSCABased(tosca);
+		getControlService().setApplicationDescriptionInfoTOSCABased(tosca);
+	}
+
+	public ControlService getControlService() {
+		return controlService;
+	}
+
+	public void setControlService(ControlService controlService) {
+		this.controlService = controlService;
+	}
+
+	public UriInfo getContext() {
+		return context;
+	}
+
+	public void setContext(UriInfo context) {
+		this.context = context;
 	}
 }
