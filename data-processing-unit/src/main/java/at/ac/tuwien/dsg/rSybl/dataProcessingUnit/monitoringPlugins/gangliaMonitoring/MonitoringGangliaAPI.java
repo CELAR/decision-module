@@ -560,6 +560,11 @@ Float retValue = 0.0f;
 		// TODO Auto-generated method stub
 		return 0;
 	}
+	@Override
+	public void refreshServiceStructure(Node node) {
+		// TODO Auto-generated method stub
+		
+	}
 
 	
 

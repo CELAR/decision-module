@@ -32,6 +32,7 @@ import at.ac.tuwien.dsg.csdg.Node;
 import at.ac.tuwien.dsg.csdg.Node.NodeType;
 import at.ac.tuwien.dsg.csdg.Relationship.RelationshipType;
 import at.ac.tuwien.dsg.csdg.elasticityInformation.ElasticityRequirement;
+import at.ac.tuwien.dsg.csdg.elasticityInformation.elasticityRequirements.BinaryRestriction;
 import at.ac.tuwien.dsg.csdg.elasticityInformation.elasticityRequirements.Constraint;
 import at.ac.tuwien.dsg.csdg.elasticityInformation.elasticityRequirements.SYBLAnnotation;
 import at.ac.tuwien.dsg.csdg.elasticityInformation.elasticityRequirements.SYBLSpecification;
@@ -46,6 +47,10 @@ import at.ac.tuwien.dsg.rSybl.dataProcessingUnit.api.MonitoringAPI;
 import at.ac.tuwien.dsg.rSybl.dataProcessingUnit.api.MonitoringAPIInterface;
 import at.ac.tuwien.dsg.rSybl.planningEngine.PlanningGreedyAlgorithm;
 import at.ac.tuwien.dsg.sybl.syblProcessingUnit.utils.SYBLDirectivesEnforcementLogger;
+
+
+
+
 
 
 
@@ -75,13 +80,13 @@ public class ControlService{
 			node = dependencyGraph.getCloudService();
 			monitoringAPI = new MonitoringAPI();
 			monitoringAPI.setControlledService(node);
-    
+			
 			enforcementAPI = new EnforcementAPI();
     
 			enforcementAPI.setControlledService(node);
 
 			enforcementAPI.setMonitoringPlugin(monitoringAPI);
-  
+			
     	} catch (Exception e) {
     		AnalysisLogger.logger.error( "Control service Instantiation "+e.toString());
     		e.printStackTrace();
@@ -96,7 +101,7 @@ public class ControlService{
 		    syblService.processAnnotations(syblSpecification.getAnnotation().getEntityID(), annotation);
 
 		}
-    	
+    	monitoringAPI.submitElasticityRequirements(dependencyGraph.getAllElasticityRequirements());
     	planningGreedyAlgorithm = new PlanningGreedyAlgorithm(dependencyGraph,monitoringAPI,enforcementAPI);
     	
 		    planningGreedyAlgorithm.start();
@@ -162,53 +167,54 @@ public class ControlService{
 	}
 	
 	
+	//Conflict resolution for complex constraints
 	
-	
-	public boolean checkIfConstraintsAreConflicting(Constraint constraint1,Constraint constraint2){
+	public String checkIfConstraintsAreConflicting(BinaryRestriction binaryRestriction1,BinaryRestriction binaryRestriction2){
 		boolean conflict = false;
 		String metricLeft1= "";
 		Float numberRight1=0.0f;
 		
-		if (constraint1.getToEnforce().getBinaryRestriction().get(0).getLeftHandSide().getMetric()!=null){
-			 metricLeft1 = constraint1.getToEnforce().getBinaryRestriction().get(0).getLeftHandSide().getMetric();
-			numberRight1 = Float.parseFloat(constraint1.getToEnforce().getBinaryRestriction().get(0).getRightHandSide().getNumber());
+		if (binaryRestriction1.getLeftHandSide().getMetric()!=null){
+			 metricLeft1 = binaryRestriction1.getLeftHandSide().getMetric();
+			numberRight1 = Float.parseFloat(binaryRestriction1.getRightHandSide().getNumber());
 			
 			
 		}else{
-			metricLeft1 = constraint1.getToEnforce().getBinaryRestriction().get(0).getRightHandSide().getMetric();
-			numberRight1 = Float.parseFloat(constraint1.getToEnforce().getBinaryRestriction().get(0).getLeftHandSide().getNumber());
-			if (constraint1.getToEnforce().getBinaryRestriction().get(0).getType().contains("lessThan"))
-			constraint1.getToEnforce().getBinaryRestriction().get(0).getType().replaceAll("lessThan", "greaterThan");
-			else constraint1.getToEnforce().getBinaryRestriction().get(0).getType().replaceAll("greaterThan", "lessThan");
+			metricLeft1 = binaryRestriction1.getRightHandSide().getMetric();
+			numberRight1 = Float.parseFloat(binaryRestriction1.getLeftHandSide().getNumber());
+			if (binaryRestriction1.getType().contains("lessThan"))
+				binaryRestriction1.getType().replaceAll("lessThan", "greaterThan");
+			else binaryRestriction1.getType().replaceAll("greaterThan", "lessThan");
 			}
 		String metricLeft2= "";
 		Float numberRight2=0.0f;
 		
-		if (constraint2.getToEnforce().getBinaryRestriction().get(0).getLeftHandSide().getMetric()!=null){
-			 metricLeft2 = constraint2.getToEnforce().getBinaryRestriction().get(0).getLeftHandSide().getMetric();
-			numberRight2= Float.parseFloat(constraint2.getToEnforce().getBinaryRestriction().get(0).getRightHandSide().getNumber());
+		if (binaryRestriction2.getLeftHandSide().getMetric()!=null){
+			 metricLeft2 = binaryRestriction2.getLeftHandSide().getMetric();
+			numberRight2= Float.parseFloat(binaryRestriction2.getRightHandSide().getNumber());
 			
 			
 		}else{
-			metricLeft2 = constraint2.getToEnforce().getBinaryRestriction().get(0).getRightHandSide().getMetric();
-			numberRight2 = Float.parseFloat(constraint2.getToEnforce().getBinaryRestriction().get(0).getLeftHandSide().getNumber());
-			if (constraint2.getToEnforce().getBinaryRestriction().get(0).getType().contains("lessThan"))
-			constraint2.getToEnforce().getBinaryRestriction().get(0).getType().replaceAll("lessThan", "greaterThan");
-			else constraint2.getToEnforce().getBinaryRestriction().get(0).getType().replaceAll("greaterThan", "lessThan");
+			metricLeft2 = binaryRestriction2.getRightHandSide().getMetric();
+			numberRight2 = Float.parseFloat(binaryRestriction2.getLeftHandSide().getNumber());
+			if (binaryRestriction2.getType().contains("lessThan"))
+			 binaryRestriction2.getType().replaceAll("lessThan", "greaterThan");
+			else binaryRestriction2.getType().replaceAll("greaterThan", "lessThan");
 		}
+		
 		if (metricLeft1.equalsIgnoreCase(metricLeft2))
-		if ( constraint1.getToEnforce().getBinaryRestriction().get(0).getType().contains("lessThan")){
-			if (constraint2.getToEnforce().getBinaryRestriction().get(0).getType().contains("greaterThan")){
-				if (numberRight1<=numberRight2) return true;
+		if ( binaryRestriction1.getType().contains("lessThan")){
+			if (binaryRestriction2.getType().contains("greaterThan")){
+				if (numberRight1<=numberRight2) return metricLeft1;
 			}
 		}else{
-			if ( constraint1.getToEnforce().getBinaryRestriction().get(0).getType().contains("greaterThan")){
-				if (constraint2.getToEnforce().getBinaryRestriction().get(0).getType().contains("lessThan")){
-					if (numberRight1>=numberRight2) return true;
+			if ( binaryRestriction1.getType().contains("greaterThan")){
+				if (binaryRestriction2.getType().contains("lessThan")){
+					if (numberRight1>=numberRight2) return metricLeft1;
 				}
 			}
 		}
-		return conflict;
+		return "";
 	}
 	
 	public void disableConflictingConstraints(){
@@ -230,29 +236,28 @@ public class ControlService{
 						if (specification.getComponentId().equalsIgnoreCase(topology.getId())){
 							for (Constraint c1:constraints){
 								for (Constraint c2:specification.getConstraint()){
-									String metric1 ="";
-									if (c1.getToEnforce().getBinaryRestriction().get(0).getLeftHandSide().getMetric()!=null) metric1=c1.getToEnforce().getBinaryRestriction().get(0).getLeftHandSide().getMetric();
-									else metric1= c1.getToEnforce().getBinaryRestriction().get(0).getRightHandSide().getMetric();
-									
-									String metric2 ="";
-									if (c2.getToEnforce().getBinaryRestriction().get(0).getLeftHandSide().getMetric()!=null) metric2=c2.getToEnforce().getBinaryRestriction().get(0).getLeftHandSide().getMetric();
-									else metric2= c2.getToEnforce().getBinaryRestriction().get(0).getRightHandSide().getMetric();
-									
-									if ( metric1.equalsIgnoreCase(metric2))
-									if (checkIfConstraintsAreConflicting(c1, c2) ){
-										toRemove.put(metric1,c1.getId());
-									}else{
-										if (toRemove.containsKey(metric1))
-										{
-											if (toRemove.get(metric1).equalsIgnoreCase(c1.getId())){
-												toRemove.remove(metric1);
+									for (ArrayList<BinaryRestriction> binaryRestrictionsC1:c1.getCondition().getBinaryRestriction()){
+										for (BinaryRestriction binaryRestrictionC1:binaryRestrictionsC1){
+											for (ArrayList<BinaryRestriction>binaryRestrictionsC2:c2.getCondition().getBinaryRestriction()){
+												for(BinaryRestriction binaryRestrictionC2:binaryRestrictionsC2){
+													if (!checkIfConstraintsAreConflicting(binaryRestrictionC1, binaryRestrictionC2).equalsIgnoreCase("")){
+														String metric = checkIfConstraintsAreConflicting(binaryRestrictionC1, binaryRestrictionC2);
+														toRemove.put(metric,c1.getId());
+
+													}
+												}
 											}
 										}
 									}
+									
 								}
 							}
 						}
 					}
+				
+			
+						
+					
 					if (topology.getAllRelatedNodesOfType(RelationshipType.COMPOSITION_RELATIONSHIP, NodeType.SERVICE_TOPOLOGY)!=null){
 						for (Node topology1:topology.getAllRelatedNodesOfType(RelationshipType.COMPOSITION_RELATIONSHIP, NodeType.SERVICE_TOPOLOGY)){
 							for( ElasticityRequirement el: topology.getElasticityRequirements()){
@@ -260,58 +265,49 @@ public class ControlService{
 									if (specification.getComponentId().equalsIgnoreCase(topology1.getId())){
 									for (Constraint c1:constraints){
 										for (Constraint c2:specification.getConstraint()){
-											String metric1 ="";
-											if (c1.getToEnforce().getBinaryRestriction().get(0).getLeftHandSide().getMetric()!=null) metric1=c1.getToEnforce().getBinaryRestriction().get(0).getLeftHandSide().getMetric();
-											else metric1= c1.getToEnforce().getBinaryRestriction().get(0).getRightHandSide().getMetric();
-											
-											String metric2 ="";
-											if (c2.getToEnforce().getBinaryRestriction().get(0).getLeftHandSide().getMetric()!=null) metric2=c2.getToEnforce().getBinaryRestriction().get(0).getLeftHandSide().getMetric();
-											else metric2= c2.getToEnforce().getBinaryRestriction().get(0).getRightHandSide().getMetric();
-											
-											if ( metric1.equalsIgnoreCase(metric2))
-											if (checkIfConstraintsAreConflicting(c1, c2)){
-												toRemove.put(metric1,c1.getId());
-											}else{
-												if (toRemove.containsKey(metric1))
-												{
-													if (toRemove.get(metric1).equalsIgnoreCase(c1.getId())){
-														toRemove.remove(metric1);
-													}
+													for (ArrayList<BinaryRestriction> binaryRestrictionsC1:c1.getCondition().getBinaryRestriction()){
+														for (BinaryRestriction binaryRestrictionC1:binaryRestrictionsC1){
+															for (ArrayList<BinaryRestriction>binaryRestrictionsC2:c2.getCondition().getBinaryRestriction()){
+																for(BinaryRestriction binaryRestrictionC2:binaryRestrictionsC2){
+																	if (!checkIfConstraintsAreConflicting(binaryRestrictionC1, binaryRestrictionC2).equalsIgnoreCase("")){
+																		String metric = checkIfConstraintsAreConflicting(binaryRestrictionC1, binaryRestrictionC2);
+																		toRemove.put(metric,c1.getId());
+
+																	}
+																}
+															}
+													
 												}
 											}										}
 									}								}
 							}
 						}
-					}
+					
 					for (Node comp:topology.getAllRelatedNodesOfType(RelationshipType.COMPOSITION_RELATIONSHIP, NodeType.SERVICE_UNIT)){
 						for( ElasticityRequirement el: topology.getElasticityRequirements()){
 							SYBLSpecification specification=SYBLDirectiveMappingFromXML.mapFromSYBLAnnotation(el.getAnnotation());
 							if (specification.getComponentId().equalsIgnoreCase(comp.getId())){
 								for (Constraint c1:constraints){
 									for (Constraint c2:specification.getConstraint()){
-										String metric1 ="";
-										if (c1.getToEnforce().getBinaryRestriction().get(0).getLeftHandSide().getMetric()!=null) metric1=c1.getToEnforce().getBinaryRestriction().get(0).getLeftHandSide().getMetric();
-										else metric1= c1.getToEnforce().getBinaryRestriction().get(0).getRightHandSide().getMetric();
-										
-										String metric2 ="";
-										if (c2.getToEnforce().getBinaryRestriction().get(0).getLeftHandSide().getMetric()!=null) metric2=c2.getToEnforce().getBinaryRestriction().get(0).getLeftHandSide().getMetric();
-										else metric2= c2.getToEnforce().getBinaryRestriction().get(0).getRightHandSide().getMetric();
-										
-										if ( metric1.equalsIgnoreCase(metric2))
-										if (checkIfConstraintsAreConflicting(c1, c2) ){
-											toRemove.put(metric1,c1.getId());
-										}else{
-											if (toRemove.containsKey(metric1))
-											{
-												if (toRemove.get(metric1).equalsIgnoreCase(c1.getId())){
-													toRemove.remove(metric1);
+										for (ArrayList<BinaryRestriction> binaryRestrictionsC1:c1.getCondition().getBinaryRestriction()){
+											for (BinaryRestriction binaryRestrictionC1:binaryRestrictionsC1){
+												for (ArrayList<BinaryRestriction>binaryRestrictionsC2:c2.getCondition().getBinaryRestriction()){
+													for(BinaryRestriction binaryRestrictionC2:binaryRestrictionsC2){
+														if (!checkIfConstraintsAreConflicting(binaryRestrictionC1, binaryRestrictionC2).equalsIgnoreCase("")){
+															String metric = checkIfConstraintsAreConflicting(binaryRestrictionC1, binaryRestrictionC2);
+															toRemove.put(metric,c1.getId());
+
+														}
+													}
 												}
 											}
-										}									}
+										}
+										
+									}					}
 								}							}
 						}
-					}
-				}
+					
+				
 				if ((entity).getAllRelatedNodesOfType(RelationshipType.COMPOSITION_RELATIONSHIP, NodeType.SERVICE_UNIT)!=null)
 				for (Node comp:entity.getAllRelatedNodesOfType(RelationshipType.COMPOSITION_RELATIONSHIP, NodeType.SERVICE_UNIT)){
 					for( ElasticityRequirement el: comp.getElasticityRequirements()){
@@ -319,32 +315,32 @@ public class ControlService{
 						if (specification.getComponentId().equalsIgnoreCase(comp.getId())){
 							for (Constraint c1:constraints){
 								for (Constraint c2:specification.getConstraint()){
-									String metric1 ="";
-									if (c1.getToEnforce().getBinaryRestriction().get(0).getLeftHandSide().getMetric()!=null) metric1=c1.getToEnforce().getBinaryRestriction().get(0).getLeftHandSide().getMetric();
-									else metric1= c1.getToEnforce().getBinaryRestriction().get(0).getRightHandSide().getMetric();
-									
-									String metric2 ="";
-									if (c2.getToEnforce().getBinaryRestriction().get(0).getLeftHandSide().getMetric()!=null) metric2=c2.getToEnforce().getBinaryRestriction().get(0).getLeftHandSide().getMetric();
-									else metric2= c2.getToEnforce().getBinaryRestriction().get(0).getRightHandSide().getMetric();
-									
-									if ( metric1.equalsIgnoreCase(metric2))
-									if (checkIfConstraintsAreConflicting(c1, c2) ){
-										toRemove.put(metric1,c1.getId());
-									}else{
-										if (toRemove.containsKey(metric1))
-										{
-											if (toRemove.get(metric1).equalsIgnoreCase(c1.getId())){
-												toRemove.remove(metric1);
+									for (ArrayList<BinaryRestriction> binaryRestrictionsC1:c1.getCondition().getBinaryRestriction()){
+										for (BinaryRestriction binaryRestrictionC1:binaryRestrictionsC1){
+											for (ArrayList<BinaryRestriction>binaryRestrictionsC2:c2.getCondition().getBinaryRestriction()){
+												for(BinaryRestriction binaryRestrictionC2:binaryRestrictionsC2){
+													if (!checkIfConstraintsAreConflicting(binaryRestrictionC1, binaryRestrictionC2).equalsIgnoreCase("")){
+														String metric = checkIfConstraintsAreConflicting(binaryRestrictionC1, binaryRestrictionC2);
+														toRemove.put(metric,c1.getId());
+
+													}
+												}
 											}
 										}
-									}								}
-							}						}
+									}
+									
+								}				}
+					}
+				}
+				}
 					}
 				}
 			}
+		}
+		}
 		
-		}
-		}
+		
+		
 	for (ElasticityRequirement elasticityRequirement:dependencyGraph.getAllElasticityRequirements()){
 		SYBLSpecification specification=SYBLDirectiveMappingFromXML.mapFromSYBLAnnotation(elasticityRequirement.getAnnotation());
 		List<Constraint> constr = new ArrayList<Constraint>();
@@ -357,7 +353,7 @@ public class ControlService{
 			}
 		}
 	}
-	}
+					}
 	
 	
 

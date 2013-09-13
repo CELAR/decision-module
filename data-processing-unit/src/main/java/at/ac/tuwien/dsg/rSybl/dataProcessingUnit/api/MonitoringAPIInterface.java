@@ -70,4 +70,5 @@ public interface MonitoringAPIInterface {
     public void enforcingActionEnded(String actionName, Node e);
 
     public Float getNumberInstances(Node e);
+    public void refreshServiceStructure(Node cloudService);
 }

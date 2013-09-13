@@ -22,18 +22,22 @@
 
 package at.ac.tuwien.dsg.rSybl.planningEngine;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
+
+import at.ac.tuwien.dsg.rSybl.cloudInteractionUnit.utils.RuntimeLogger;
 public class MonitoredComponent extends MonitoredEntity{
 	private String id;
-	public HashMap<String,Float> monitoredData=new HashMap<String,Float>();
-	public HashMap<String,String> monitoredVariables = new HashMap<String,String>();
+	private HashMap<String,Float> monitoredData=new HashMap<String,Float>();
+	private HashMap<String,String> monitoredVariables = new HashMap<String,String>();
 
 	public void setMonitoredValue(String data, Float value){
+            
 		monitoredData.put(data,value);
 	}
 	public Float getMonitoredValue(String data){
-		return monitoredData.get(data);
+		return getMonitoredData().get(data);
 	}
 	public String getId() {
 		return id;
@@ -42,12 +46,43 @@ public class MonitoredComponent extends MonitoredEntity{
 		this.id = id;
 	}		
 	public Collection<String> getMonitoredMetrics(){
-		return monitoredData.keySet();
+		return getMonitoredData().keySet();
 	}
 	public void setMonitoredVar(String data, String value){
-		monitoredVariables.put(data,value);
+		getMonitoredVariables().put(data,value);
 	}
 	public String getMonitoredVar(String data){
-		return monitoredVariables.get(data);
+		return getMonitoredVariables().get(data);
+	}
+	public MonitoredComponent clone(){
+		MonitoredComponent cloudService=new MonitoredComponent();
+		cloudService.setId(id);
+		HashMap<String,Float> newMonitoredData = new HashMap<String,Float>();
+		for (String entry:getMonitoredData().keySet()){
+			
+			newMonitoredData.put(entry, getMonitoredData().get(entry).floatValue());
+		}
+
+		HashMap<String,String> newMonitoredVariables = new HashMap<String,String>();
+		for (String entry:getMonitoredVariables().keySet()){
+			newMonitoredVariables.put(entry, getMonitoredVariables().get(entry));
+		}
+
+		newMonitoredVariables.putAll(getMonitoredVariables());
+		cloudService.setMonitoredData(newMonitoredData);
+		cloudService.setMonitoredVariables(newMonitoredVariables);
+		return cloudService;
+	}
+	public HashMap<String,Float> getMonitoredData() {
+		return monitoredData;
+	}
+	public void setMonitoredData(HashMap<String,Float> monitoredData) {
+		this.monitoredData = monitoredData;
+	}
+	public HashMap<String,String> getMonitoredVariables() {
+		return monitoredVariables;
+	}
+	public void setMonitoredVariables(HashMap<String,String> monitoredVariables) {
+		this.monitoredVariables = monitoredVariables;
 	}
 }

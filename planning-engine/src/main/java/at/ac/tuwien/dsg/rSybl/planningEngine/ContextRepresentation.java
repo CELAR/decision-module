@@ -24,7 +24,6 @@ package at.ac.tuwien.dsg.rSybl.planningEngine;
 
 import java.lang.reflect.Method;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 
 import at.ac.tuwien.dsg.csdg.DependencyGraph;
@@ -33,6 +32,7 @@ import at.ac.tuwien.dsg.csdg.Node.NodeType;
 import at.ac.tuwien.dsg.csdg.Relationship.RelationshipType;
 import at.ac.tuwien.dsg.csdg.elasticityInformation.ElasticityRequirement;
 import at.ac.tuwien.dsg.csdg.elasticityInformation.elasticityRequirements.BinaryRestriction;
+import at.ac.tuwien.dsg.csdg.elasticityInformation.elasticityRequirements.Condition;
 import at.ac.tuwien.dsg.csdg.elasticityInformation.elasticityRequirements.Constraint;
 import at.ac.tuwien.dsg.csdg.elasticityInformation.elasticityRequirements.Monitoring;
 import at.ac.tuwien.dsg.csdg.elasticityInformation.elasticityRequirements.SYBLSpecification;
@@ -52,14 +52,19 @@ public class ContextRepresentation {
 	
 	private MonitoredCloudService monitoredCloudService = new MonitoredCloudService(); 
 	private DependencyGraph dependencyGraph;
-	private HashMap<Node,Node> mapMonitoringVars=new HashMap<Node,Node>();
 	private MonitoringAPIInterface monitoringAPI ;
 	public ContextRepresentation(DependencyGraph cloudService, MonitoringAPIInterface monitoringAPI){
 		this.dependencyGraph=cloudService;
 		this.monitoringAPI=monitoringAPI;
 		
 	}
-	public void initializeContext(DependencyGraph dependencyGraph){
+	public ContextRepresentation(MonitoredCloudService cloudService, MonitoringAPIInterface monitoringAPI){
+		monitoredCloudService=cloudService;
+		this.monitoringAPI=monitoringAPI;
+		
+	}
+	
+	public void initializeContext(){
 		//find all targeted metrics
 		createMonitoredService();	
 	}
@@ -67,11 +72,34 @@ public class ContextRepresentation {
 	
 	
 	private MonitoredEntity findTargetedMetrics(Node entity,MonitoredEntity monitoredEntity){
-		
+		monitoredEntity.setId(entity.getId());
+
 		for (ElasticityRequirement elasticityRequirement :entity.getElasticityRequirements()){
 			SYBLSpecification syblSpecification = SYBLDirectiveMappingFromXML.mapFromSYBLAnnotation(elasticityRequirement.getAnnotation());
-			monitoredEntity.setId(entity.getId());
-   			
+			for (Strategy strategy:syblSpecification.getStrategy()){
+				SYBLDescriptionParser descriptionParser = new SYBLDescriptionParser();
+	   	
+	   				String methodName = descriptionParser.getMethod(strategy.getToEnforce().getParameter());
+	   				Float value = 0.0f;	
+	   				if (!methodName.equals("")) {
+						try {
+							Class partypes[] = new Class[1];
+							Object[] parameters = new Object[1];
+							parameters[0]=entity;
+							partypes[0]= Node.class;
+							Method method = MonitoringInterface.class.getMethod(methodName,partypes);
+							value = (Float)method.invoke(monitoringAPI,parameters);
+						}catch(Exception e){
+							e.printStackTrace();
+						}
+					}else{
+						 value= (Float) monitoringAPI.getMetricValue(strategy.getToEnforce().getParameter(), entity);
+
+					}
+	   				monitoredEntity.setMonitoredValue(strategy.getToEnforce().getParameter(),value );	
+	   			}
+   		
+			
 	   			for (Monitoring monitoring:syblSpecification.getMonitoring()){
 					monitoredEntity.setMonitoredVar(monitoring.getMonitor().getEnvVar(),monitoring.getMonitor().getMetric());
 		   			SYBLDescriptionParser descriptionParser = new SYBLDescriptionParser();
@@ -100,7 +128,8 @@ public class ContextRepresentation {
 	   			
 	   			for (Constraint constraint:syblSpecification.getConstraint()){
 		   			SYBLDescriptionParser descriptionParser = new SYBLDescriptionParser();
-		   			for (BinaryRestriction restriction:constraint.getToEnforce().getBinaryRestriction()){
+		   			for (ArrayList<BinaryRestriction> restrictions:constraint.getToEnforce().getBinaryRestriction()){
+		   			for (BinaryRestriction restriction:restrictions){
 		   				String right = restriction.getRightHandSide().getMetric();
 		   				String left = restriction.getLeftHandSide().getMetric();
 		   				String metric="";
@@ -126,7 +155,7 @@ public class ContextRepresentation {
 						}
 		   				monitoredEntity.setMonitoredValue(metric,value );	
 		   			}
-	   		
+		   			}
 	   	}
 	}
 		return monitoredEntity;
@@ -134,7 +163,7 @@ public class ContextRepresentation {
 	
 	private MonitoredCloudService createMonitoredService(){
 		
-		monitoredCloudService=(MonitoredCloudService) findTargetedMetrics(dependencyGraph.getCloudService(), monitoredCloudService);
+		setMonitoredCloudService((MonitoredCloudService) findTargetedMetrics(dependencyGraph.getCloudService(), getMonitoredCloudService()));
 		
 		
 		List<Node> topologies =new ArrayList<Node>();
@@ -161,71 +190,96 @@ public class ContextRepresentation {
 				monitoredComponent = (MonitoredComponent) findTargetedMetrics(component,monitoredComponent);
 				monitoredTopology.addMonitoredComponent(monitoredComponent);
 		    }
-			monitoredCloudService.addMonitoredTopology(monitoredTopology);
+			getMonitoredCloudService().addMonitoredTopology(monitoredTopology);
 
 		}
 		
 
-		return monitoredCloudService;
+		return getMonitoredCloudService();
 	}
 	
 	public void doAction(ActionEffect action){
-		for (String currentMetric:monitoredCloudService.getMonitoredMetrics()){
-			if (action.getActionEffectForMetric(currentMetric,monitoredCloudService.getId())!=null)
-			monitoredCloudService.setMonitoredValue(currentMetric, monitoredCloudService.getMonitoredValue(currentMetric) + action.getActionEffectForMetric(currentMetric,monitoredCloudService.getId()) );
+		for (String currentMetric:getMonitoredCloudService().getMonitoredMetrics()){
+			if (action.getActionEffectForMetric(currentMetric,getMonitoredCloudService().getId())!=null){
+                         float oldValue = monitoredCloudService.getMonitoredValue(currentMetric);   
+			getMonitoredCloudService().setMonitoredValue(currentMetric, oldValue + action.getActionEffectForMetric(currentMetric,getMonitoredCloudService().getId()) );
 		}
-		for (MonitoredComponentTopology componentTopology:monitoredCloudService.getMonitoredTopologies()){
+                }
+		for (MonitoredComponentTopology componentTopology:getMonitoredCloudService().getMonitoredTopologies()){
 			for (String currentMetric:componentTopology.getMonitoredMetrics()){
-				if(action.getActionEffectForMetric(currentMetric,componentTopology.getId())!=null)
-				componentTopology.setMonitoredValue(currentMetric, componentTopology.getMonitoredValue(currentMetric) +action.getActionEffectForMetric(currentMetric,componentTopology.getId()));
+				if(action.getActionEffectForMetric(currentMetric,componentTopology.getId())!=null){
+                                 float oldValue = componentTopology.getMonitoredValue(currentMetric);   
+				componentTopology.setMonitoredValue(currentMetric, oldValue +action.getActionEffectForMetric(currentMetric,componentTopology.getId()));
 			}
+                        }
 			for (MonitoredComponentTopology componentTopology2:componentTopology.getMonitoredTopologies()){
 				for (String currentMetric:componentTopology2.getMonitoredMetrics()){
-					if (action.getActionEffectForMetric(currentMetric,componentTopology2.getId())!=null)
-					componentTopology2.setMonitoredValue(currentMetric, componentTopology2.getMonitoredValue(currentMetric) +action.getActionEffectForMetric(currentMetric,componentTopology2.getId()) );
-				}
+					if (action.getActionEffectForMetric(currentMetric,componentTopology2.getId())!=null){
+                                         float oldValue = componentTopology2.getMonitoredValue(currentMetric);   
+                                        componentTopology2.setMonitoredValue(currentMetric, oldValue +action.getActionEffectForMetric(currentMetric,componentTopology2.getId()) );
+                                        }
+                                        }
 				for (MonitoredComponent comp:componentTopology2.getMonitoredComponents()){
 					for (String currentMetric:comp.getMonitoredMetrics()){
-						if (action.getActionEffectForMetric(currentMetric,comp.getId())!=null)
-						comp.setMonitoredValue(currentMetric, comp.getMonitoredValue(currentMetric) +action.getActionEffectForMetric(currentMetric,comp.getId()) );
+						if (action.getActionEffectForMetric(currentMetric,comp.getId())!=null){
+                                                     float oldValue = comp.getMonitoredValue(currentMetric);
+                                                      float newValue =   oldValue +action.getActionEffectForMetric(currentMetric,comp.getId());
+
+                                                     comp.setMonitoredValue(currentMetric, newValue );
+                                                }
 					}
 				}
 			}
 			for (MonitoredComponent comp:componentTopology.getMonitoredComponents()){
 				for (String currentMetric:comp.getMonitoredMetrics()){
 					if (action.getActionEffectForMetric(currentMetric,comp.getId())!=null)
-					comp.setMonitoredValue(currentMetric, comp.getMonitoredValue(currentMetric) +action.getActionEffectForMetric(currentMetric,comp.getId()) );
-				}
+                                        {
+                                             float oldValue = comp.getMonitoredValue(currentMetric);
+                                                  float newValue =   oldValue +action.getActionEffectForMetric(currentMetric,comp.getId());
+					comp.setMonitoredValue(currentMetric, newValue );
+                                        }
+                                        }
 			}
 		}
 	}
 	public void undoAction(ActionEffect action){
-		for (String currentMetric:monitoredCloudService.getMonitoredMetrics()){
-			if (action.getActionEffectForMetric(currentMetric,monitoredCloudService.getId())!=null)
-			monitoredCloudService.setMonitoredValue(currentMetric, monitoredCloudService.getMonitoredValue(currentMetric) +(-1)*action.getActionEffectForMetric(currentMetric,monitoredCloudService.getId()) );
-		}
-		for (MonitoredComponentTopology componentTopology:monitoredCloudService.getMonitoredTopologies()){
+		for (String currentMetric:getMonitoredCloudService().getMonitoredMetrics()){
+			if (action.getActionEffectForMetric(currentMetric,getMonitoredCloudService().getId())!=null){
+                            float oldValue = monitoredCloudService.getMonitoredValue(currentMetric);
+                            monitoredCloudService.setMonitoredValue(currentMetric, oldValue +(-1)*action.getActionEffectForMetric(currentMetric,getMonitoredCloudService().getId()) );
+                        
+                        }
+                        }
+		for (MonitoredComponentTopology componentTopology:getMonitoredCloudService().getMonitoredTopologies()){
 			for (String currentMetric:componentTopology.getMonitoredMetrics()){
-				if (action.getActionEffectForMetric(currentMetric,componentTopology.getId())!=null)
-				componentTopology.setMonitoredValue(currentMetric, componentTopology.getMonitoredValue(currentMetric) +(-1)*action.getActionEffectForMetric(currentMetric,componentTopology.getId()));
-			}
+				if (action.getActionEffectForMetric(currentMetric,componentTopology.getId())!=null){
+                                    float oldValue = componentTopology.getMonitoredValue(currentMetric);
+                                    componentTopology.setMonitoredValue(currentMetric, oldValue +(-1)*action.getActionEffectForMetric(currentMetric,componentTopology.getId()));
+			
+                                }}
 			for (MonitoredComponentTopology componentTopology2:componentTopology.getMonitoredTopologies()){
 				for (String currentMetric:componentTopology2.getMonitoredMetrics()){
-					if (action.getActionEffectForMetric(currentMetric,componentTopology2.getId())!=null)
-					componentTopology2.setMonitoredValue(currentMetric, componentTopology2.getMonitoredValue(currentMetric) +(-1)*action.getActionEffectForMetric(currentMetric,componentTopology2.getId()) );
-				}
+					if (action.getActionEffectForMetric(currentMetric,componentTopology2.getId())!=null){
+					 float oldValue = componentTopology2.getMonitoredValue(currentMetric);
+                                   
+                                            componentTopology2.setMonitoredValue(currentMetric, componentTopology2.getMonitoredValue(currentMetric) +(-1)*action.getActionEffectForMetric(currentMetric,componentTopology2.getId()) );
+                                        }
+                                        }
 				for (MonitoredComponent comp:componentTopology2.getMonitoredComponents()){
 					for (String currentMetric:comp.getMonitoredMetrics()){
-						if (action.getActionEffectForMetric(currentMetric,comp.getId())!=null)
-						comp.setMonitoredValue(currentMetric, comp.getMonitoredValue(currentMetric) +(-1)*action.getActionEffectForMetric(currentMetric,comp.getId()) );
-					}
+						if (action.getActionEffectForMetric(currentMetric,comp.getId())!=null){
+						 float oldValue = comp.getMonitoredValue(currentMetric);
+                                   
+                                                    comp.setMonitoredValue(currentMetric,oldValue +(-1)*action.getActionEffectForMetric(currentMetric,comp.getId()) );
+					}}
 				}
 			}
 			for (MonitoredComponent comp:componentTopology.getMonitoredComponents()){
 				for (String currentMetric:comp.getMonitoredMetrics()){
-					if (action.getActionEffectForMetric(currentMetric,comp.getId())!=null)
-					comp.setMonitoredValue(currentMetric, comp.getMonitoredValue(currentMetric) +(-1)*action.getActionEffectForMetric(currentMetric,comp.getId()) );
-				}
+					if (action.getActionEffectForMetric(currentMetric,comp.getId())!=null){
+                                         float oldValue = comp.getMonitoredValue(currentMetric);
+					comp.setMonitoredValue(currentMetric, oldValue +(-1)*action.getActionEffectForMetric(currentMetric,comp.getId()) );
+				}}
 			}
 		}
 		
@@ -233,21 +287,21 @@ public class ContextRepresentation {
 	public MonitoredEntity findMonitoredEntity(String id){
 		boolean found=false;
 		if (!found){
-			if (id.equalsIgnoreCase(monitoredCloudService.getId())){
+			if (id.equalsIgnoreCase(getMonitoredCloudService().getId())){
 				found = true;
-				return monitoredCloudService;
+				return getMonitoredCloudService();
 			}
 		}
 
 		List<MonitoredComponentTopology> topologies =new ArrayList<MonitoredComponentTopology>();
-		if (monitoredCloudService.getMonitoredTopologies()!=null)
-		topologies.addAll(monitoredCloudService.getMonitoredTopologies());
+		if (getMonitoredCloudService().getMonitoredTopologies()!=null)
+		topologies.addAll(getMonitoredCloudService().getMonitoredTopologies());
 		
 		List<MonitoredComponent> componentsToExplore = new ArrayList<MonitoredComponent>();
 		while (!found && !topologies.isEmpty()){
 			MonitoredComponentTopology currentTopology = topologies.get(0);
 			if (currentTopology!=null){
-				PlanningLogger.logger.info("id "+id+" current topology "+currentTopology+ "  "+ currentTopology.getId()+" ");
+				//PlanningLogger.logger.info("id "+id+" current topology "+currentTopology+ "  "+ currentTopology.getId()+" ");
 				
 			if (currentTopology.getId().equalsIgnoreCase(id)){
 				found=true;
@@ -283,184 +337,132 @@ public class ContextRepresentation {
 			//System.out.println("Searching for monitored entity "+syblSpecification.getComponentId());
 			MonitoredEntity monitoredEntity = findMonitoredEntity(syblSpecification.getComponentId());
 			for (Constraint constraint:syblSpecification.getConstraint()){
-				boolean evaluate = true;
-				if (constraint.getCondition()!=null){
-					for (BinaryRestriction binaryRestriction:constraint.getCondition().getBinaryRestriction()){
-						float currentLeftValue=0;
-						float currentRightValue = 0;
-						if (binaryRestriction.getLeftHandSide().getMetric()!=null){
-							String metric = binaryRestriction.getLeftHandSide().getMetric();
-							//System.out.println(monitoredEntity+" "+syblSpecification.getComponentId());
-							try{
-							currentLeftValue = monitoredEntity.getMonitoredValue(metric);
-							if (currentLeftValue<0){
-								if (monitoredEntity.getMonitoredVar(metric)!=null)
-								currentLeftValue = monitoredEntity.getMonitoredValue(monitoredEntity.getMonitoredVar(metric));
-								else currentRightValue=0;
-							}
-							}catch(Exception e){
-								SYBLDirectivesEnforcementLogger.logger.error("Metric not found "+metric +" for entity "+monitoredEntity.getId());
-							}
-							currentRightValue=Float.parseFloat(binaryRestriction.getRightHandSide().getNumber());
-						}else
-						if (binaryRestriction.getRightHandSide().getMetric()!=null){
-							String metric = binaryRestriction.getRightHandSide().getMetric();
-							try{
-							currentRightValue = monitoredEntity.getMonitoredValue(metric);
-							//System.out.println("Current value for metric is  "+ currentRightValue);
-							if (currentRightValue<0){
-								if (monitoredEntity.getMonitoredVar(metric)!=null)
-								currentRightValue = monitoredEntity.getMonitoredValue(monitoredEntity.getMonitoredVar(metric));
-								else currentRightValue=0;
-							}
-							currentLeftValue=Float.parseFloat(binaryRestriction.getLeftHandSide().getNumber());
-							}catch(Exception e){
-								SYBLDirectivesEnforcementLogger.logger.error("Metric not found "+metric +" for entity "+monitoredEntity.getId());
-							}
-						}
-						switch (binaryRestriction.getType()){
-						case "lessThan":
-							if (currentLeftValue>=currentRightValue){
-								evaluate=false;
-							}
-							break;
-						case "greaterThan":
-							if (currentLeftValue<=currentRightValue){
-								evaluate=false;
-							}
-							break;
-						case "lessThanOrEqual":
-							if (currentLeftValue>currentRightValue){
-								evaluate=false;
-							}
-							break;
-						case "greaterThanOrEqual":
-							if (currentLeftValue<currentRightValue){
-								evaluate=false;
-							}
-							break;
-						case "differentThan":
-							if (currentLeftValue==currentRightValue){
-								evaluate=false;
-							}
-							break;
-						case "equals":
-							if (currentLeftValue!=currentRightValue){
-								evaluate=false;
-							}
-							break;
-						default:
-							if (currentLeftValue>=currentRightValue){
-								evaluate=false;
-							}
-							break;
-						}
-					}				
+				
+				if (evaluateCondition(constraint.getCondition(),monitoredEntity) && !evaluateCondition(constraint.getToEnforce(), monitoredEntity)) constr+=constraint.getId()+" ";
 					
-				}
-				if (evaluate)
-				for (BinaryRestriction binaryRestriction:constraint.getToEnforce().getBinaryRestriction()){
-					float currentLeftValue=0;
-					float currentRightValue = 0;
-					if (binaryRestriction.getLeftHandSide().getMetric()!=null){
-						String metric = binaryRestriction.getLeftHandSide().getMetric();
-						//System.out.println(monitoredEntity+" "+syblSpecification.getComponentId());
-						currentLeftValue = monitoredEntity.getMonitoredValue(metric);
-						if (currentLeftValue<0){
-							if (monitoredEntity.getMonitoredVar(metric)!=null)
-							currentLeftValue = monitoredEntity.getMonitoredValue(monitoredEntity.getMonitoredVar(metric));
-							else currentRightValue=0;
-						}
-						currentRightValue=Float.parseFloat(binaryRestriction.getRightHandSide().getNumber());
-					}else
-					if (binaryRestriction.getRightHandSide().getMetric()!=null){
-						String metric = binaryRestriction.getRightHandSide().getMetric();
-						currentRightValue = monitoredEntity.getMonitoredValue(metric);
-						//System.out.println("Current value for metric is  "+ currentRightValue);
-						if (currentRightValue<0){
-							if (monitoredEntity.getMonitoredVar(metric)!=null)
-							currentRightValue = monitoredEntity.getMonitoredValue(monitoredEntity.getMonitoredVar(metric));
-							else currentRightValue=0;
-						}
-						currentLeftValue=Float.parseFloat(binaryRestriction.getLeftHandSide().getNumber());
-					}
-					switch (binaryRestriction.getType()){
-					case "lessThan":
-						if (currentLeftValue>=currentRightValue){
-							//System.out.println("Violated constraint "+constraint.getId());
-							constr+=constraint.getId()+" ";
-						}
-						break;
-					case "greaterThan":
-						if (currentLeftValue<=currentRightValue){
-							//System.out.println("Violated constraint "+constraint.getId());
-							constr+=constraint.getId()+" ";
-						}
-						break;
-					case "lessThanOrEqual":
-						if (currentLeftValue>currentRightValue){
-						//	System.out.println("Violated constraint "+constraint.getId());
-							constr+=constraint.getId()+" ";
-						}
-						break;
-					case "greaterThanOrEqual":
-						if (currentLeftValue<currentRightValue){
-							//System.out.println("Violated constraint "+constraint.getId());
-
-							constr+=constraint.getId()+" ";
-						}
-						break;
-					case "differentThan":
-						if (currentLeftValue==currentRightValue){
-						//	System.out.println("Violated constraint "+constraint.getId());
-							constr+=constraint.getId()+" ";
-						}
-						break;
-					case "equals":
-						if (currentLeftValue!=currentRightValue){
-							//System.out.println("Violated constraint "+constraint.getId());
-							constr+=constraint.getId()+" ";
-						}
-						break;
-					default:
-						if (currentLeftValue>=currentRightValue){
-							//System.out.println("Violated constraint "+constraint.getId());
-							constr+=constraint.getId()+" ";
-						}
-						break;
-					}
-				}
-			}
+		}
 		}
 		return constr;
+	}
+	public boolean evaluateBinaryRestriction(BinaryRestriction binaryRestriction,MonitoredEntity monitoredEntity){
+		boolean fulfilled=true;
+		float currentLeftValue=0;
+		float currentRightValue = 0;
+		if (binaryRestriction.getLeftHandSide().getMetric()!=null){
+			String metric = binaryRestriction.getLeftHandSide().getMetric();
+			//System.out.println(monitoredEntity+" "+syblSpecification.getComponentId());
+			currentLeftValue = monitoredEntity.getMonitoredValue(metric);
+			if (currentLeftValue<0){
+				if (monitoredEntity.getMonitoredVar(metric)!=null)
+				currentLeftValue = monitoredEntity.getMonitoredValue(monitoredEntity.getMonitoredVar(metric));
+				else currentRightValue=0;
+			}
+			currentRightValue=Float.parseFloat(binaryRestriction.getRightHandSide().getNumber());
+		}else
+		if (binaryRestriction.getRightHandSide().getMetric()!=null){
+			String metric = binaryRestriction.getRightHandSide().getMetric();
+			currentRightValue = monitoredEntity.getMonitoredValue(metric);
+			//System.out.println("Current value for metric is  "+ currentRightValue);
+			if (currentRightValue<0){
+				if (monitoredEntity.getMonitoredVar(metric)!=null)
+				currentRightValue = monitoredEntity.getMonitoredValue(monitoredEntity.getMonitoredVar(metric));
+				else currentRightValue=0;
+			}
+			currentLeftValue=Float.parseFloat(binaryRestriction.getLeftHandSide().getNumber());
+		}
+		switch (binaryRestriction.getType()){
+		case "lessThan":
+			if (currentLeftValue>=currentRightValue){
+				fulfilled=false;
+			}
+			break;
+		case "greaterThan":
+			if (currentLeftValue<=currentRightValue){
+				fulfilled=false;
+
+			}
+			break;
+		case "lessThanOrEqual":
+			if (currentLeftValue>currentRightValue){
+				fulfilled=false;
+
+			}
+			break;
+		case "greaterThanOrEqual":
+			if (currentLeftValue<currentRightValue){
+				fulfilled=false;
+			}
+			break;
+		case "differentThan":
+			if (currentLeftValue==currentRightValue){
+				fulfilled=false;
+			}
+			break;
+		case "equals":
+			if (currentLeftValue!=currentRightValue){
+				//System.out.println("Violated constraint "+constraint.getId());
+				fulfilled=false;
+			}
+			break;
+		default:
+			if (currentLeftValue>=currentRightValue){
+				//System.out.println("Violated constraint "+constraint.getId());
+				fulfilled=false;
+			}
+			break;
+		}
+		return fulfilled;
 	}
 	public int countFixedStrategies(ContextRepresentation previousContextRepresentation){
 		int nbFixedStrategies = 0;
 		for (ElasticityRequirement elReq:dependencyGraph.getAllElasticityRequirements()){
 			SYBLSpecification syblSpecification = SYBLDirectiveMappingFromXML.mapFromSYBLAnnotation(elReq.getAnnotation());
 		//System.out.println("Searching for monitored entity "+syblSpecification.getComponentId());
-			MonitoredEntity monitoredEntity = findMonitoredEntity(syblSpecification.getComponentId());
+				MonitoredEntity monitoredEntity = findMonitoredEntity(syblSpecification.getComponentId());
 			for (Strategy strategy:syblSpecification.getStrategy()){
-				if (strategy.getToEnforce().getActionName().toLowerCase().contains("maximum")||strategy.getToEnforce().getActionName().toLowerCase().contains("minimum")){
-					if (strategy.getToEnforce().getActionName().toLowerCase().contains("maximum")){
-						String[] s= strategy.getToEnforce().getActionName().split("[()]");
-						if (monitoredEntity.getMonitoredValue(s[1])>previousContextRepresentation.getValueForMetric(monitoredEntity, s[1])){
+				Condition condition = strategy.getCondition();		
+				
+				if (evaluateCondition(condition, monitoredEntity)){
+				if (strategy.getToEnforce().getActionName().toLowerCase().contains("maximize")||strategy.getToEnforce().getActionName().toLowerCase().contains("minimize")){
+					if (strategy.getToEnforce().getActionName().toLowerCase().contains("maximize")){
+						PlanningLogger.logger.info("Current value for "+ strategy.getToEnforce().getParameter()+" is "+ monitoredEntity.getMonitoredValue(strategy.getToEnforce().getParameter())+" .Previous value was "+previousContextRepresentation.getValueForMetric(monitoredEntity,strategy.getToEnforce().getParameter()));
+						
+						if (monitoredEntity.getMonitoredValue(strategy.getToEnforce().getParameter())>previousContextRepresentation.getValueForMetric(monitoredEntity, strategy.getToEnforce().getParameter())){
 							nbFixedStrategies+=1;
 						}
 					}
-					if (strategy.getToEnforce().getActionName().toLowerCase().contains("minimum")){
-						String[] s= strategy.getToEnforce().getActionName().split("[()]");
-						if (monitoredEntity.getMonitoredValue(s[1])<previousContextRepresentation.getValueForMetric(monitoredEntity, s[1])){
+					if (strategy.getToEnforce().getActionName().toLowerCase().contains("minimize")){
+						PlanningLogger.logger.info("Current value for "+ strategy.getToEnforce().getParameter()+" is "+ monitoredEntity.getMonitoredValue(strategy.getToEnforce().getParameter())+" .Previous value was "+previousContextRepresentation.getValueForMetric(monitoredEntity,strategy.getToEnforce().getParameter()));
+						
+						if (monitoredEntity.getMonitoredValue(strategy.getToEnforce().getParameter())<previousContextRepresentation.getValueForMetric(monitoredEntity,strategy.getToEnforce().getParameter())){
 							nbFixedStrategies+=1;
 						}
 					}
 				}
 			}
+			}
 		}
 		return nbFixedStrategies;
 	}
+	public boolean evaluateCondition(Condition c, MonitoredEntity monitoredEntity){
+		if (c==null) return true;
+
+			boolean oneEvaluatedToTrueFound=false;
+
+			for (ArrayList<BinaryRestriction> restrictions:c.getBinaryRestriction()){
+				boolean value=true;
+			for (BinaryRestriction binaryRestriction:restrictions){
+				if (!evaluateBinaryRestriction(binaryRestriction, monitoredEntity)) value =false;
+				}
+			if (value==true) oneEvaluatedToTrueFound=true;
+			}				
+		if (oneEvaluatedToTrueFound)
+			return true;
+		else return false;
+
+	}
 	public float getValueForMetric(MonitoredEntity monitoredEntity,String metricName){
-		return monitoredEntity.getMonitoredValue(metricName);
+		return findMonitoredEntity(monitoredEntity.getId()).getMonitoredValue(metricName);
 	}
 	public int countViolatedConstraints(){
 		int numberofViolatedConstraints=0;
@@ -469,150 +471,18 @@ public class ContextRepresentation {
 			//System.out.println("Searching for monitored entity "+syblSpecification.getComponentId());
 			MonitoredEntity monitoredEntity = findMonitoredEntity(syblSpecification.getComponentId());
 			for (Constraint constraint:syblSpecification.getConstraint()){
-				boolean evaluate = true;
-				if (constraint.getCondition()!=null){
-					for (BinaryRestriction binaryRestriction:constraint.getCondition().getBinaryRestriction()){
-						float currentLeftValue=0;
-						float currentRightValue = 0;
-						if (binaryRestriction.getLeftHandSide().getMetric()!=null){
-							String metric = binaryRestriction.getLeftHandSide().getMetric();
-							try{
-							currentLeftValue = monitoredEntity.getMonitoredValue(metric);
-							}catch(Exception e){
-								SYBLDirectivesEnforcementLogger.logger.error(monitoredEntity.getId()+" "+" "+" searching value for metric "+ metric);
-							}
-							if (currentLeftValue<0){
-								if (monitoredEntity.getMonitoredVar(metric)!=null)
-								currentLeftValue = monitoredEntity.getMonitoredValue(monitoredEntity.getMonitoredVar(metric));
-								else currentRightValue=0;
-							}
-							currentRightValue=Float.parseFloat(binaryRestriction.getRightHandSide().getNumber());
-						}else
-						if (binaryRestriction.getRightHandSide().getMetric()!=null){
-							String metric = binaryRestriction.getRightHandSide().getMetric();
-							currentRightValue = monitoredEntity.getMonitoredValue(metric);
-							//System.out.println("Current value for metric is  "+ currentRightValue);
-							if (currentRightValue<0){
-								if (monitoredEntity.getMonitoredVar(metric)!=null)
-								currentRightValue = monitoredEntity.getMonitoredValue(monitoredEntity.getMonitoredVar(metric));
-								else currentRightValue=0;
-							}
-							currentLeftValue=Float.parseFloat(binaryRestriction.getLeftHandSide().getNumber());
-						}
-						switch (binaryRestriction.getType()){
-						case "lessThan":
-							if (currentLeftValue>=currentRightValue){
-								evaluate=false;
-							}
-							break;
-						case "greaterThan":
-							if (currentLeftValue<=currentRightValue){
-								evaluate=false;
-							}
-							break;
-						case "lessThanOrEqual":
-							if (currentLeftValue>currentRightValue){
-								evaluate=false;
-							}
-							break;
-						case "greaterThanOrEqual":
-							if (currentLeftValue<currentRightValue){
-								evaluate=false;
-							}
-							break;
-						case "differentThan":
-							if (currentLeftValue==currentRightValue){
-								evaluate=false;
-							}
-							break;
-						case "equals":
-							if (currentLeftValue!=currentRightValue){
-								evaluate=false;
-							}
-							break;
-						default:
-							if (currentLeftValue>=currentRightValue){
-								evaluate=false;
-							}
-							break;
-						}
-					}				
-					
-				}
-				if (evaluate)
-				for (BinaryRestriction binaryRestriction:constraint.getToEnforce().getBinaryRestriction()){
-					float currentLeftValue=0;
-					float currentRightValue = 0;
-					if (binaryRestriction.getLeftHandSide().getMetric()!=null){
-						String metric = binaryRestriction.getLeftHandSide().getMetric();
-						currentLeftValue = monitoredEntity.getMonitoredValue(metric);
-						if (currentLeftValue<0){
-							if (monitoredEntity.getMonitoredVar(metric)!=null)
-							currentLeftValue = monitoredEntity.getMonitoredValue(monitoredEntity.getMonitoredVar(metric));
-							else currentRightValue=0;
-						}
-						currentRightValue=Float.parseFloat(binaryRestriction.getRightHandSide().getNumber());
-					}else
-					if (binaryRestriction.getRightHandSide().getMetric()!=null){
-						String metric = binaryRestriction.getRightHandSide().getMetric();
-						currentRightValue = monitoredEntity.getMonitoredValue(metric);
-						//System.out.println("Current value for metric is  "+ currentRightValue);
-						if (currentRightValue<0){
-							if (monitoredEntity.getMonitoredVar(metric)!=null)
-							currentRightValue = monitoredEntity.getMonitoredValue(monitoredEntity.getMonitoredVar(metric));
-							else currentRightValue=0;
-						}
-						currentLeftValue=Float.parseFloat(binaryRestriction.getLeftHandSide().getNumber());
-					}
-					switch (binaryRestriction.getType()){
-					case "lessThan":
-						if (currentLeftValue>=currentRightValue){
-							//PlanningLogger.logger.info("Violated constraint "+constraint.getId());
-							numberofViolatedConstraints=numberofViolatedConstraints+1;
-						}
-						break;
-					case "greaterThan":
-						if (currentLeftValue<=currentRightValue){
-							//PlanningLogger.logger.info("Violated constraint "+constraint.getId());
-							numberofViolatedConstraints=numberofViolatedConstraints+1;
-						}
-						break;
-					case "lessThanOrEqual":
-						if (currentLeftValue>currentRightValue){
-						//	PlanningLogger.logger.info("Violated constraint "+constraint.getId());
-							numberofViolatedConstraints=numberofViolatedConstraints+1;
-						}
-						break;
-					case "greaterThanOrEqual":
-						if (currentLeftValue<currentRightValue){
-							//PlanningLogger.logger.info("Violated constraint "+constraint.getId());
-
-							numberofViolatedConstraints=numberofViolatedConstraints+1;
-						}
-						break;
-					case "differentThan":
-						if (currentLeftValue==currentRightValue){
-						//	PlanningLogger.logger.info("Violated constraint "+constraint.getId());
-							numberofViolatedConstraints=numberofViolatedConstraints+1;
-						}
-						break;
-					case "equals":
-						if (currentLeftValue!=currentRightValue){
-							//PlanningLogger.logger.info("Violated constraint "+constraint.getId());
-							numberofViolatedConstraints=numberofViolatedConstraints+1;
-						}
-						break;
-					default:
-						if (currentLeftValue>=currentRightValue){
-							//PlanningLogger.logger.info("Violated constraint "+constraint.getId());
-							numberofViolatedConstraints=numberofViolatedConstraints+1;
-						}
-						break;
-					}
-				}
+				if (evaluateCondition(constraint.getCondition(), monitoredEntity) && !evaluateCondition(constraint.getToEnforce(), monitoredEntity))
+						numberofViolatedConstraints=numberofViolatedConstraints+1;
+				
 			}
 		}
 		//PlanningLogger.logger.info("Number of violated constraints"+ numberofViolatedConstraints);
 		return numberofViolatedConstraints;
+	}
+	public MonitoredCloudService getMonitoredCloudService() {
+		return monitoredCloudService;
+	}
+	public void setMonitoredCloudService(MonitoredCloudService monitoredCloudService) {
+		this.monitoredCloudService = monitoredCloudService;
 	}
 }

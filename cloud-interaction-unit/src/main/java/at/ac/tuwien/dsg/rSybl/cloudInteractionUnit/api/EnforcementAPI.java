@@ -63,18 +63,23 @@ public class EnforcementAPI implements EnforcementAPIInterface{
 
 
 	public void scalein(Node arg0) {
+		RuntimeLogger.logger.info("Scaling in "+arg0.getId()+" ...");
 		executingControlAction=true;
 		offeredCapabilities.scaleIn(arg0);
 		executingControlAction=false;
+		RuntimeLogger.logger.info("Finished scaling in "+arg0.getId()+" ...");
+
 	}
 
 
 
 
 	public void scaleout(Node arg0) {
+		RuntimeLogger.logger.info("Scaling out "+arg0.getId()+" ...");
 		executingControlAction=true;
 		offeredCapabilities.scaleOut(arg0);
 		executingControlAction=false;
+		RuntimeLogger.logger.info("Finished scaling out "+arg0.getId()+" ...");
 	}
 
 
@@ -82,10 +87,13 @@ public class EnforcementAPI implements EnforcementAPIInterface{
 
 	@Override
 	public void enforceAction(String actionName, Node e) {
+		RuntimeLogger.logger.info("Enforcing action "+actionName+" on the node "+e.getId()+" ...");
+
 		executingControlAction=true;
 
 		offeredCapabilities.enforceAction(actionName, e);
 		executingControlAction=false;
+		RuntimeLogger.logger.info("Finished enforcing action "+actionName+" on the node "+e.getId()+" ...");
 
 	}
 

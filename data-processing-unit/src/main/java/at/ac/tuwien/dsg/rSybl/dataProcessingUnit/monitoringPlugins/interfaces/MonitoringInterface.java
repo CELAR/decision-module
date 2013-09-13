@@ -49,5 +49,5 @@ public interface MonitoringInterface {
 		public void notifyControlActionEnded(String actionName, Node node);
 	    public float getMetricValue(String metricName, Node node);
 	    public float getNumberInstances(Node node);
-   
+	    public void refreshServiceStructure(Node node);
 }

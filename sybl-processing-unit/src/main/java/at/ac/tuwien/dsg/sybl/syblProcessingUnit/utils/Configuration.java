@@ -63,5 +63,13 @@ public class Configuration {
     public static String getMonitoringServiceURL(){
     	return configuration.getProperty("MonitoringServiceURL");
     }
+    public static long getRefreshPeriod(){
+    	try{
+    	return Integer.parseInt(configuration.getProperty("REFRESH_PERIOD"));
+    	}catch(Exception e){
+    		SYBLDirectivesEnforcementLogger.logger.error("The refresh period(in the config file) needs to be an integer");
+    		return 120000;
+    	}
+    }
 
 }

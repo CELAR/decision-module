@@ -30,6 +30,7 @@ import at.ac.tuwien.dsg.csdg.Node;
 import at.ac.tuwien.dsg.csdg.elasticityInformation.elasticityRequirements.SYBLAnnotation;
 import at.ac.tuwien.dsg.rSybl.cloudInteractionUnit.api.EnforcementAPIInterface;
 import at.ac.tuwien.dsg.rSybl.dataProcessingUnit.api.MonitoringAPIInterface;
+import at.ac.tuwien.dsg.sybl.syblProcessingUnit.utils.Configuration;
 import at.ac.tuwien.dsg.sybl.syblProcessingUnit.utils.SYBLDirectivesEnforcementLogger;
 
 public class SYBLProcessingThread implements Runnable {
@@ -46,6 +47,7 @@ public class SYBLProcessingThread implements Runnable {
     	try {
 		    currentEntity = ent;
 		    this.monitoringAPI=monitoringAPI;
+		    REFRESH_TIME=Configuration.getRefreshPeriod();
 		} catch (Exception e) {
 		    SYBLDirectivesEnforcementLogger.logger.error("Client exception rmiSYBLRuntime: " + e.toString());
 		    e.printStackTrace();

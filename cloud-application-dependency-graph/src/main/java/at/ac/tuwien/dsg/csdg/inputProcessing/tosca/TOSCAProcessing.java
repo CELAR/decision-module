@@ -40,6 +40,7 @@ import org.oasis_open.docs.tosca.ns._2011._12.TExtensibleElements;
 import org.oasis_open.docs.tosca.ns._2011._12.TDefinitions.Extensions;
 import org.oasis_open.docs.tosca.ns._2011._12.TDefinitions.Types;
 import org.oasis_open.docs.tosca.ns._2011._12.TNodeTemplate;
+import org.oasis_open.docs.tosca.ns._2011._12.TPolicy;
 import org.oasis_open.docs.tosca.ns._2011._12.TRelationshipTemplate;
 import org.oasis_open.docs.tosca.ns._2011._12.TServiceTemplate;
 import org.oasis_open.docs.tosca.ns._2011._12.TTopologyTemplate;
@@ -213,6 +214,8 @@ public class TOSCAProcessing {
 		Relationship rel = new Relationship();
 		//TODO: take each construct present in TOSCA and transform it to our model
 		Definitions definitions = readTOSCADescriptionsString(tosca);
+		TPolicy policy=new TPolicy();
+
 		parseTOSCAGraph(nodes, definitions.getServiceTemplateOrNodeTypeOrNodeTypeImplementation(), "");
 		for (Node n:nodes.values())
 			if (n.getNodeType()==NodeType.CLOUD_SERVICE)

@@ -138,10 +138,10 @@ import javax.xml.bind.annotation.XmlType;
 })
 public class Condition {
 
-    @XmlElement(name = "BinaryRestriction", required = true)
-    protected List<BinaryRestriction> binaryRestriction = new ArrayList<BinaryRestriction>();
-    @XmlElement(name = "UnaryRestriction", required = true)
-    protected  List<UnaryRestriction> unaryRestriction=new ArrayList<UnaryRestriction>();
+    @XmlElement(name = "BinaryRestriction", required = true) // in disjunctive normal form 
+    protected ArrayList<ArrayList<BinaryRestriction>> binaryRestriction = new ArrayList<ArrayList<BinaryRestriction>>();
+    @XmlElement(name = "UnaryRestriction", required = true) // in disjunctive normal form 
+    protected  ArrayList<ArrayList<UnaryRestriction>> unaryRestriction=new ArrayList<ArrayList<UnaryRestriction>>();
 
     /**
      * Gets the value of the binaryRestriction property.
@@ -151,7 +151,7 @@ public class Condition {
      *     {@link SYBLSpecification.Strategy.Condition.BinaryRestriction }
      *     
      */
-    public List<BinaryRestriction> getBinaryRestriction() {
+    public  ArrayList<ArrayList<BinaryRestriction>> getBinaryRestriction() {
         return binaryRestriction;
     }
 
@@ -163,7 +163,7 @@ public class Condition {
      *     {@link SYBLSpecification.Strategy.Condition.BinaryRestriction }
      *     
      */
-    public void addBinaryRestriction( BinaryRestriction value) {
+    public void addBinaryRestrictionConjunction(  ArrayList<BinaryRestriction> value) {
         this.binaryRestriction.add(value);
     }
 
@@ -175,7 +175,7 @@ public class Condition {
      *     {@link SYBLSpecification.Strategy.Condition.UnaryRestriction }
      *     
      */
-    public List<UnaryRestriction> getUnaryRestriction() {
+    public  ArrayList<ArrayList<UnaryRestriction>> getUnaryRestrictions() {
         return unaryRestriction;
     }
 
@@ -187,14 +187,28 @@ public class Condition {
      *     {@link SYBLSpecification.Strategy.Condition.UnaryRestriction }
      *     
      */
-    public void addUnaryRestriction(UnaryRestriction value) {
+    public void addUnaryRestrictionConjunction( ArrayList<UnaryRestriction> value) {
         this.unaryRestriction.add(value);
     }
 
     public String toString(){
     	String res = "";
-    	for (BinaryRestriction restriction : binaryRestriction){
+    	if (binaryRestriction.size()>1)
+    		res="(";
+    	for (List<BinaryRestriction> binaryRes:binaryRestriction){
+    		
+    	for (BinaryRestriction restriction : binaryRes){
     		res+=restriction.toString()+" ";
+    		if (binaryRes.size()>1 && (!binaryRes.get(binaryRes.size()-1).equals(restriction))){
+    			res+=" AND ";
+    		}
+    	}
+    	if (binaryRestriction.size()>1 && (!binaryRestriction.get(binaryRes.size()-1).equals(binaryRes))){
+    		res+= ") OR (";
+    	}else
+    	{
+    		res+= ")";
+    	}
     	}
     	return res;
     }

@@ -28,6 +28,8 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.math.BigInteger;
+import java.security.SecureRandom;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -49,6 +51,7 @@ import org.jclouds.openstack.v2_0.domain.Resource;
 
 import at.ac.tuwien.dsg.csdg.Node;
 import at.ac.tuwien.dsg.csdg.Node.NodeType;
+import at.ac.tuwien.dsg.csdg.Relationship;
 import at.ac.tuwien.dsg.csdg.Relationship.RelationshipType;
 import at.ac.tuwien.dsg.rSybl.cloudInteractionUnit.utils.Configuration;
 import at.ac.tuwien.dsg.rSybl.cloudInteractionUnit.utils.RuntimeLogger;
@@ -76,7 +79,6 @@ public class JCloudsOpenStackConnection {
 
 	public JCloudsOpenStackConnection(Node controlledService){
 		this.controlledService = controlledService;
-        RuntimeLogger.logger.info("Started instantiating JClouds");
 
 		Iterable<Module> modules = ImmutableSet.<Module>of(
                 new SLF4JLoggingModule());
@@ -96,7 +98,6 @@ public class JCloudsOpenStackConnection {
         final String region = "myregion";
 
         serverApi = client.getServerApiForZone(region);
-        RuntimeLogger.logger.info("Finished instantiating JClouds");
 	}
 	/**
 	 * 
@@ -130,62 +131,65 @@ public class JCloudsOpenStackConnection {
         serverApi = client.getServerApiForZone(region);
 
 	}
-	public void scaleOutAndWaitUntilNewServerBoots(Node entity,Node controller){
+	public String scaleOutAndWaitUntilNewServerBoots(Node entity,Node controller){
 		 try{  
         CreateServerOptions createNodeOptions = new CreateServerOptions();
         Map<String, String> nodeMetaData = new HashMap<String, String>();
         
         String metadata ="";
-        if (entity.getId().equalsIgnoreCase("CassandraNode"))metadata= "CASSANDRA_SEED_NODE_IP=10.99.0.147";
-        else 
-        	metadata="LOAD_BALANCER_IP=10.99.0.151";
-        nodeMetaData.put(metadata, "");
-        createNodeOptions.metadata(nodeMetaData);
-        createNodeOptions.userData(metadata.getBytes());
-        
-        createNodeOptions.keyPairName(Configuration.getCertificateName());
-        String vmName = entity.getId();
-       // RuntimeLogger.logger.info("FLAVOR ID "+entity.getGetFlavorID());
-        String flavorID = "";
-        for (Resource flavor:client.getFlavorApiForZone("myregion").list().concat()){
-    		//RuntimeLogger.logger.error("Flavor "+flavor.getName()+" "+ flavor.getId());
-
-        	if (((String)entity.getStaticInformation("DefaultFlavor")).equalsIgnoreCase(flavor.getName())){
-        		RuntimeLogger.logger.info("Flavor found "+flavor.getId());
-        		flavorID=flavor.getId();
-        	}
-        }
-        RuntimeLogger.logger.info("Scaling out "+entity.getId()+" which has controller "+controller.getId());
-        
-        boolean serverCorrectlyCreated = false;
-        ServerCreated serverCreated = null;
-        while (!serverCorrectlyCreated){
-         serverCreated = serverApi.create(vmName,((String)entity.getStaticInformation("DefaultImage")), ((String)entity.getStaticInformation("DefaultFlavor")),createNodeOptions);
-         
-        //wait for all to become ACTIVE
-
-            while(serverApi.get(serverCreated.getId()).getStatus() != Server.Status.ACTIVE){
-                try {
-                    Thread.sleep(1000);
-                } catch (InterruptedException e) {
-                    e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
-                }
-            }
-            if (serverApi.get(serverCreated.getId()).getStatus() != Server.Status.ERROR){
-            	RuntimeLogger.logger.info(serverApi.get(serverCreated.getId()).getStatus() );
-            	serverCorrectlyCreated=true;
-            }else{
-            	serverApi.delete(serverCreated.getId());
-            	RuntimeLogger.logger.error("Created with error new instance for "+entity.getId()+ " - deleting and retrying....");
-            }
-            
-        }
-            Server server = serverApi.get(serverCreated.getId());
-
-            addRecursivelyIp(entity, server.getAddresses().get("private").iterator().next().getAddr());
+//        if (entity.getId().equalsIgnoreCase("CassandraNode"))metadata= "CASSANDRA_SEED_NODE_IP=10.99.0.147";
+//        else 
+//        	metadata="LOAD_BALANCER_IP=10.99.0.151";
+//        nodeMetaData.put(metadata, "");
+//        createNodeOptions.metadata(nodeMetaData);
+//        createNodeOptions.userData(metadata.getBytes());
+//        
+//        createNodeOptions.keyPairName(Configuration.getCertificateName());
+//        String vmName = entity.getId();
+//       // RuntimeLogger.logger.info("FLAVOR ID "+entity.getGetFlavorID());
+//        String flavorID = "";
+//        for (Resource flavor:client.getFlavorApiForZone("myregion").list().concat()){
+//    		//RuntimeLogger.logger.error("Flavor "+flavor.getName()+" "+ flavor.getId());
+//
+//        	if (((String)entity.getStaticInformation("DefaultFlavor")).equalsIgnoreCase(flavor.getName())){
+//        		RuntimeLogger.logger.info("Flavor found "+flavor.getId());
+//        		flavorID=flavor.getId();
+//        	}
+//        }
+//        RuntimeLogger.logger.info("Scaling out "+entity.getId()+" which has controller "+controller.getId());
+//        
+//        boolean serverCorrectlyCreated = false;
+//        ServerCreated serverCreated = null;
+//        while (!serverCorrectlyCreated){
+//         serverCreated = serverApi.create(vmName,((String)entity.getStaticInformation("DefaultImage")), ((String)entity.getStaticInformation("DefaultFlavor")),createNodeOptions);
+//         
+//        //wait for all to become ACTIVE
+//
+//            while(serverApi.get(serverCreated.getId()).getStatus() != Server.Status.ACTIVE){
+//                try {
+//                    Thread.sleep(1000);
+//                } catch (InterruptedException e) {
+//                    e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+//                }
+//            }
+//            if (serverApi.get(serverCreated.getId()).getStatus() != Server.Status.ERROR){
+//            	RuntimeLogger.logger.info(serverApi.get(serverCreated.getId()).getStatus() );
+//            	serverCorrectlyCreated=true;
+//            }else{
+//            	serverApi.delete(serverCreated.getId());
+//            	RuntimeLogger.logger.error("Created with error new instance for "+entity.getId()+ " - deleting and retrying....");
+//            }
+//            
+//        }
+//            Server server = serverApi.get(serverCreated.getId());
+//        addRecursivelyIp(entity, server.getAddresses().get("private").iterator().next().getAddr());
+         SecureRandom random = new SecureRandom();  
+        return new BigInteger(130, random).toString(32);
         }catch(Exception e){
         	RuntimeLogger.logger.error("Error when scaling out "+e.getMessage()+e.toString());
+        	return "IPPP";
         }
+		 
     }
 
 	public void scaleOutCluster(Node controller, Node slave, int numberSlaves, String ipForControllerofHigherTopology,Node controlledSrevice){

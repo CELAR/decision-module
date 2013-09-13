@@ -85,7 +85,9 @@ public class UtilsMain {
 		bRestriction.setLeftHandSide(leftHandSide);
 		bRestriction.setRightHandSide(rightHandSide);
 		bRestriction.setType("lessThan");
-		condition1.addBinaryRestriction(bRestriction);
+		ArrayList<BinaryRestriction> binaryRestrictions = new ArrayList<BinaryRestriction>();
+		binaryRestrictions.add(bRestriction);
+		condition1.addBinaryRestrictionConjunction(binaryRestrictions);
 		constraint.setToEnforce(condition1);
 		spec.addConstraint(constraint);
 		
@@ -100,7 +102,10 @@ public class UtilsMain {
 		bRestriction.setLeftHandSide(leftHandSide);
 		bRestriction.setRightHandSide(rightHandSide);
 		bRestriction.setType("lessThan");
-		condition1.addBinaryRestriction(bRestriction);
+		 binaryRestrictions = new ArrayList<BinaryRestriction>();
+		binaryRestrictions.add(bRestriction);
+	
+		condition1.addBinaryRestrictionConjunction(binaryRestrictions);
 		constraint.setToEnforce(condition1);
 		spec.addConstraint(constraint);
 		
@@ -121,7 +126,9 @@ public class UtilsMain {
 		bRestriction.setLeftHandSide(leftHandSide);
 		bRestriction.setRightHandSide(rightHandSide);
 		bRestriction.setType("lessThan");
-		condition1.addBinaryRestriction(bRestriction);
+		 binaryRestrictions = new ArrayList<BinaryRestriction>();
+			binaryRestrictions.add(bRestriction);
+		condition1.addBinaryRestrictionConjunction(binaryRestrictions);
 		constraint.setToEnforce(condition1);
 		spec.addConstraint(constraint);
 		
@@ -136,7 +143,9 @@ public class UtilsMain {
 			bRestriction.setLeftHandSide(leftHandSide);
 			bRestriction.setRightHandSide(rightHandSide);
 			bRestriction.setType("lessThan");
-			condition1.addBinaryRestriction(bRestriction);
+			 binaryRestrictions = new ArrayList<BinaryRestriction>();
+				binaryRestrictions.add(bRestriction);
+			condition1.addBinaryRestrictionConjunction(binaryRestrictions);
 			constraint.setToEnforce(condition1);
 			spec.addConstraint(constraint);
 		
@@ -157,7 +166,9 @@ public class UtilsMain {
 			bRestriction.setLeftHandSide(leftHandSide);
 			bRestriction.setRightHandSide(rightHandSide);
 			bRestriction.setType("lessThan");
-			condition1.addBinaryRestriction(bRestriction);
+			 binaryRestrictions = new ArrayList<BinaryRestriction>();
+				binaryRestrictions.add(bRestriction);
+			condition1.addBinaryRestrictionConjunction(binaryRestrictions);
 			constraint.setToEnforce(condition1);
 			spec.addConstraint(constraint);
 			syblSpecifications.add(spec);
@@ -178,7 +189,9 @@ public class UtilsMain {
 			bRestriction.setLeftHandSide(leftHandSide);
 			bRestriction.setRightHandSide(rightHandSide);
 			bRestriction.setType("lessThan");
-			condition1.addBinaryRestriction(bRestriction);
+			 binaryRestrictions = new ArrayList<BinaryRestriction>();
+				binaryRestrictions.add(bRestriction);
+			condition1.addBinaryRestrictionConjunction(binaryRestrictions);
 			constraint.setToEnforce(condition1);
 			spec.addConstraint(constraint);
 			
@@ -196,8 +209,9 @@ public class UtilsMain {
 			bRestriction2.setLeftHandSide(leftHandSide);
 			bRestriction2.setRightHandSide(rightHandSide);
 			bRestriction2.setType("greaterThan");
-			
-			condition2.addBinaryRestriction(bRestriction2);
+			binaryRestrictions = new ArrayList<BinaryRestriction>();
+			binaryRestrictions.add(bRestriction);
+			condition2.addBinaryRestrictionConjunction(binaryRestrictions);
 			
 			ToEnforce enforce = new ToEnforce();
 			enforce.setActionName("scaleout");

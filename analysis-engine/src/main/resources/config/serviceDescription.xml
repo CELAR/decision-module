@@ -15,7 +15,7 @@
 		</Relationship>
 		<ServiceUnit id="LoadBalancerServiceUnit" />
 		<ServiceUnit id="EventProcessingServiceUnit" >
-		<SYBLDirective Constraints="Co3:CONSTRAINT responseTime &lt; 450 ms" />
+		<SYBLDirective Constraints="Co3:CONSTRAINT responseTime &lt; 450 ms" Strategies="St1:STRATEGY maximize(throughput)" />
 		</ServiceUnit>
 	</ServiceTopology>
 </CloudService>

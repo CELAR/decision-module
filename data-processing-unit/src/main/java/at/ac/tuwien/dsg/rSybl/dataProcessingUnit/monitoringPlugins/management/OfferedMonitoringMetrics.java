@@ -41,7 +41,7 @@ public class OfferedMonitoringMetrics implements MonitoringInterface{
     	Float result = 0.0f;
     	Map<Method,MonitoringInterface> methods = manageMonitoringPlugins.getMethods(manageMonitoringPlugins.getAllPlugins(cloudService));
 		for (Method method:methods.keySet()){
-			System.out.println(method.getName());
+
 			if (method.getName().equalsIgnoreCase("getCpuUsage")){
 				 result = methods.get(method).getCpuUsage(string);
 			}
@@ -53,7 +53,7 @@ public class OfferedMonitoringMetrics implements MonitoringInterface{
     	Float result = 0.0f;
     	Map<Method,MonitoringInterface> methods = manageMonitoringPlugins.getMethods(manageMonitoringPlugins.getAllPlugins(cloudService));
 		for (Method method:methods.keySet()){
-			System.out.println(method.getName());
+
 			if (method.getName().equalsIgnoreCase("getMemoryAvailable")){
 				 result = methods.get(method).getMemoryAvailable(string);
 			}
@@ -65,7 +65,7 @@ public class OfferedMonitoringMetrics implements MonitoringInterface{
     	Float result = 0.0f;
     	Map<Method,MonitoringInterface> methods = manageMonitoringPlugins.getMethods(manageMonitoringPlugins.getAllPlugins(cloudService));
 		for (Method method:methods.keySet()){
-			System.out.println(method.getName());
+
 			if (method.getName().equalsIgnoreCase("getMemorySize")){
 				 result = methods.get(method).getMemorySize(string);
 			}
@@ -77,7 +77,7 @@ public class OfferedMonitoringMetrics implements MonitoringInterface{
     	Float result = 0.0f;
     	Map<Method,MonitoringInterface> methods = manageMonitoringPlugins.getMethods(manageMonitoringPlugins.getAllPlugins(cloudService));
 		for (Method method:methods.keySet()){
-			System.out.println(method.getName());
+
 			if (method.getName().equalsIgnoreCase("getMemoryUsage")){
 				 result = methods.get(method).getMemoryUsage(string);
 			}
@@ -89,7 +89,7 @@ public class OfferedMonitoringMetrics implements MonitoringInterface{
     	Float result = 0.0f;
     	Map<Method,MonitoringInterface> methods = manageMonitoringPlugins.getMethods(manageMonitoringPlugins.getAllPlugins(cloudService));
 		for (Method method:methods.keySet()){
-			System.out.println(method.getName());
+
 			if (method.getName().equalsIgnoreCase("getDiskSize")){
 				 result = methods.get(method).getDiskSize(string);
 			}
@@ -102,7 +102,7 @@ public class OfferedMonitoringMetrics implements MonitoringInterface{
     	Float result = 0.0f;
     	Map<Method,MonitoringInterface> methods = manageMonitoringPlugins.getMethods(manageMonitoringPlugins.getAllPlugins(cloudService));
 		for (Method method:methods.keySet()){
-			System.out.println(method.getName());
+
 			if (method.getName().equalsIgnoreCase("getDiskAvailable")){
 				 result = methods.get(method).getDiskAvailable(string);
 			}
@@ -113,7 +113,7 @@ public class OfferedMonitoringMetrics implements MonitoringInterface{
     	Float result = 0.0f;
     	Map<Method,MonitoringInterface> methods = manageMonitoringPlugins.getMethods(manageMonitoringPlugins.getAllPlugins(cloudService));
 		for (Method method:methods.keySet()){
-			System.out.println(method.getName());
+
 			if (method.getName().equalsIgnoreCase("getDiskUsage")){
 				 result = methods.get(method).getDiskUsage(string);
 			}
@@ -124,7 +124,7 @@ public class OfferedMonitoringMetrics implements MonitoringInterface{
     	Float result = 0.0f;
     	Map<Method,MonitoringInterface> methods = manageMonitoringPlugins.getMethods(manageMonitoringPlugins.getAllPlugins(cloudService));
 		for (Method method:methods.keySet()){
-			System.out.println(method.getName());
+
 			if (method.getName().equalsIgnoreCase("getCPUSpeed")){
 				 result = methods.get(method).getCPUSpeed(string);
 			}
@@ -135,7 +135,7 @@ public class OfferedMonitoringMetrics implements MonitoringInterface{
     	Float result = 0.0f;
     	Map<Method,MonitoringInterface> methods = manageMonitoringPlugins.getMethods(manageMonitoringPlugins.getAllPlugins(cloudService));
 		for (Method method:methods.keySet()){
-			System.out.println(method.getName());
+
 			if (method.getName().equalsIgnoreCase("getPkts")){
 				 result = methods.get(method).getPkts(string);
 			}
@@ -146,7 +146,7 @@ public class OfferedMonitoringMetrics implements MonitoringInterface{
     	Float result = 0.0f;
     	Map<Method,MonitoringInterface> methods = manageMonitoringPlugins.getMethods(manageMonitoringPlugins.getAllPlugins(cloudService));
 		for (Method method:methods.keySet()){
-			System.out.println(method.getName());
+
 			if (method.getName().equalsIgnoreCase("getPktsIn")){
 				 result = methods.get(method).getPktsIn(string);
 			}
@@ -157,7 +157,7 @@ public class OfferedMonitoringMetrics implements MonitoringInterface{
     	Float result = 0.0f;
     	Map<Method,MonitoringInterface> methods = manageMonitoringPlugins.getMethods(manageMonitoringPlugins.getAllPlugins(cloudService));
 		for (Method method:methods.keySet()){
-			System.out.println(method.getName());
+
 			if (method.getName().equalsIgnoreCase("getPktsOut")){
 				 result = methods.get(method).getPktsOut(string);
 			}
@@ -168,7 +168,7 @@ public class OfferedMonitoringMetrics implements MonitoringInterface{
     	Float result = 0.0f;
     	Map<Method,MonitoringInterface> methods = manageMonitoringPlugins.getMethods(manageMonitoringPlugins.getAllPlugins(cloudService));
 		for (Method method:methods.keySet()){
-			System.out.println(method.getName());
+
 			if (method.getName().equalsIgnoreCase("getReadLatency")){
 				 result = methods.get(method).getReadLatency(string);
 			}
@@ -179,7 +179,7 @@ public class OfferedMonitoringMetrics implements MonitoringInterface{
     	Float result = 0.0f;
     	Map<Method,MonitoringInterface> methods = manageMonitoringPlugins.getMethods(manageMonitoringPlugins.getAllPlugins(cloudService));
 		for (Method method:methods.keySet()){
-			System.out.println(method.getName());
+
 			if (method.getName().equalsIgnoreCase("getWriteLatency")){
 				 result = methods.get(method).getWriteLatency(string);
 			}
@@ -190,7 +190,7 @@ public class OfferedMonitoringMetrics implements MonitoringInterface{
     	Float result = 0.0f;
     	Map<Method,MonitoringInterface> methods = manageMonitoringPlugins.getMethods(manageMonitoringPlugins.getAllPlugins(cloudService));
 		for (Method method:methods.keySet()){
-			System.out.println(method.getName());
+
 			if (method.getName().equalsIgnoreCase("getReadCount")){
 				 result = methods.get(method).getReadCount(string);
 			}
@@ -202,7 +202,7 @@ public class OfferedMonitoringMetrics implements MonitoringInterface{
     	Float result = 0.0f;
     	Map<Method,MonitoringInterface> methods = manageMonitoringPlugins.getMethods(manageMonitoringPlugins.getAllPlugins(cloudService));
 		for (Method method:methods.keySet()){
-			System.out.println(method.getName());
+
 			if (method.getName().equalsIgnoreCase("getWriteCount")){
 				 result = methods.get(method).getWriteCount(string);
 			}
@@ -213,7 +213,7 @@ public class OfferedMonitoringMetrics implements MonitoringInterface{
     	Float result = 0.0f;
     	Map<Method,MonitoringInterface> methods = manageMonitoringPlugins.getMethods(manageMonitoringPlugins.getAllPlugins(cloudService));
 		for (Method method:methods.keySet()){
-			System.out.println(method.getName());
+
 			if (method.getName().equalsIgnoreCase("getCostPerHour")){
 				 result = methods.get(method).getCostPerHour(string);
 			}
@@ -226,7 +226,6 @@ public class OfferedMonitoringMetrics implements MonitoringInterface{
     	Float result = 0.0f;
     	Map<Method,MonitoringInterface> methods = manageMonitoringPlugins.getMethods(manageMonitoringPlugins.getAllPlugins(cloudService));
 		for (Method method:methods.keySet()){
-			System.out.println(method.getName());
 			if (method.getName().equalsIgnoreCase("getTotalCostSoFar")){
 				 result = methods.get(method).getTotalCostSoFar(string);
 			}
@@ -238,7 +237,6 @@ public class OfferedMonitoringMetrics implements MonitoringInterface{
     	List<String> metricsAvailable = new ArrayList<String>();
     	Map<Method,MonitoringInterface> methods = manageMonitoringPlugins.getMethods(manageMonitoringPlugins.getAllPlugins(cloudService));
 		for (Method method:methods.keySet()){
-			System.out.println(method.getName());
 			if (method.getName().equalsIgnoreCase("getAvailableMetrics")){
 				metricsAvailable = methods.get(method).getAvailableMetrics();
 			}
@@ -250,7 +248,6 @@ public class OfferedMonitoringMetrics implements MonitoringInterface{
     	Float result = 0.0f;
     	Map<Method,MonitoringInterface> methods = manageMonitoringPlugins.getMethods(manageMonitoringPlugins.getAllPlugins(cloudService));
 		for (Method method:methods.keySet()){
-			System.out.println(method.getName());
 			if (method.getName().equalsIgnoreCase("getMetricValue")){
 				 result = methods.get(method).getMetricValue(metricName,node);
 			}
@@ -260,7 +257,6 @@ public class OfferedMonitoringMetrics implements MonitoringInterface{
 	public void notifyControlActionStarted(String actionName, Node e) {
     	Map<Method,MonitoringInterface> methods = manageMonitoringPlugins.getMethods(manageMonitoringPlugins.getAllPlugins(cloudService));
 		for (Method method:methods.keySet()){
-			System.out.println(method.getName());
 			if (method.getName().equalsIgnoreCase("notifyControlActionStarted")){
 				 methods.get(method).notifyControlActionStarted(actionName,e);
 			}
@@ -271,7 +267,6 @@ public class OfferedMonitoringMetrics implements MonitoringInterface{
 	public void notifyControlActionEnded(String actionName,Node e) {
 		Map<Method,MonitoringInterface> methods = manageMonitoringPlugins.getMethods(manageMonitoringPlugins.getAllPlugins(cloudService));
 		for (Method method:methods.keySet()){
-			System.out.println(method.getName());
 			if (method.getName().equalsIgnoreCase("notifyControlActionEnded")){
 				 methods.get(method).notifyControlActionEnded(actionName, e);
 			}
@@ -281,7 +276,6 @@ public class OfferedMonitoringMetrics implements MonitoringInterface{
 	public void submitServiceConfiguration(Node cloudService) {
 		Map<Method,MonitoringInterface> methods = manageMonitoringPlugins.getMethods(manageMonitoringPlugins.getAllPlugins(cloudService));
 		for (Method method:methods.keySet()){
-			System.out.println(method.getName());
 			if (method.getName().equalsIgnoreCase("submitServiceConfiguration")){
 				 methods.get(method).submitServiceConfiguration(cloudService);
 			}
@@ -294,7 +288,6 @@ public class OfferedMonitoringMetrics implements MonitoringInterface{
 			ArrayList<ElasticityRequirement> description) {
     	Map<Method,MonitoringInterface> methods = manageMonitoringPlugins.getMethods(manageMonitoringPlugins.getAllPlugins(cloudService));
 		for (Method method:methods.keySet()){
-			System.out.println(method.getName());
 			if (method.getName().equalsIgnoreCase("submitElasticityRequirements")){
 				  methods.get(method).submitElasticityRequirements(description);
 			}
@@ -305,12 +298,20 @@ public class OfferedMonitoringMetrics implements MonitoringInterface{
 		Float result = 0.0f;
     	Map<Method,MonitoringInterface> methods = manageMonitoringPlugins.getMethods(manageMonitoringPlugins.getAllPlugins(cloudService));
 		for (Method method:methods.keySet()){
-			System.out.println(method.getName());
 			if (method.getName().equalsIgnoreCase("getNumberInstances")){
 				 result = methods.get(method).getNumberInstances(string);
 			}
 		}
 		return result;
+	}
+	@Override
+	public void refreshServiceStructure(Node node) {
+    	Map<Method,MonitoringInterface> methods = manageMonitoringPlugins.getMethods(manageMonitoringPlugins.getAllPlugins(cloudService));
+		for (Method method:methods.keySet()){
+			if (method.getName().equalsIgnoreCase("refreshServiceStructure")){
+				  methods.get(method).refreshServiceStructure(node);
+			}
+		}
 	}
 
 }

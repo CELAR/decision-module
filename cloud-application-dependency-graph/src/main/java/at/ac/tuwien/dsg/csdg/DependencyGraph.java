@@ -141,18 +141,30 @@ public class DependencyGraph implements Serializable{
 			if (rel.getTargetElement().equalsIgnoreCase(entityID))
 				parent=n;
 		}
+		for (Node n: cloudService.getAllRelatedNodes()){
+			if (n.getId().equalsIgnoreCase(entityID)){
+				parent=cloudService;
+			return parent;}
+		}
 		for (Node n:getAllServiceTopologies()){
 			if (n.getRelatedNode(entityID)!=null ){
 				Relationship rel =n.getRelationshipWithNode(currentNode);
-				if (rel.getTargetElement().equalsIgnoreCase(entityID))
+				if (rel.getTargetElement().equalsIgnoreCase(entityID)){
+					
 					parent=n;
+					return parent;
+				}
+				
 			}
 		}
 		for (Node n:getAllServiceUnits()){
 			if (n.getRelatedNode(entityID)!=null ){
 				Relationship rel =n.getRelationshipWithNode(currentNode);
-				if (rel.getTargetElement().equalsIgnoreCase(entityID))
+				if (rel.getTargetElement().equalsIgnoreCase(entityID)){
+					
 					parent=n;
+					return parent;
+				}
 			}
 		}
 		return parent;

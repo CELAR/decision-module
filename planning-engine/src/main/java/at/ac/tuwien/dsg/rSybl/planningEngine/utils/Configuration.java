@@ -64,6 +64,10 @@ public class Configuration {
     }
     public static String getMonitoringServiceURL(){
     	return configuration.getProperty("MonitoringServiceURL");
+    }   
+    
+    public static int getRefreshPeriod(){
+    	return Integer.parseInt(configuration.getProperty("REFRESH_PERIOD"));
     }
 
 }

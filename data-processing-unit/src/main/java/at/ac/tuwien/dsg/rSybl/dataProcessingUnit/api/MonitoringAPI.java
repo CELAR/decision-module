@@ -306,7 +306,7 @@ try{
 				e1.printStackTrace();
 			}
 		try{
-			RuntimeLogger.logger.info("The value of offered monitoring metrics " + offeredMonitoringMetrics);
+			//RuntimeLogger.logger.info("The value of offered monitoring metrics " + offeredMonitoringMetrics);
 		return offeredMonitoringMetrics.getMetricValue(metricName, e);
 		}catch(Exception ex){
 			RuntimeLogger.logger.error("Current "+metricName +ex.toString()+"for node "+e.getId());
@@ -353,7 +353,7 @@ try{
 	@Override
 	public void submitElasticityRequirements(
 			ArrayList<ElasticityRequirement> description) {
-		// TODO Auto-generated method stub
+		offeredMonitoringMetrics.submitElasticityRequirements(description);
 		
 	}
 
@@ -375,6 +375,14 @@ try{
 	
 		offeredMonitoringMetrics.notifyControlActionEnded(actionName,e);	
 		executingControlAction=false;
+	}
+
+
+
+
+	@Override
+	public void refreshServiceStructure(Node cloudService) {
+		offeredMonitoringMetrics.refreshServiceStructure(cloudService);
 	}
 
 

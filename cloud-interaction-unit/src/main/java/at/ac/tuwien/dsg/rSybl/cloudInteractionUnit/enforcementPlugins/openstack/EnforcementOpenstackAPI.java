@@ -26,6 +26,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import at.ac.tuwien.dsg.csdg.Node;
+import at.ac.tuwien.dsg.csdg.Relationship;
 import at.ac.tuwien.dsg.csdg.Node.NodeType;
 import at.ac.tuwien.dsg.csdg.Relationship.RelationshipType;
 import at.ac.tuwien.dsg.rSybl.cloudInteractionUnit.enforcementPlugins.interfaces.EnforcementInterface;
@@ -85,7 +86,6 @@ public class EnforcementOpenstackAPI implements EnforcementInterface{
 			componentsToExplore.remove(0);
 			if (component.getId().equalsIgnoreCase(id)){
 				found=true;
-				component.getAssociatedIps();
 				return component;
 			}
 		}
@@ -95,7 +95,7 @@ public class EnforcementOpenstackAPI implements EnforcementInterface{
 	
 	public void scaleOut(Node arg0)   {
 		Node o = findNode(arg0.getId());
-		
+		RuntimeLogger.logger.info("Scaling out ... "+arg0+" "+arg0.getNodeType());
 	
 		if (o.getNodeType()==NodeType.CODE_REGION){
 			scaleOutComponent(findComponentOfCodeRegion(arg0));
@@ -167,7 +167,21 @@ public class EnforcementOpenstackAPI implements EnforcementInterface{
 	}
 	private void scaleOutComponent(Node o){
 		
-				 cloudsOpenStackConnection.scaleOutAndWaitUntilNewServerBoots( o ,findControllerForComponent(o));
+				String ip= cloudsOpenStackConnection.scaleOutAndWaitUntilNewServerBoots( o ,findControllerForComponent(o));
+				Node node = new Node();
+	            node.setId(ip);
+	            node.getStaticInformation().put("IP",ip);
+	            node.setNodeType(NodeType.VIRTUAL_MACHINE);
+	            Relationship rel = new Relationship();
+	            rel.setSourceElement(o.getId());
+	            rel.setTargetElement(node.getId());
+	            rel.setType(RelationshipType.HOSTED_ON_RELATIONSHIP);
+	            RuntimeLogger.logger.info("Adding to "+o.getId()+" vm with ip "+ip);
+	            
+	            o.addNode(node,rel);
+	            RuntimeLogger.logger.info("The controlled service is now "+controlledService.toString());
+	            monitoring.refreshServiceStructure(controlledService);
+	            
 		}
 	private void scaleInComponent(Node o){
 		

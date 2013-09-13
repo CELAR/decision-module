@@ -22,6 +22,7 @@
 
 package at.ac.tuwien.dsg.csdg.inputProcessing.multiLevelModel.abstractModelXML;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import at.ac.tuwien.dsg.csdg.elasticityInformation.elasticityRequirements.BinaryRestriction;
@@ -94,90 +95,97 @@ public static SYBLAnnotation mapFromXMLRepresentation(SYBLSpecification syblSpec
 	syblAnnotation.setPriorities(priorities);
 	return syblAnnotation;
 }
-
+public static String conditionToString(Condition condition){
+	String stringCondition = "";
+	if (condition.getBinaryRestriction().size()>0){
+		for( List<BinaryRestriction> binaryRestrictions : condition.getBinaryRestriction()){
+			if (condition.getBinaryRestriction().size()>1){
+				stringCondition+="(";
+			}
+			for (BinaryRestriction binaryRestriction:binaryRestrictions){
+		String leftHandSide="";
+		String rightHandSide="";
+		if (binaryRestriction.getLeftHandSide().getMetric()!=null){
+			leftHandSide=binaryRestriction.getLeftHandSide().getMetric();
+			rightHandSide=binaryRestriction.getRightHandSide().getNumber();
+		}else{
+			leftHandSide=binaryRestriction.getLeftHandSide().getNumber();
+			rightHandSide=binaryRestriction.getRightHandSide().getMetric();
+		}
+		stringCondition+=leftHandSide;
+		switch(binaryRestriction.getType()){
+		case "lessThan":stringCondition+=" < ";
+		break;
+		case "greaterThan":stringCondition+=" > ";
+		break;
+		case "lessThanOrEqual":stringCondition+=" <= ";
+		break;
+		case "greaterThanOrEqual":stringCondition+=" >= ";
+		break;
+		case "differentThan":stringCondition+=" != ";
+		break;
+		case "equals":stringCondition+=" = ";
+		break;
+		default:
+			stringCondition+=" < ";
+			break;
+		}
+		stringCondition+=rightHandSide;
+		if (binaryRestrictions.size()>1){
+			if (binaryRestrictions.get(binaryRestrictions.size()-1)!=binaryRestriction){
+				stringCondition+=" AND ";
+			}
+		}
+		
+		}
+			if (condition.getBinaryRestriction().size()>1){
+				stringCondition+=")";
+				if (condition.getBinaryRestriction().get(condition.getBinaryRestriction().size()-1)!=binaryRestrictions){
+					stringCondition+=" OR ";
+				}
+			}
+			
+			}
+	}
+	if (condition.getUnaryRestrictions()!=null && condition.getUnaryRestrictions().size()>0){
+		for (List<UnaryRestriction> unaryRestrictions:condition.getUnaryRestrictions()){
+			for(UnaryRestriction unaryRestriction:unaryRestrictions){
+			 if (unaryRestriction.getReferenceTo().getValue()!="") stringCondition += unaryRestriction.getReferenceTo().getValue();
+			 else
+			 if (unaryRestriction.getReferenceTo().getName()!="") stringCondition += unaryRestriction.getReferenceTo().getFunction()+"("+unaryRestriction.getReferenceTo().getName()+")";
+			 if (unaryRestrictions.size()>1){
+					if (unaryRestrictions.get(unaryRestrictions.size()-1)!=unaryRestriction){
+						stringCondition+=" AND ";
+					}
+				}
+			}
+			if (condition.getUnaryRestrictions().size()>1){
+				stringCondition+=")";
+				if (condition.getUnaryRestrictions().get(condition.getUnaryRestrictions().size()-1)!=unaryRestrictions){
+					stringCondition+=" OR ";
+				}
+			}
+			
+		
+		}
+	}
+	
+	return stringCondition;
+}
 public static String mapXMLConstraintToSYBLAnnotation(Constraint constraint){
 	String constraints=constraint.getId()+":CONSTRAINT ";
-	if (constraint.getToEnforce().getBinaryRestriction().size()>0){
-		BinaryRestriction binaryRestriction = constraint.getToEnforce().getBinaryRestriction().get(0);
-		String leftHandSide="";
-		String rightHandSide="";
-		if (binaryRestriction.getLeftHandSide().getMetric()!=null){
-			leftHandSide=binaryRestriction.getLeftHandSide().getMetric();
-			rightHandSide=binaryRestriction.getRightHandSide().getNumber();
-		}else{
-			leftHandSide=binaryRestriction.getLeftHandSide().getNumber();
-			rightHandSide=binaryRestriction.getRightHandSide().getMetric();
-		}
-		constraints+=leftHandSide;
-		switch(binaryRestriction.getType()){
-		case "lessThan":constraints+=" < ";
-		break;
-		case "greaterThan":constraints+=" > ";
-		break;
-		case "lessThanOrEqual":constraints+=" <= ";
-		break;
-		case "greaterThanOrEqual":constraints+=" >= ";
-		break;
-		case "differentThan":constraints+=" != ";
-		break;
-		case "equals":constraints+=" = ";
-		break;
-		default:
-			constraints+=" < ";
-			break;
-		}
-		constraints+=rightHandSide;
-	}
-	
+	constraints+=conditionToString(constraint.getToEnforce());
 	
 	//TODO:Add UnaryRestriction
-	if (constraint.getToEnforce().getUnaryRestriction().size()>0){
-		
-	}
+
 	
 	if (constraint.getCondition()!=null){
-		constraints += " WHEN ";
-		if (constraint.getCondition().getBinaryRestriction().size()>0){
-		BinaryRestriction binaryRestriction = constraint.getCondition().getBinaryRestriction().get(0);
-		String leftHandSide="";
-		String rightHandSide="";
-		if (binaryRestriction.getLeftHandSide().getMetric()!=null){
-			leftHandSide=binaryRestriction.getLeftHandSide().getMetric();
-			rightHandSide=binaryRestriction.getRightHandSide().getNumber();
-		}else{
-			leftHandSide=binaryRestriction.getLeftHandSide().getNumber();
-			rightHandSide=binaryRestriction.getRightHandSide().getMetric();
-		}
-		
-		constraints+=leftHandSide;
-		switch(binaryRestriction.getType()){
-		case "lessThan":constraints+=" < ";
-		break;
-		case "greaterThan":constraints+=" > ";
-		break;
-		case "lessThanOrEqual":constraints+=" <= ";
-		break;
-		case "greaterThanOrEqual":constraints+=" >= ";
-		break;
-		case "differentThan":constraints+=" != ";
-		break;
-		case "equals":constraints+=" = ";
-		break;
-		default:
-			constraints+=" < ";
-			break;
-		}
-		constraints+=rightHandSide;
+		constraints += " WHEN "+conditionToString(constraint.getCondition());
 		
 	}
 	
 	
 	//TODO:Add UnaryRestriction
-	if (constraint.getCondition().getUnaryRestriction().size()>0){
-		
-	}
-	
-	}
 	constraints+=";";
 	return constraints;
 }
@@ -185,87 +193,13 @@ public static String mapXMLConstraintToSYBLAnnotation(Constraint constraint){
 public static String mapFromXMLStrategyToSYBLAnnotation(Strategy strategy){
 	if (strategy.getCondition()!=null){
 	String strategies = strategy.getId()+":STRATEGY CASE ";
-	int nb = 0;
+
 	if (strategy.getCondition()!=null){
 		if (strategy.getCondition().getBinaryRestriction().size()>0){
-			BinaryRestriction binaryRestriction = strategy.getCondition().getBinaryRestriction().get(0);
-			String leftHandSide="";
-			String rightHandSide="";
-			if (binaryRestriction.getLeftHandSide().getMetric()!=null){
-				leftHandSide=binaryRestriction.getLeftHandSide().getMetric();
-				rightHandSide=binaryRestriction.getRightHandSide().getNumber();
-			}else{
-				leftHandSide=binaryRestriction.getLeftHandSide().getNumber();
-				rightHandSide=binaryRestriction.getRightHandSide().getMetric();
-			}
-			strategies+=leftHandSide;
-			switch(binaryRestriction.getType()){
-			case "lessThan":strategies+=" < ";
-			break;
-			case "greaterThan":strategies+=" > ";
-			break;
-			case "lessThanOrEqual":strategies+=" <= ";
-			break;
-			case "greaterThanOrEqual":strategies+=" >= ";
-			break;
-			case "differentThan":strategies+=" != ";
-			break;
-			case "equals":strategies+=" = ";
-			break;
-			default:
-				strategies+=" < ";
-				break;
-			}
-			strategies+=rightHandSide;
-			if (strategy.getCondition().getBinaryRestriction().size()>1){
-				strategies +=" AND ";
-				binaryRestriction = strategy.getCondition().getBinaryRestriction().get(1);
-			    leftHandSide="";
-			    rightHandSide="";
-			if (binaryRestriction.getLeftHandSide().getMetric()!=null){
-				
-				leftHandSide=binaryRestriction.getLeftHandSide().getMetric();
-				rightHandSide=binaryRestriction.getRightHandSide().getNumber();
-			}else{
-				leftHandSide=binaryRestriction.getLeftHandSide().getNumber();
-				rightHandSide=binaryRestriction.getRightHandSide().getMetric();
-			}
-			strategies+=leftHandSide;
-			switch(binaryRestriction.getType()){
-			case "lessThan":strategies+=" < ";
-			break;
-			case "greaterThan":strategies+=" > ";
-			break;
-			case "lessThanOrEqual":strategies+=" <= ";
-			break;
-			case "greaterThanOrEqual":strategies+=" >= ";
-			break;
-			case "differentThan":strategies+=" != ";
-			break;
-			case "equals":strategies+=" = ";
-			break;
-			default:
-				strategies+=" < ";
-				break;
-			}
-			strategies+=rightHandSide;
-
-			}
-			
-			//nb+=1;
+			strategies+=conditionToString(strategy.getCondition());
 		}
-
-	 if (strategy.getCondition().getUnaryRestriction()!=null && strategy.getCondition().getUnaryRestriction().size()>0){
-		 
-		 UnaryRestriction unaryRestriction=strategy.getCondition().getUnaryRestriction().get(0);
-		 if (nb>0) strategies += " AND ";
-		 if (unaryRestriction.getReferenceTo().getValue()!="") strategies += unaryRestriction.getReferenceTo().getValue();
-		 else
-		 if (unaryRestriction.getReferenceTo().getName()!="") strategies += unaryRestriction.getReferenceTo().getFunction()+"("+unaryRestriction.getReferenceTo().getName()+")";
-		
-		 //System.err.println("EEEEEEEEEEEEEEEEEEEEEEEEEEEE  "+ strategies+strategy.getCondition().getUnaryRestriction());
-
-	 }
+    
+	
 	 strategies +=" : ";
 	}
 	//System.err.println("EEEEEEEEEEEEEEEEEEEEEEEEEEEE  "+ strategies);
@@ -291,41 +225,8 @@ public static String mapFromXMLMonitoringToSYBLAnnotation(Monitoring m){
 	monitoring += m.getMonitor().getEnvVar() +" = ";
 	monitoring +=m.getMonitor().getMetric();
 	if (m.getCondition()!=null){
-		monitoring += " WHEN";
-		if (m.getCondition().getBinaryRestriction().size()>0){
-		BinaryRestriction binaryRestriction = m.getCondition().getBinaryRestriction().get(0);
-		String leftHandSide="";
-		String rightHandSide="";
-		if (binaryRestriction.getLeftHandSide().getMetric()!=null){
-			leftHandSide=binaryRestriction.getLeftHandSide().getMetric();
-			rightHandSide=binaryRestriction.getRightHandSide().getNumber();
-		}else{
-			leftHandSide=binaryRestriction.getLeftHandSide().getNumber();
-			rightHandSide=binaryRestriction.getRightHandSide().getMetric();
-		}
-		
-		monitoring+=leftHandSide;
-		switch(binaryRestriction.getType()){
-		case "lessThan":monitoring+=" < ";
-		break;
-		case "greaterThan":monitoring+=" > ";
-		break;
-		case "lessThanOrEqual":monitoring+=" <= ";
-		break;
-		case "greaterThanOrEqual":monitoring+=" >= ";
-		break;
-		case "differentThan":monitoring+=" != ";
-		break;
-		case "equals":monitoring+=" = ";
-		break;
-		default:
-			monitoring+=" < ";
-			break;
-		}
-		monitoring+=rightHandSide;
+		monitoring += " WHEN "+conditionToString(m.getCondition());
 	}
-		
-}
 	monitoring+=";";
 	return monitoring;
 	
@@ -335,7 +236,7 @@ public static String mapFromXMLMonitoringToSYBLAnnotation(Monitoring m){
 public static String mapFromXMLPriorityToSYBLAnnotation(Priority priority){
 	String priorities ="";
 	if (priority.getCondition()!=null){
-		BinaryRestriction binaryRestriction = priority.getCondition().getBinaryRestriction().get(0);
+		BinaryRestriction binaryRestriction = priority.getCondition().getBinaryRestriction().get(0).get(0);
 		priorities += "Priority("+binaryRestriction.getLeftHandSide().getMetric()+")";
 		
 		switch(binaryRestriction.getType()){
@@ -459,7 +360,10 @@ public static Constraint mapSYBLAnnotationToXMLConstraint(String constraint ){
 	rightHandSide.setNumber(s[4]);
 	binaryRestr.setLeftHandSide(leftHandSide);
 	binaryRestr.setRightHandSide(rightHandSide);
-	toEnforce.addBinaryRestriction(binaryRestr);
+	
+	ArrayList<BinaryRestriction> binaryRestrictions = new ArrayList<BinaryRestriction>();
+	binaryRestrictions.add(binaryRestr);
+	toEnforce.addBinaryRestrictionConjunction(binaryRestrictions);
 	c.setToEnforce(toEnforce);
 
 	if (constraint.contains("WHEN")){
@@ -494,7 +398,10 @@ public static Constraint mapSYBLAnnotationToXMLConstraint(String constraint ){
 			}
 			binaryRestriction.setLeftHandSide(leftHandSide2);
 			binaryRestriction.setRightHandSide(rightHandSide2);
-			cond.addBinaryRestriction(binaryRestriction);
+			 binaryRestrictions = new ArrayList<BinaryRestriction>();
+			binaryRestrictions.add(binaryRestriction);
+			
+			cond.addBinaryRestrictionConjunction(binaryRestrictions);
 			c.setCondition(cond);
 		}else{
 			if (when.length>1){
@@ -502,7 +409,9 @@ public static Constraint mapSYBLAnnotationToXMLConstraint(String constraint ){
 				ReferenceTo referenceTo = new ReferenceTo();
 				referenceTo.setValue(when[1]);
 				unaryRestriction.setReferenceTo(referenceTo);
-				cond.addUnaryRestriction(unaryRestriction);
+				ArrayList<UnaryRestriction> unaryRestrictions = new ArrayList<UnaryRestriction>();
+				unaryRestrictions.add(unaryRestriction);
+				cond.addUnaryRestrictionConjunction(unaryRestrictions);
 				
 				c.setCondition(cond);
 			}
@@ -541,12 +450,16 @@ public static Strategy mapFromSYBLAnnotationToXMLStrategy(String strategy){
 			ReferenceTo referenceTo = new ReferenceTo();
 			referenceTo.setValue(s[3]);
 			unaryRestriction.setReferenceTo(referenceTo);
-			cond.addUnaryRestriction(unaryRestriction);
+			ArrayList<UnaryRestriction> unaryRestrictions = new ArrayList<UnaryRestriction>();
+			unaryRestrictions.add(unaryRestriction);
+			cond.addUnaryRestrictionConjunction(unaryRestrictions);
 			unaryRestriction=new UnaryRestriction();
 			referenceTo = new ReferenceTo();
 			referenceTo.setValue(s[6]);
 			unaryRestriction.setReferenceTo(referenceTo);
-			cond.addUnaryRestriction(unaryRestriction);
+			 unaryRestrictions = new ArrayList<UnaryRestriction>();
+			unaryRestrictions.add(unaryRestriction);
+			cond.addUnaryRestrictionConjunction(unaryRestrictions);
 			
 		}else{
 			BinaryRestriction binaryRestriction = new BinaryRestriction();
@@ -575,7 +488,9 @@ public static Strategy mapFromSYBLAnnotationToXMLStrategy(String strategy){
 			}
 			binaryRestriction.setLeftHandSide(leftHandSide2);
 			binaryRestriction.setRightHandSide(rightHandSide2);
-			cond.addBinaryRestriction(binaryRestriction);
+			ArrayList<BinaryRestriction> binaryRestrictions = new ArrayList<BinaryRestriction>();
+			binaryRestrictions.add(binaryRestriction);
+			cond.addBinaryRestrictionConjunction(binaryRestrictions);
 			int index = 0;
 			if (s[7].equalsIgnoreCase("AND")) index= 7;
 			else index = 6;
@@ -605,7 +520,9 @@ public static Strategy mapFromSYBLAnnotationToXMLStrategy(String strategy){
 			}
 			binaryRestriction.setLeftHandSide(leftHandSide2);
 			binaryRestriction.setRightHandSide(rightHandSide2);
-			cond.addBinaryRestriction(binaryRestriction);
+			 binaryRestrictions = new ArrayList<BinaryRestriction>();
+				binaryRestrictions.add(binaryRestriction);
+			cond.addBinaryRestrictionConjunction(binaryRestrictions);
 		}
 	}else{
 			
@@ -634,14 +551,18 @@ public static Strategy mapFromSYBLAnnotationToXMLStrategy(String strategy){
 			}
 			binaryRestriction.setLeftHandSide(leftHandSide2);
 			binaryRestriction.setRightHandSide(rightHandSide2);
-			cond.addBinaryRestriction(binaryRestriction);
+			ArrayList<BinaryRestriction> binaryRestrictions = new ArrayList<BinaryRestriction>();
+			binaryRestrictions.add(binaryRestriction);
+			cond.addBinaryRestrictionConjunction(binaryRestrictions);
 	}
 	}else{
 		UnaryRestriction unaryRestriction = new UnaryRestriction();
 		ReferenceTo referenceTo = new ReferenceTo();
 		referenceTo.setValue(s[3]);
 		unaryRestriction.setReferenceTo(referenceTo);
-		cond.addUnaryRestriction(unaryRestriction);
+		 ArrayList<UnaryRestriction>unaryRestrictions = new ArrayList<UnaryRestriction>();
+			unaryRestrictions.add(unaryRestriction);
+		cond.addUnaryRestrictionConjunction(unaryRestrictions);
 	}
 	c.setCondition(cond);
 	}
@@ -682,7 +603,9 @@ public static Monitoring mapFromSYBLAnnotationToXMLMonitoring(String monitor){
 		}
 		binaryRestriction.setLeftHandSide(leftHandSide2);
 		binaryRestriction.setRightHandSide(rightHandSide2);
-		c.addBinaryRestriction(binaryRestriction);
+		ArrayList<BinaryRestriction> binaryRestrictions = new ArrayList<BinaryRestriction>();
+		binaryRestrictions.add(binaryRestriction);
+		c.addBinaryRestrictionConjunction(binaryRestrictions);
 	}
 	monitoring1.setCondition(c);
 	monitoring1.setMonitor(m);

@@ -27,34 +27,36 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 
+import at.ac.tuwien.dsg.rSybl.cloudInteractionUnit.utils.RuntimeLogger;
+
 public class MonitoredComponentTopology extends MonitoredEntity {
 	private String id;
-	public HashMap<String,Float> monitoredData=new HashMap<String,Float>();
-	public ArrayList<MonitoredComponent> monitoredComponents = new ArrayList<MonitoredComponent>();
-	public ArrayList<MonitoredComponentTopology> monitoredComponentTopologies= new ArrayList<MonitoredComponentTopology>();
-	public HashMap<String,String> monitoredVariables = new HashMap<String,String>();
+	private HashMap<String,Float> monitoredData=new HashMap<String,Float>();
+	private ArrayList<MonitoredComponent> monitoredComponents = new ArrayList<MonitoredComponent>();
+	private ArrayList<MonitoredComponentTopology> monitoredComponentTopologies= new ArrayList<MonitoredComponentTopology>();
+	private HashMap<String,String> monitoredVariables = new HashMap<String,String>();
 
 
 	public void setMonitoredValue(String data, Float value){
-		monitoredData.put(data,value);
+		getMonitoredData().put(data,value);
 	}
 	public Float getMonitoredValue(String data){
-		return monitoredData.get(data);
+		return getMonitoredData().get(data);
 	}	
 	public void addMonitoredTopology(MonitoredComponentTopology componentTopology){
-		monitoredComponentTopologies.add(componentTopology);
+		getMonitoredComponentTopologies().add(componentTopology);
 	}
 	public List<MonitoredComponentTopology> getMonitoredTopologies(){
-		return monitoredComponentTopologies;
+		return getMonitoredComponentTopologies();
 	}
 	public void addMonitoredComponent(MonitoredComponent componentTopology){
-		monitoredComponents.add(componentTopology);
+		getMonitoredComponents().add(componentTopology);
 	}
 	public List<MonitoredComponent> getMonitoredComponents(){
 		return monitoredComponents;
 	}
 	public Collection<String> getMonitoredMetrics(){
-		return monitoredData.keySet();
+		return getMonitoredData().keySet();
 	}
 	public String getId() {
 		return id;
@@ -63,9 +65,58 @@ public class MonitoredComponentTopology extends MonitoredEntity {
 		this.id = id;
 	}
 	public void setMonitoredVar(String data, String value){
-		monitoredVariables.put(data,value);
+		getMonitoredVariables().put(data,value);
 	}
 	public String getMonitoredVar(String data){
-		return monitoredVariables.get(data);
+		return getMonitoredVariables().get(data);
+	}
+	public MonitoredComponentTopology clone(){
+		MonitoredComponentTopology cloudService=new MonitoredComponentTopology();
+		cloudService.setId(id);
+		HashMap<String,Float> newMonitoredData = new HashMap<String,Float>();
+		for (String entry:getMonitoredData().keySet()){
+			newMonitoredData.put(entry, getMonitoredData().get(entry).floatValue());
+		}
+
+		ArrayList<MonitoredComponentTopology> newMonitoredTopology=new ArrayList<MonitoredComponentTopology>();
+		for (MonitoredComponentTopology monitoredComponentTopology:getMonitoredComponentTopologies()){
+		    newMonitoredTopology.add(monitoredComponentTopology.clone());
+		}
+		ArrayList<MonitoredComponent> newMonitoredComponents=new ArrayList<MonitoredComponent>();
+		for (MonitoredComponent monitoredComponent:getMonitoredComponents()){
+			newMonitoredComponents.add(monitoredComponent.clone());
+		}
+		HashMap<String,String> newMonitoredVariables = new HashMap<String,String>();
+		for (String entry:getMonitoredVariables().keySet()){
+			newMonitoredVariables.put(entry, getMonitoredVariables().get(entry));
+		}
+
+		cloudService.setMonitoredData(newMonitoredData);
+		cloudService.setMonitoredComponentTopologies(newMonitoredTopology);
+		cloudService.setMonitoredComponents(newMonitoredComponents);
+		cloudService.setMonitoredVariables(newMonitoredVariables);
+		return cloudService;
+	}
+	public HashMap<String,Float> getMonitoredData() {
+		return monitoredData;
+	}
+	public void setMonitoredData(HashMap<String,Float> monitoredData) {
+		this.monitoredData = monitoredData;
+	}
+	public void setMonitoredComponents(ArrayList<MonitoredComponent> monitoredComponents) {
+		this.monitoredComponents = monitoredComponents;
+	}
+	public ArrayList<MonitoredComponentTopology> getMonitoredComponentTopologies() {
+		return monitoredComponentTopologies;
+	}
+	public void setMonitoredComponentTopologies(
+			ArrayList<MonitoredComponentTopology> monitoredComponentTopologies) {
+		this.monitoredComponentTopologies = monitoredComponentTopologies;
+	}
+	public HashMap<String,String> getMonitoredVariables() {
+		return monitoredVariables;
+	}
+	public void setMonitoredVariables(HashMap<String,String> monitoredVariables) {
+		this.monitoredVariables = monitoredVariables;
 	}
 }

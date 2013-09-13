@@ -27,11 +27,14 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 
+import org.junit.BeforeClass;
+
 import at.ac.tuwien.dsg.csdg.DependencyGraph;
 import at.ac.tuwien.dsg.csdg.Node;
 import at.ac.tuwien.dsg.csdg.Node.NodeType;
 import at.ac.tuwien.dsg.rSybl.cloudInteractionUnit.api.EnforcementAPIInterface;
 import at.ac.tuwien.dsg.rSybl.dataProcessingUnit.api.MonitoringAPIInterface;
+import at.ac.tuwien.dsg.rSybl.planningEngine.utils.Configuration;
 import at.ac.tuwien.dsg.rSybl.planningEngine.staticData.ActionEffect;
 import at.ac.tuwien.dsg.rSybl.planningEngine.staticData.ActionEffects;
 import at.ac.tuwien.dsg.rSybl.planningEngine.utils.PlanningLogger;
@@ -42,6 +45,7 @@ public class PlanningGreedyAlgorithm implements Runnable {
 	private MonitoringAPIInterface monitoringAPI;
 	private EnforcementAPIInterface enforcementAPI;
 	private DependencyGraph dependencyGraph;
+	private int REFRESH_PERIOD = 120000;
 	public class Pair<A, B> {
 		private A first;
 		private B second;
@@ -98,6 +102,7 @@ public class PlanningGreedyAlgorithm implements Runnable {
 		this.dependencyGraph = cloudService;
 		this.monitoringAPI = monitoringAPI;
 	   this.enforcementAPI = enforcementAPI;
+	   REFRESH_PERIOD = Configuration.getRefreshPeriod();
 		t = new Thread(this);
 	}
 
@@ -137,97 +142,7 @@ public class PlanningGreedyAlgorithm implements Runnable {
 		return possible;
 	}
 
-	public void findBestActions() {
-		HashMap<String, List<ActionEffect>> actionEffects = ActionEffects
-				.getActionEffects(dependencyGraph,monitoringAPI);
-	    PlanningLogger.logger.info("1 Number of elasticity requirements are "+dependencyGraph.getAllElasticityRequirements().size());
-
-		int numberOfBrokenConstraints = contextRepresentation
-				.countViolatedConstraints();
-	    PlanningLogger.logger.info(" 2 Number of elasticity requirements are "+dependencyGraph.getAllElasticityRequirements().size());
-
-		int lastFixed = 1;
-		Date date = new Date();
-		PlanningLogger.logger.info("At " + date.getDay() + "_"
-				+ date.getMonth() + "_" + date.getHours() + "_"
-				+ date.getMinutes() + " Number of violated constraints "
-				+ numberOfBrokenConstraints+ ". The violated constraints are the following: "
-				+ contextRepresentation.getViolatedConstraints());
-
-		while (numberOfBrokenConstraints > 0 && lastFixed > 0) {
-
-			HashMap<ActionEffect, Integer> fixedConstraints = new HashMap<ActionEffect, Integer>();
-			for (List<ActionEffect> list : actionEffects.values()) {
-				for (ActionEffect actionEffect : list)
-					if (checkIfActionPossible(actionEffect)) {
-						contextRepresentation.doAction(actionEffect);
-						PlanningLogger.logger.info("Action "+actionEffect.getTargetedEntityID()+" "+actionEffect.getActionType()+" fixes "+(numberOfBrokenConstraints-contextRepresentation.countViolatedConstraints())+" Constraints violated: "+contextRepresentation.getViolatedConstraints()+".");
-						fixedConstraints.put(
-								actionEffect,
-								numberOfBrokenConstraints
-										- contextRepresentation
-												.countViolatedConstraints());
-						contextRepresentation.undoAction(actionEffect);
-					}
-			}
-
-			int maxAction = -20;
-			ActionEffect action = null;
-			for (Integer val : fixedConstraints.values()) {
-				if (val > maxAction) {
-					maxAction = val;
-				}
-			}
-			for (ActionEffect actionEffect : fixedConstraints.keySet()) {
-				if (fixedConstraints.get(actionEffect) == maxAction)
-					action = actionEffect;
-			}
-
-			// Find cloudService = SYBLRMI enforce action with action type,
-			if (maxAction > 0) {
-				PlanningLogger.logger.info("Found action "
-						+ action.getActionType() + " on "
-						+ action.getTargetedEntityID() + " Number of constraints fixed:"
-						+ fixedConstraints.get(action)+" The remaining  violated constraints are the following: "
-								+ contextRepresentation.getViolatedConstraints());
-				lastFixed = fixedConstraints.get(action);
-				Node entity = dependencyGraph.getNodeWithID(action.getTargetedEntityID());
-				if (fixedConstraints.get(action) != 0) {
-					if (action.getActionType().equalsIgnoreCase("scaleout")) {
-						monitoringAPI.scaleoutstarted(entity);
-						enforcementAPI.scaleout(entity);
-						monitoringAPI.scaleoutended(entity);
-
-						try {
-							Thread.sleep(120000);
-						} catch (InterruptedException e) {
-							// TODO Auto-generated catch block
-							PlanningLogger.logger.error(e.toString());
-						}
-
-						PlanningLogger.logger.info("Scale out for "
-								+ entity.getId());
-					} else {
-						if (action.getActionType().equalsIgnoreCase("scalein")) {
-							monitoringAPI.scaleinstarted(entity);
-							enforcementAPI.scalein(entity);
-							monitoringAPI.scaleinended(entity);
-							try {
-								Thread.sleep(120000);
-							} catch (InterruptedException e) {
-								// TODO Auto-generated catch block
-								PlanningLogger.logger.error(e.toString());
-							}
-							PlanningLogger.logger.info("Scale in for "
-									+ entity.getId());
-						}
-					}
-				}
-			} else {
-				lastFixed = 0;
-			}
-		}
-	}
+	
 
 	public void findAndExecuteBestActions() {
 		HashMap<String, List<ActionEffect>> actionEffects = ActionEffects
@@ -238,16 +153,16 @@ public class PlanningGreedyAlgorithm implements Runnable {
 
 		int lastFixed = 1;
 		ArrayList<Pair<ActionEffect, Integer>> result = new ArrayList<Pair<ActionEffect, Integer>>();
-		Date date = new Date();
-		PlanningLogger.logger.info("At " + date.getDay() + "_"
-				+ date.getMonth() + "_" + date.getHours() + "_"
-				+ date.getMinutes() 
-				+ ". The violated constraints are the following: "
-				+ contextRepresentation.getViolatedConstraints());
-
+	
+		int numberOfRemainingConstraints=numberOfBrokenConstraints;
 		while (contextRepresentation.countViolatedConstraints() > 0
-				&& lastFixed > 0) {
-
+				&& numberOfRemainingConstraints > 0) {
+			Date date = new Date();
+			PlanningLogger.logger.info("At " + date.getDay() + "_"
+					+ date.getMonth() + "_" + date.getHours() + "_"
+					+ date.getMinutes() 
+					+ ". The violated constraints are the following: "
+					+ contextRepresentation.getViolatedConstraints());
 			HashMap<Pair<ActionEffect, Integer>, Integer> fixedConstraints = new HashMap<Pair<ActionEffect, Integer>, Integer>();
 			for (List<ActionEffect> list : actionEffects.values()) {
 				for (ActionEffect actionEffect : list)
@@ -259,21 +174,25 @@ public class PlanningGreedyAlgorithm implements Runnable {
 						}
 						int initiallyBrokenConstraints = contextRepresentation
 								.countViolatedConstraints();
-						ContextRepresentation beforeActionContextRepresentation = contextRepresentation;
+						MonitoredCloudService monitoredCloudService = contextRepresentation.getMonitoredCloudService().clone();
+						ContextRepresentation beforeActionContextRepresentation = new ContextRepresentation(monitoredCloudService, monitoringAPI);
 						// TODO: Try from 1 to 10 actions of the same type
 //						for (int i = 0; i < 10; i++) {
 //							for (int current = 0; current < i; current++) {
 //								contextRepresentation.doAction(actionEffect);
 //							}
+						
 						contextRepresentation.doAction(actionEffect);
-
-						PlanningLogger.logger.info("Trying the action "+actionEffect.getActionName()+"constraints violated : "+ contextRepresentation.getViolatedConstraints());
-							fixedConstraints
+						
+						int fixedStrategies = contextRepresentation.countFixedStrategies(beforeActionContextRepresentation);
+						PlanningLogger.logger.info("Trying the action "+actionEffect.getActionName()+"constraints violated : "+ contextRepresentation.getViolatedConstraints()+" Strategies improved "+fixedStrategies);
+						
+						fixedConstraints
 									.put(new Pair<ActionEffect, Integer>(
 											actionEffect, 1),
 											initiallyBrokenConstraints
 													- contextRepresentation
-															.countViolatedConstraints()+contextRepresentation.countFixedStrategies(beforeActionContextRepresentation));
+															.countViolatedConstraints()+fixedStrategies);
 							contextRepresentation.undoAction(actionEffect);
 //							for (int current = 0; current < i; current++) {
 //								contextRepresentation.undoAction(actionEffect);
@@ -333,6 +252,8 @@ public class PlanningGreedyAlgorithm implements Runnable {
 			} else {
 				lastFixed = 0;
 			}
+			numberOfRemainingConstraints-=lastFixed;
+			
 		}
 
 		for (Pair<ActionEffect, Integer> actionEffect : result)
@@ -398,7 +319,7 @@ public class PlanningGreedyAlgorithm implements Runnable {
 				contextRepresentation = new ContextRepresentation(dependencyGraph,
 						monitoringAPI);
 
-				contextRepresentation.initializeContext(dependencyGraph);
+				contextRepresentation.initializeContext();
 
 				findAndExecuteBestActions();
 				
