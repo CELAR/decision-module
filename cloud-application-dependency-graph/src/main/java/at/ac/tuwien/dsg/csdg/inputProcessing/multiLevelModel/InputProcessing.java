@@ -33,11 +33,11 @@ import java.util.Map.Entry;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBElement;
 import javax.xml.bind.JAXBException;
+import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
 import javax.xml.transform.stream.StreamSource;
 
 import at.ac.tuwien.dsg.csdg.DependencyGraph;
-import at.ac.tuwien.dsg.csdg.GraphLogger;
 import at.ac.tuwien.dsg.csdg.Node;
 import at.ac.tuwien.dsg.csdg.Relationship;
 import at.ac.tuwien.dsg.csdg.Node.NodeType;
@@ -53,6 +53,7 @@ import at.ac.tuwien.dsg.csdg.inputProcessing.multiLevelModel.abstractModelXML.SY
 import at.ac.tuwien.dsg.csdg.inputProcessing.multiLevelModel.abstractModelXML.ServiceTopologyXML;
 import at.ac.tuwien.dsg.csdg.inputProcessing.multiLevelModel.abstractModelXML.ServiceUnitXML;
 import at.ac.tuwien.dsg.csdg.inputProcessing.multiLevelModel.abstractModelXML.ServiceUnitXML.ActionXML;
+import at.ac.tuwien.dsg.csdg.inputProcessing.multiLevelModel.deploymentDescription.AssociatedVM;
 import at.ac.tuwien.dsg.csdg.inputProcessing.multiLevelModel.deploymentDescription.DeploymentDescription;
 import at.ac.tuwien.dsg.csdg.inputProcessing.multiLevelModel.deploymentDescription.DeploymentUnit;
 import at.ac.tuwien.dsg.csdg.utils.Configuration;
@@ -292,7 +293,8 @@ public class InputProcessing {
 		}
 		graph.setCloudService(cloudService);
 		cloudService.getStaticInformation().put("AccessIP",deploymentDescription.getAccessIP());
-
+		//
+		
 		//Populate with deployment information
 		for (DeploymentUnit deploymentUnit :deploymentDescription.getDeployments()){
 			
@@ -300,11 +302,29 @@ public class InputProcessing {
 			if (node!=null){
 				node.getStaticInformation().put("DefaultFlavor", deploymentUnit.getDefaultFlavor());
 				node.getStaticInformation().put("DefaultImage", deploymentUnit.getDefaultImage());
+				DependencyGraphLogger.logger.info("Adding vm "+deploymentUnit.getAssociatedVM().size());
+
+				if (deploymentUnit.getAssociatedVM()!=null && deploymentUnit.getAssociatedVM().size()>0){
+					for (AssociatedVM associatedVM:deploymentUnit.getAssociatedVM()){
+					Node vmNode = new Node();
+					vmNode.setId(associatedVM.getIp());
+					vmNode.setNodeType(NodeType.VIRTUAL_MACHINE);
+					Relationship vmRel = new Relationship();
+					vmRel.setSourceElement(node.getId());
+					vmRel.setTargetElement(vmNode.getId());
+					vmRel.setType(RelationshipType.HOSTED_ON_RELATIONSHIP);
+					node.addNode(vmNode, vmRel);
+					DependencyGraphLogger.logger.info("Adding vm "+vmNode.getId());
+					}
+				}
 			}else{
-				GraphLogger.logger.error("Cannot find node "+deploymentUnit.getServiceUnitID()+". Current graph is "+graph.graphToString());
+				DependencyGraphLogger.logger.error("Cannot find node "+deploymentUnit.getServiceUnitID()+". Current graph is "+graph.graphToString());
 				
 			}
-		}
+			
+			}
+			
+		
 		
 		//Populate with elasticity requirements information
 		for (SYBLSpecification specification: syblSpecifications.getSyblSpecifications()){
@@ -313,7 +333,7 @@ public class InputProcessing {
 			if (graph.getNodeWithID(specification.getComponentId())!=null)
 			graph.getNodeWithID(specification.getComponentId()).addElasticityRequirement(elRequirement);
 			else
-				GraphLogger.logger.error("Specification targets entity which is not found: "+specification.getComponentId());
+				DependencyGraphLogger.logger.error("Specification targets entity which is not found: "+specification.getComponentId());
 		}
 		return graph;
 	}

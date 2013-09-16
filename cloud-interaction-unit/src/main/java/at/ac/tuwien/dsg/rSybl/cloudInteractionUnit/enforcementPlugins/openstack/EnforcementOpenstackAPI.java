@@ -94,7 +94,7 @@ public class EnforcementOpenstackAPI implements EnforcementInterface{
 	}
 	
 	public void scaleOut(Node arg0)   {
-		Node o = findNode(arg0.getId());
+		Node o = arg0;
 		RuntimeLogger.logger.info("Scaling out ... "+arg0+" "+arg0.getNodeType());
 	
 		if (o.getNodeType()==NodeType.CODE_REGION){

@@ -1,7 +1,9 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<DeploymentDescription CloudServiceID="CloudService" AccessIP="128.1.2.2">
-	<DeploymentUnit serviceUnitID="LoadBalancerServiceUnit"
-		defaultFlavor="m1.tiny" defaultImage="0f344e97-76ef-43ae-b868-6fce6bed0f77" />
+<DeploymentDescription CloudServiceID="CloudService" AccessIP="128.130.172.214">
+	<DeploymentUnit serviceUnitID="LoadBalancerServiceUnit" 
+		defaultFlavor="m1.tiny" defaultImage="0f344e97-76ef-43ae-b868-6fce6bed0f77" >
+	<AssociatedVM IP="10.99.0.151"/>
+	</DeploymentUnit>
 	<DeploymentUnit serviceUnitID="EventProcessingServiceUnit"
 		defaultFlavor="m1.tiny" defaultImage="fb6e50ab-f2c3-4089-8cd2-0cbfaba2d6b4" />
 	<DeploymentUnit serviceUnitID="DataControllerServiceUnit"

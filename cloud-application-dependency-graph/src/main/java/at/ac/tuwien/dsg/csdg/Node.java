@@ -33,6 +33,7 @@ import at.ac.tuwien.dsg.csdg.Relationship.RelationshipType;
 import at.ac.tuwien.dsg.csdg.elasticityInformation.ElasticityCapability;
 import at.ac.tuwien.dsg.csdg.elasticityInformation.ElasticityMetric;
 import at.ac.tuwien.dsg.csdg.elasticityInformation.ElasticityRequirement;
+import at.ac.tuwien.dsg.csdg.utils.DependencyGraphLogger;
 
 
 
@@ -92,7 +93,7 @@ public class Node implements Serializable{
 				return;
 			}
 		}
-		GraphLogger.logger.info("Cannot set metric value. Metric not found with the name "+metricName);
+		DependencyGraphLogger.logger.info("Cannot set metric value. Metric not found with the name "+metricName);
 	}
 	public void addNode(Node node, Relationship rel){
 		if	(getRelatedNode(node.getId())!=null){
@@ -216,7 +217,7 @@ public  ArrayList<Node> getAllRelatedNodesOfType(RelationshipType relationshipTy
 				return m.getValue();
 			}
 		}
-		GraphLogger.logger.info("Cannot get metric value. Metric not found with the name "+metricName);
+		DependencyGraphLogger.logger.info("Cannot get metric value. Metric not found with the name "+metricName);
 		return 0;
 	}
 	public boolean hasElasticityMetric(String metricName){

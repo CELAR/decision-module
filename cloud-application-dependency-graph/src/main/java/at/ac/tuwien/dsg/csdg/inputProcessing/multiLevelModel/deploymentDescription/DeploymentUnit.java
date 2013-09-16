@@ -22,9 +22,13 @@
 
 package at.ac.tuwien.dsg.csdg.inputProcessing.multiLevelModel.deploymentDescription;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;
+import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlType;
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "DeploymentUnit")
@@ -35,7 +39,8 @@ public class DeploymentUnit {
  private String defaultFlavor="";
  @XmlAttribute(name = "serviceUnitID")
  private String serviceUnitID="";
- 
+ @XmlElement(name = "AssociatedVM")
+ private List<AssociatedVM> associatedVMs=new ArrayList<AssociatedVM>();
 public String getDefaultFlavor() {
 	return defaultFlavor;
 }
@@ -53,5 +58,14 @@ public String getServiceUnitID() {
 }
 public void setServiceUnitID(String serviceUnitID) {
 	this.serviceUnitID = serviceUnitID;
+}
+public List<AssociatedVM> getAssociatedVM() {
+	return associatedVMs;
+}
+public void setAssociatedVM(List<AssociatedVM> associatedVMs) {
+	this.associatedVMs = associatedVMs;
+}
+public void addAssociatedVM(AssociatedVM associatedVMs) {
+	this.associatedVMs.add(associatedVMs);
 }
 }

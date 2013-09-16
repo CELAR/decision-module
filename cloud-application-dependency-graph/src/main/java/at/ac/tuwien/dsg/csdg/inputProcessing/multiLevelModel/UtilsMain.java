@@ -30,6 +30,7 @@ import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
 
+import at.ac.tuwien.dsg.csdg.DependencyGraph;
 import at.ac.tuwien.dsg.csdg.elasticityInformation.elasticityRequirements.BinaryRestriction;
 import at.ac.tuwien.dsg.csdg.elasticityInformation.elasticityRequirements.Condition;
 import at.ac.tuwien.dsg.csdg.elasticityInformation.elasticityRequirements.Constraint;
@@ -60,7 +61,9 @@ public class UtilsMain {
 
 	public static void main(String[] args) {
 		// TODO Auto-generated method stub
-		new UtilsMain().writeDefaultData();
+	 InputProcessing inputProc = new InputProcessing();
+	 DependencyGraph dependencyGraph=inputProc.loadDependencyGraphFromFile();
+	 System.out.println(dependencyGraph.graphToString());
 		//new UtilsMain().writeElasticityRequirementsDirectives();
 	}
 	

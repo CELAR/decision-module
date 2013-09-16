@@ -828,12 +828,7 @@ public class MELA_API implements MonitoringInterface{
              //write message body
              OutputStream os = connection.getOutputStream();
              JAXBContext jaxbContext = JAXBContext.newInstance(Requirements.class);
-             RuntimeLogger.logger.info("Creating file f.xml");
-             OutputStream os1 = new FileOutputStream(new File("../webapps/logs/f.xml"));
              
-             jaxbContext.createMarshaller().marshal(requirements, os1);
-             os1.flush();
-             os1.close();
              jaxbContext.createMarshaller().marshal(requirements, os);
              os.flush();
              os.close();

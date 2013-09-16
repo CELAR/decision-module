@@ -40,7 +40,6 @@ import com.sun.jersey.spi.resource.Singleton;
 import at.ac.tuwien.dsg.csdg.elasticityInformation.elasticityRequirements.SYBLAnnotation;
 import at.ac.tuwien.dsg.rSybl.analysisEngine.main.ControlService;
 import at.ac.tuwien.dsg.rSybl.analysisEngine.main.ControlServiceFactory;
-import at.ac.tuwien.dsg.rSybl.analysisEngine.utils.AnalysisLogger;
 
 
 @Singleton

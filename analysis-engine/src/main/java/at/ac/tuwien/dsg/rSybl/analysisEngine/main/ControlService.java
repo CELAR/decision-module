@@ -78,6 +78,7 @@ public class ControlService{
 		//	at.ac.tuwien.dsg.sybl.monitorandenforcement.runtimeapi.Node clService = MappingToWS.mapNodeToNode(dependencyGraph.getCloudService());
 			Node node = new Node();
 			node = dependencyGraph.getCloudService();
+			AnalysisLogger.logger.info(dependencyGraph.graphToString());
 			monitoringAPI = new MonitoringAPI();
 			monitoringAPI.setControlledService(node);
 			
