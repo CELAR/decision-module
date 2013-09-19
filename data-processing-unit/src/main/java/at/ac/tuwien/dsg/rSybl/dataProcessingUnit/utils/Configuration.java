@@ -107,5 +107,9 @@ public class Configuration {
     public static String getCloudPassword()
     {
     	return configuration.getProperty("CloudPassword");
+    }  
+    public static String getMonitoringServiceURL(){
+    	return configuration.getProperty("MonitoringServiceURL");
     }
+    
 }

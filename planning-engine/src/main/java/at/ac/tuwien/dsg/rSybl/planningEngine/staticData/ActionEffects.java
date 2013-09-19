@@ -47,10 +47,10 @@ public class ActionEffects {
 		
 		{
 			scaleOutEffectForCassandraDB.setTargetedEntityID("DataNodeServiceUnit");
-			scaleOutEffectForCassandraDB.setActionEffectForMetric("cpu.usage", -40.0f,"DataNodeServiceUnit");
-			scaleOutEffectForCassandraDB.setActionEffectForMetric("mem.usage", -40.0f,"DataNodeServiceUnit");
-			scaleOutEffectForCassandraDB.setActionEffectForMetric("latency.average", -30.0f,"DataNodeServiceUnit");
-			scaleOutEffectForCassandraDB.setActionEffectForMetric("cost.PerHour", 0.001f*3600,"DataNodeServiceUnit");
+			scaleOutEffectForCassandraDB.setActionEffectForMetric("cpuUsage", -40.0f,"DataNodeServiceUnit");
+			scaleOutEffectForCassandraDB.setActionEffectForMetric("cpuUsage", -40.0f,"DataControllerServiceUnit");
+			scaleOutEffectForCassandraDB.setActionEffectForMetric("latency", -30.0f,"DataNodeServiceUnit");
+			scaleOutEffectForCassandraDB.setActionEffectForMetric("cost", 0.12f,"DataNodeServiceUnit");
 			scaleOutEffectForCassandraDB.setActionName("scaleOutEffectForDataNode");
 			scaleOutEffectForCassandraDB.setActionType("scaleout");
 
@@ -60,7 +60,7 @@ public class ActionEffects {
 		{
 			scaleOutEffectForWebServer.setTargetedEntityID("EventProcessingServiceUnit") ; 
 			scaleOutEffectForWebServer.setActionEffectForMetric("cpu.usage", -40.0f,"EventProcessingServiceUnit");
-			scaleOutEffectForWebServer.setActionEffectForMetric("cost.PerHour", 0.001f*3600,"EventProcessingServiceUnit");
+			scaleOutEffectForWebServer.setActionEffectForMetric("cost",0.12f,"EventProcessingServiceUnit");
 			scaleOutEffectForWebServer.setActionEffectForMetric("responseTime", -1000.0f,"EventProcessingServiceUnit");
 			scaleOutEffectForWebServer.setActionEffectForMetric("throughput", 1000f,"EventProcessingServiceUnit");
 			scaleOutEffectForWebServer.setActionName("scaleOutEffectForEventProcessingServiceUnit");
@@ -80,10 +80,9 @@ public class ActionEffects {
 
 		{
 			scaleInEffectForCassandraDB.setTargetedEntityID("DataNodeServiceUnit");
-			scaleInEffectForCassandraDB.setActionEffectForMetric("cpu.usage", 4.0f,"DataNodeServiceUnit");
-			scaleInEffectForCassandraDB.setActionEffectForMetric("mem.usage", 40.0f,"DataNodeServiceUnit");
-			scaleInEffectForCassandraDB.setActionEffectForMetric("latency.average", 0.001f,"DataNodeServiceUnit");
-			scaleInEffectForCassandraDB.setActionEffectForMetric("cost.PerHour", -30.0f,"DataNodeServiceUnit");
+			scaleInEffectForCassandraDB.setActionEffectForMetric("cpuUsage", 10.0f,"DataNodeServiceUnit");
+			scaleInEffectForCassandraDB.setActionEffectForMetric("latency", 0.0001f,"DataNodeServiceUnit");
+			scaleInEffectForCassandraDB.setActionEffectForMetric("cost", -0.12f,"DataNodeServiceUnit");
 			scaleInEffectForCassandraDB.setActionName("scaleInEffectForDataNode");
 			scaleInEffectForCassandraDB.setActionType("scalein");
 
@@ -92,8 +91,8 @@ public class ActionEffects {
 
 		{
 			scaleInEffectForWebServer.setTargetedEntityID("EventProcessingServiceUnit") ; 
-			scaleInEffectForWebServer.setActionEffectForMetric("cpu.usage", 40.0f,"EventProcessingServiceUnit");
-			scaleInEffectForWebServer.setActionEffectForMetric("cost.PerHour", 0.0f,"EventProcessingServiceUnit");
+			scaleInEffectForWebServer.setActionEffectForMetric("cpuUsage", 40.0f,"EventProcessingServiceUnit");
+			scaleInEffectForWebServer.setActionEffectForMetric("cost", 0.12f,"EventProcessingServiceUnit");
 			scaleInEffectForWebServer.setActionEffectForMetric("responseTime", 400.0f,"EventProcessingServiceUnit");
 			scaleInEffectForWebServer.setActionEffectForMetric("throughput", -1000.0f,"EventProcessingServiceUnit");
 			scaleInEffectForWebServer.setActionName("scaleInEffectForEventProcessingServiceUnit");

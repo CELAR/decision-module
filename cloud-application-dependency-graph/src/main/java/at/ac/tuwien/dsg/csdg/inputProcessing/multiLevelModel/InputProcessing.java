@@ -302,7 +302,7 @@ public class InputProcessing {
 			if (node!=null){
 				node.getStaticInformation().put("DefaultFlavor", deploymentUnit.getDefaultFlavor());
 				node.getStaticInformation().put("DefaultImage", deploymentUnit.getDefaultImage());
-				DependencyGraphLogger.logger.info("Adding vm "+deploymentUnit.getAssociatedVM().size());
+				//DependencyGraphLogger.logger.info("Adding vm "+deploymentUnit.getAssociatedVM().size());
 
 				if (deploymentUnit.getAssociatedVM()!=null && deploymentUnit.getAssociatedVM().size()>0){
 					for (AssociatedVM associatedVM:deploymentUnit.getAssociatedVM()){
@@ -314,7 +314,6 @@ public class InputProcessing {
 					vmRel.setTargetElement(vmNode.getId());
 					vmRel.setType(RelationshipType.HOSTED_ON_RELATIONSHIP);
 					node.addNode(vmNode, vmRel);
-					DependencyGraphLogger.logger.info("Adding vm "+vmNode.getId());
 					}
 				}
 			}else{

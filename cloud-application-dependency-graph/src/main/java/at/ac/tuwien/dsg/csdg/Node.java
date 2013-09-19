@@ -103,6 +103,9 @@ public class Node implements Serializable{
 		}
 		getRelatedNodes().put(node, rel);
 			if (getRelationships().containsKey(rel.getType())){
+				if (rel.getType()==RelationshipType.HOSTED_ON_RELATIONSHIP){
+					DependencyGraphLogger.logger.info("Adding "+node+" with relationship types "+rel.getType());
+				}
 				Node foundNode = null;
 				for (Node myNode : getAllRelatedNodesOfType(rel.getType())){
 					if ((myNode.getId().equalsIgnoreCase(node.getId())) ){
@@ -183,20 +186,38 @@ public  ArrayList<Node> getAllRelatedNodesOfType(RelationshipType relationshipTy
 	}
 	public  void removeNode(Node node){
 		
-		Relationship rel = getRelatedNodes().get(node);
-		getRelationships().get(rel).remove(node);
-		getRelatedNodes().remove(node);
+		Relationship rel = relatedNodes.get(node);
+		if (relatedNodes.containsKey(node))
+		relatedNodes.remove(node);
+		else
+			DependencyGraphLogger.logger.info("Not found node "+node);
+		try{
+			if (relationships.containsKey(rel))
+				DependencyGraphLogger.logger.info("Not finding relationship"+rel.getType());
+			else{	
+		
+				relationships.get(rel.getType()).remove(node);
+			}
+		}catch(Exception e){
+			DependencyGraphLogger.logger.info("Not finding relationship for this "+this+". "+rel.getType()+" source "+rel.getSourceElement()+" target "+rel.getTargetElement()+relationships.get(rel));
+		}
 	}
 	public  void removeNode(String id){
 		Node string = null;
-		for (Node n:getRelatedNodes().keySet()){
+		for (Node n:relatedNodes.keySet()){
+			DependencyGraphLogger.logger.info("Searching for node to remove "+n.id);
 			if (n.getId().equalsIgnoreCase(id)){
 				string = n;
 			}
 		}
+		
+		try{
 		Relationship rel = getRelatedNodes().get(string);
 		getRelationships().get(rel).remove(string);
 		getRelatedNodes().remove(string);
+		}catch(Exception e){
+			DependencyGraphLogger.logger.info("Cannot remove "+id+" from "+this.id +e.getCause());
+		}
 	}
 	public String getId() {
 		return id;

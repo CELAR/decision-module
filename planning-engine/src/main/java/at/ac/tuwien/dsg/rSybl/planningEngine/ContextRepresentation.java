@@ -73,36 +73,61 @@ public class ContextRepresentation {
 	
 	private MonitoredEntity findTargetedMetrics(Node entity,MonitoredEntity monitoredEntity){
 		monitoredEntity.setId(entity.getId());
+			SYBLDescriptionParser descriptionParser = new SYBLDescriptionParser();
 
 		for (ElasticityRequirement elasticityRequirement :entity.getElasticityRequirements()){
 			SYBLSpecification syblSpecification = SYBLDirectiveMappingFromXML.mapFromSYBLAnnotation(elasticityRequirement.getAnnotation());
 			for (Strategy strategy:syblSpecification.getStrategy()){
-				SYBLDescriptionParser descriptionParser = new SYBLDescriptionParser();
-	   	
-	   				String methodName = descriptionParser.getMethod(strategy.getToEnforce().getParameter());
+					String methodName="";
 	   				Float value = 0.0f;	
-	   				if (!methodName.equals("")) {
+
+					if (methodName.equals("") && strategy.getToEnforce().getParameter()!=null && strategy.getToEnforce().getParameter()!=""){
 						try {
-							Class partypes[] = new Class[1];
-							Object[] parameters = new Object[1];
-							parameters[0]=entity;
-							partypes[0]= Node.class;
-							Method method = MonitoringInterface.class.getMethod(methodName,partypes);
-							value = (Float)method.invoke(monitoringAPI,parameters);
-						}catch(Exception e){
+							
+								value=	monitoringAPI.getMetricValue(strategy.getToEnforce().getParameter(), entity);
+							}catch(Exception e){
 							e.printStackTrace();
 						}
-					}else{
-						 value= (Float) monitoringAPI.getMetricValue(strategy.getToEnforce().getParameter(), entity);
-
+						
 					}
+	   				
+					
 	   				monitoredEntity.setMonitoredValue(strategy.getToEnforce().getParameter(),value );	
+		   			if (strategy.getCondition()!=null)
+	   				for (ArrayList<BinaryRestriction> restrictions:strategy.getCondition().getBinaryRestriction()){
+		   			for (BinaryRestriction restriction:restrictions){
+		   				String right = restriction.getRightHandSide().getMetric();
+		   				String left = restriction.getLeftHandSide().getMetric();
+		   				String metric="";
+		   				if (right!=null)
+		   					metric =right;
+		   				else metric=left;
+		   				 methodName = descriptionParser.getMethod(metric);
+		   				 value = 0.0f;	
+		   				if (!methodName.equals("")) {
+							try {
+								Class partypes[] = new Class[1];
+								Object[] parameters = new Object[1];
+								parameters[0]=entity;
+								partypes[0]= Node.class;
+								Method method = MonitoringInterface.class.getMethod(methodName,partypes);
+								value = (Float)method.invoke(monitoringAPI,parameters);
+							}catch(Exception e){
+								e.printStackTrace();
+							}
+						}else{
+							 value= (Float) monitoringAPI.getMetricValue(metric, entity);
+
+						}
+		   				monitoredEntity.setMonitoredValue(metric,value );	
+		   				
+		   			}
+		   			}
 	   			}
    		
 			
 	   			for (Monitoring monitoring:syblSpecification.getMonitoring()){
 					monitoredEntity.setMonitoredVar(monitoring.getMonitor().getEnvVar(),monitoring.getMonitor().getMetric());
-		   			SYBLDescriptionParser descriptionParser = new SYBLDescriptionParser();
 		   			String methodName = descriptionParser.getMethod(monitoring.getMonitor().getMetric());
 					Float value = 0.0f;	
 					if (!methodName.equals("")) {
@@ -123,11 +148,11 @@ public class ContextRepresentation {
 						 value= (Float) monitoringAPI.getMetricValue(monitoring.getMonitor().getMetric(), entity);
 							
 						}
-					monitoredEntity.setMonitoredValue(monitoring.getMonitor().getMetric(),value );		
+					monitoredEntity.setMonitoredValue(monitoring.getMonitor().getMetric(),value );	
+	   				
 	   		}
 	   			
 	   			for (Constraint constraint:syblSpecification.getConstraint()){
-		   			SYBLDescriptionParser descriptionParser = new SYBLDescriptionParser();
 		   			for (ArrayList<BinaryRestriction> restrictions:constraint.getToEnforce().getBinaryRestriction()){
 		   			for (BinaryRestriction restriction:restrictions){
 		   				String right = restriction.getRightHandSide().getMetric();
@@ -154,13 +179,61 @@ public class ContextRepresentation {
 
 						}
 		   				monitoredEntity.setMonitoredValue(metric,value );	
+		   				
+		   			}
+		   			}
+		   			if (constraint.getCondition()!=null)
+		   			for (ArrayList<BinaryRestriction> restrictions:constraint.getCondition().getBinaryRestriction()){
+		   			for (BinaryRestriction restriction:restrictions){
+		   				String right = restriction.getRightHandSide().getMetric();
+		   				String left = restriction.getLeftHandSide().getMetric();
+		   				String metric="";
+		   				if (right!=null)
+		   					metric =right;
+		   				else metric=left;
+		   				String methodName = descriptionParser.getMethod(metric);
+		   				Float value = 0.0f;	
+		   				if (!methodName.equals("")) {
+							try {
+								Class partypes[] = new Class[1];
+								Object[] parameters = new Object[1];
+								parameters[0]=entity;
+								partypes[0]= Node.class;
+								Method method = MonitoringInterface.class.getMethod(methodName,partypes);
+								value = (Float)method.invoke(monitoringAPI,parameters);
+							}catch(Exception e){
+								e.printStackTrace();
+							}
+						}else{
+							 value= (Float) monitoringAPI.getMetricValue(metric, entity);
+
+						}
+		   				monitoredEntity.setMonitoredValue(metric,value );	
+		   				
 		   			}
 		   			}
 	   	}
 	}
 		return monitoredEntity;
 	}
-	
+	private void propagateMonitoredMetrics(){
+		List<MonitoredComponentTopology> monitoredTopologies = new ArrayList<MonitoredComponentTopology>();
+		monitoredTopologies.addAll(monitoredCloudService.getMonitoredTopologies());
+		while (!monitoredTopologies.isEmpty()){
+			Node entity = dependencyGraph.getNodeWithID(monitoredTopologies.get(0).getId());
+			for (Node n:entity.getAllRelatedNodesOfType(RelationshipType.COMPOSITION_RELATIONSHIP)){
+					float v1 = -1;
+					MonitoredEntity newMon = findMonitoredEntity(n.getId());
+	   				if (entity.getAllRelatedNodesOfType(RelationshipType.COMPOSITION_RELATIONSHIP)!=null)
+					for (String metric: monitoredTopologies.get(0).getMonitoredData().keySet()){
+                                            v1=monitoringAPI.getMetricValue(metric, n);
+					if (v1>-1 && newMon!=null)
+					findMonitoredEntity(n.getId()).setMonitoredValue(metric, v1);
+					}
+				}
+			monitoredTopologies.remove(0);
+		}
+	}
 	private MonitoredCloudService createMonitoredService(){
 		
 		setMonitoredCloudService((MonitoredCloudService) findTargetedMetrics(dependencyGraph.getCloudService(), getMonitoredCloudService()));
@@ -173,10 +246,12 @@ public class ContextRepresentation {
 		for (Node currentTopology:topologies){
 			MonitoredComponentTopology monitoredTopology = new MonitoredComponentTopology();
 			monitoredTopology = (MonitoredComponentTopology) findTargetedMetrics( currentTopology,monitoredTopology);
+			monitoredTopology.setId(currentTopology.getId());
 		    if (currentTopology.getAllRelatedNodesOfType(RelationshipType.COMPOSITION_RELATIONSHIP,NodeType.SERVICE_TOPOLOGY)!=null)
 			for(Node componentTopology: currentTopology.getAllRelatedNodesOfType(RelationshipType.COMPOSITION_RELATIONSHIP,NodeType.SERVICE_TOPOLOGY)){
 		    	MonitoredComponentTopology monitoredTopology1 = new MonitoredComponentTopology();
 				monitoredTopology1 = (MonitoredComponentTopology) findTargetedMetrics(componentTopology,monitoredTopology1);
+				monitoredTopology1.setId(componentTopology.getId());
 				for (Node component:componentTopology.getAllRelatedNodesOfType(RelationshipType.COMPOSITION_RELATIONSHIP,NodeType.SERVICE_UNIT)){
 					MonitoredComponent monitoredComponent = new MonitoredComponent();
 					monitoredComponent = (MonitoredComponent) findTargetedMetrics(component,monitoredComponent);
@@ -193,7 +268,7 @@ public class ContextRepresentation {
 			getMonitoredCloudService().addMonitoredTopology(monitoredTopology);
 
 		}
-		
+		propagateMonitoredMetrics();
 
 		return getMonitoredCloudService();
 	}
@@ -336,6 +411,8 @@ public class ContextRepresentation {
 
 			//System.out.println("Searching for monitored entity "+syblSpecification.getComponentId());
 			MonitoredEntity monitoredEntity = findMonitoredEntity(syblSpecification.getComponentId());
+			if (monitoredEntity==null) PlanningLogger.logger.info("Not finding monitored entity "+monitoredEntity+ " "+syblSpecification.getComponentId());
+
 			for (Constraint constraint:syblSpecification.getConstraint()){
 				
 				if (evaluateCondition(constraint.getCondition(),monitoredEntity) && !evaluateCondition(constraint.getToEnforce(), monitoredEntity)) constr+=constraint.getId()+" ";
@@ -350,7 +427,7 @@ public class ContextRepresentation {
 		float currentRightValue = 0;
 		if (binaryRestriction.getLeftHandSide().getMetric()!=null){
 			String metric = binaryRestriction.getLeftHandSide().getMetric();
-			//System.out.println(monitoredEntity+" "+syblSpecification.getComponentId());
+			//PlanningLogger.logger.info(monitoredEntity.getId()+" "+metric);
 			currentLeftValue = monitoredEntity.getMonitoredValue(metric);
 			if (currentLeftValue<0){
 				if (monitoredEntity.getMonitoredVar(metric)!=null)
@@ -419,20 +496,21 @@ public class ContextRepresentation {
 			SYBLSpecification syblSpecification = SYBLDirectiveMappingFromXML.mapFromSYBLAnnotation(elReq.getAnnotation());
 		//System.out.println("Searching for monitored entity "+syblSpecification.getComponentId());
 				MonitoredEntity monitoredEntity = findMonitoredEntity(syblSpecification.getComponentId());
+				if (monitoredEntity==null) PlanningLogger.logger.info("Not finding monitored entity "+monitoredEntity+ " "+syblSpecification.getComponentId());
 			for (Strategy strategy:syblSpecification.getStrategy()){
 				Condition condition = strategy.getCondition();		
 				
 				if (evaluateCondition(condition, monitoredEntity)){
 				if (strategy.getToEnforce().getActionName().toLowerCase().contains("maximize")||strategy.getToEnforce().getActionName().toLowerCase().contains("minimize")){
 					if (strategy.getToEnforce().getActionName().toLowerCase().contains("maximize")){
-						PlanningLogger.logger.info("Current value for "+ strategy.getToEnforce().getParameter()+" is "+ monitoredEntity.getMonitoredValue(strategy.getToEnforce().getParameter())+" .Previous value was "+previousContextRepresentation.getValueForMetric(monitoredEntity,strategy.getToEnforce().getParameter()));
+						//PlanningLogger.logger.info("Current value for "+ strategy.getToEnforce().getParameter()+" is "+ monitoredEntity.getMonitoredValue(strategy.getToEnforce().getParameter())+" .Previous value was "+previousContextRepresentation.getValueForMetric(monitoredEntity,strategy.getToEnforce().getParameter()));
 						
 						if (monitoredEntity.getMonitoredValue(strategy.getToEnforce().getParameter())>previousContextRepresentation.getValueForMetric(monitoredEntity, strategy.getToEnforce().getParameter())){
 							nbFixedStrategies+=1;
 						}
 					}
 					if (strategy.getToEnforce().getActionName().toLowerCase().contains("minimize")){
-						PlanningLogger.logger.info("Current value for "+ strategy.getToEnforce().getParameter()+" is "+ monitoredEntity.getMonitoredValue(strategy.getToEnforce().getParameter())+" .Previous value was "+previousContextRepresentation.getValueForMetric(monitoredEntity,strategy.getToEnforce().getParameter()));
+					//	PlanningLogger.logger.info("Current value for "+ strategy.getToEnforce().getParameter()+" is "+ monitoredEntity.getMonitoredValue(strategy.getToEnforce().getParameter())+" .Previous value was "+previousContextRepresentation.getValueForMetric(monitoredEntity,strategy.getToEnforce().getParameter()));
 						
 						if (monitoredEntity.getMonitoredValue(strategy.getToEnforce().getParameter())<previousContextRepresentation.getValueForMetric(monitoredEntity,strategy.getToEnforce().getParameter())){
 							nbFixedStrategies+=1;
@@ -470,6 +548,8 @@ public class ContextRepresentation {
 			SYBLSpecification syblSpecification = SYBLDirectiveMappingFromXML.mapFromSYBLAnnotation(elReq.getAnnotation());
 			//System.out.println("Searching for monitored entity "+syblSpecification.getComponentId());
 			MonitoredEntity monitoredEntity = findMonitoredEntity(syblSpecification.getComponentId());
+			if (monitoredEntity==null) PlanningLogger.logger.info("Not finding monitored entity "+monitoredEntity+ " "+syblSpecification.getComponentId());
+
 			for (Constraint constraint:syblSpecification.getConstraint()){
 				if (evaluateCondition(constraint.getCondition(), monitoredEntity) && !evaluateCondition(constraint.getToEnforce(), monitoredEntity))
 						numberofViolatedConstraints=numberofViolatedConstraints+1;

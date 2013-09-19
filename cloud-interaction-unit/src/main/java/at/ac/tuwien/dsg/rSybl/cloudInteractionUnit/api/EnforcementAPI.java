@@ -63,7 +63,6 @@ public class EnforcementAPI implements EnforcementAPIInterface{
 
 
 	public void scalein(Node arg0) {
-		RuntimeLogger.logger.info("Scaling in "+arg0.getId()+" ...");
 		executingControlAction=true;
 		offeredCapabilities.scaleIn(arg0);
 		executingControlAction=false;

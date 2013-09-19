@@ -32,7 +32,6 @@ import at.ac.tuwien.dsg.csdg.Node;
 import at.ac.tuwien.dsg.csdg.Node.NodeType;
 import at.ac.tuwien.dsg.csdg.Relationship.RelationshipType;
 import at.ac.tuwien.dsg.csdg.elasticityInformation.elasticityRequirements.SYBLAnnotation;
-import at.ac.tuwien.dsg.rSybl.analysisEngine.utils.AnalysisLogger;
 import at.ac.tuwien.dsg.rSybl.cloudInteractionUnit.api.EnforcementAPIInterface;
 import at.ac.tuwien.dsg.rSybl.dataProcessingUnit.api.MonitoringAPIInterface;
 import at.ac.tuwien.dsg.sybl.syblProcessingUnit.processing.SYBLProcessingThread;
@@ -100,7 +99,6 @@ public class SYBLService {
 	public void processAnnotations( String componentID, SYBLAnnotation syblAnnotation){
 		if (! myProcessingThreads.containsKey(componentID)){
 			Node e = nodes.get(componentID); 
-			AnalysisLogger.logger.info("CurrentAnnotation "+syblAnnotation.getConstraints()+" "+syblAnnotation.getEntityID()+" "+componentID+ " "+e );
 		
 		 SYBLProcessingThread p = new SYBLProcessingThread(syblAnnotation, e, dependencyGraph,monitoringAPI, enforcementAPI);
 		 p.start();

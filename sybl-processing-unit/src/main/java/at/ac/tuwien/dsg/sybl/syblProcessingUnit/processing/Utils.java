@@ -30,9 +30,7 @@ import java.util.HashMap;
 import at.ac.tuwien.dsg.csdg.DependencyGraph;
 import at.ac.tuwien.dsg.csdg.Node;
 import at.ac.tuwien.dsg.rSybl.cloudInteractionUnit.api.EnforcementAPIInterface;
-import at.ac.tuwien.dsg.rSybl.cloudInteractionUnit.enforcementPlugins.interfaces.EnforcementInterface;
 import at.ac.tuwien.dsg.rSybl.dataProcessingUnit.api.MonitoringAPIInterface;
-import at.ac.tuwien.dsg.rSybl.dataProcessingUnit.monitoringPlugins.interfaces.MonitoringInterface;
 import at.ac.tuwien.dsg.sybl.syblProcessingUnit.exceptions.ConstraintViolationException;
 import at.ac.tuwien.dsg.sybl.syblProcessingUnit.exceptions.MethodNotFoundException;
 import at.ac.tuwien.dsg.sybl.syblProcessingUnit.languageDescription.SYBLDescriptionParser;
@@ -309,7 +307,7 @@ public void processStrategy(Rule r) {
 					entity.setId(parameter);
 					parameters[0]=entity;
 					partypes[0]=Node.class;
-					Method actionMethod = EnforcementInterface.class.getMethod(
+					Method actionMethod = EnforcementAPIInterface.class.getMethod(
 							actionName, partypes);
 
 					actionMethod.invoke(enforcementAPI, parameters);
@@ -346,7 +344,7 @@ public void processStrategy(Rule r) {
 					partypes[0]=Node.class;
 					try {
 						
-						Method actionMethod = EnforcementInterface.class.getMethod(
+						Method actionMethod = EnforcementAPIInterface.class.getMethod(
 								actionName, partypes);
 
 						actionMethod.invoke(enforcementAPI, parameters);
@@ -390,7 +388,7 @@ public void processStrategy(Rule r) {
 				partypes[0]=Node.class;
 				try {
 					//System.err.println("Enforcing strategy "+action);
-					Method actionMethod = EnforcementInterface.class.getMethod(
+					Method actionMethod = EnforcementAPIInterface.class.getMethod(
 							actionName, partypes);
 
 					actionMethod.invoke(enforcementAPI, parameters);
@@ -592,7 +590,7 @@ public Comparable evaluateTerm(String term)  {
 				parameters[0]=currentEntity;
 				partypes[0]=Node.class;
 							
-				Method method = MonitoringInterface.class.getMethod(methodName,partypes);
+				Method method = MonitoringAPIInterface.class.getMethod(methodName,partypes);
 				result= (Float) method.invoke(monitoringAPI, parameters);
 
 			} catch (Exception e) {

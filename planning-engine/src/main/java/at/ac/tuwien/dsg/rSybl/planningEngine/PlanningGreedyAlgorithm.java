@@ -164,6 +164,8 @@ public class PlanningGreedyAlgorithm implements Runnable {
 					+ ". The violated constraints are the following: "
 					+ contextRepresentation.getViolatedConstraints());
 			HashMap<Pair<ActionEffect, Integer>, Integer> fixedConstraints = new HashMap<Pair<ActionEffect, Integer>, Integer>();
+			HashMap<Pair<ActionEffect, Integer>, Integer> fixedStrategies = new HashMap<Pair<ActionEffect, Integer>, Integer>();
+			
 			for (List<ActionEffect> list : actionEffects.values()) {
 				for (ActionEffect actionEffect : list)
 					if (checkIfActionPossible(actionEffect)) {
@@ -184,15 +186,19 @@ public class PlanningGreedyAlgorithm implements Runnable {
 						
 						contextRepresentation.doAction(actionEffect);
 						
-						int fixedStrategies = contextRepresentation.countFixedStrategies(beforeActionContextRepresentation);
-						PlanningLogger.logger.info("Trying the action "+actionEffect.getActionName()+"constraints violated : "+ contextRepresentation.getViolatedConstraints()+" Strategies improved "+fixedStrategies);
+						int fixedStr = contextRepresentation.countFixedStrategies(beforeActionContextRepresentation);
+						PlanningLogger.logger.info("Trying the action "+actionEffect.getActionName()+"constraints violated : "+ contextRepresentation.getViolatedConstraints()+" Strategies improved "+fixedStr);
 						
 						fixedConstraints
 									.put(new Pair<ActionEffect, Integer>(
 											actionEffect, 1),
 											initiallyBrokenConstraints
 													- contextRepresentation
-															.countViolatedConstraints()+fixedStrategies);
+															.countViolatedConstraints()+fixedStr);
+						fixedStrategies
+						.put(new Pair<ActionEffect, Integer>(
+								actionEffect, 1),
+								fixedStr);
 							contextRepresentation.undoAction(actionEffect);
 //							for (int current = 0; current < i; current++) {
 //								contextRepresentation.undoAction(actionEffect);
@@ -214,26 +220,40 @@ public class PlanningGreedyAlgorithm implements Runnable {
 
 			int maxAction = -20;
 			Pair action = null;
-
+			
 			for (Integer val : fixedConstraints.values()) {
 				if (val > maxAction) {
 					maxAction = val;
 				}
+				
 			}
 			Pair actionTargetingComponent = null;
 			Pair actionTargetingComponentTopology = null;
+			int minStrat = 100;
 			for (Pair<ActionEffect, Integer> pair : fixedConstraints.keySet()) {
 				if (fixedConstraints.get(pair) == maxAction) {
-					if (dependencyGraph.getNodeWithID(pair.getFirst().getTargetedEntityID()).getNodeType()==NodeType.SERVICE_UNIT)
-						actionTargetingComponent = pair;
-					else
-						actionTargetingComponentTopology = pair;
+					
+					for(Pair<ActionEffect,Integer> p:fixedStrategies.keySet()){
+					//	PlanningLogger.logger.info("Action Effect "+p.getFirst().getActionName()+" strategies "+fixedStrategies.get(p));
+						if (p.getFirst().equals(pair.getFirst())){
+							if (minStrat>fixedStrategies.get(p)){
+								if (dependencyGraph.getNodeWithID(pair.getFirst().getTargetedEntityID()).getNodeType()==NodeType.SERVICE_UNIT)
+									actionTargetingComponent = pair;
+								else
+									actionTargetingComponentTopology = pair;
+								minStrat=fixedStrategies.get(p);
+							}
+						}
+					}
+					
 				}
 			}
+			
 			if (actionTargetingComponent != null)
 				action = actionTargetingComponent;
 			else
 				action = actionTargetingComponentTopology;
+		//	PlanningLogger.logger.info("Found action "+ action);
 			// Find cloudService = SYBLRMI enforce action with action type,
 			if (maxAction > 0 && !result.contains(action)) {
 				PlanningLogger.logger.info("Found action "
@@ -242,7 +262,7 @@ public class PlanningGreedyAlgorithm implements Runnable {
 						+ ((ActionEffect) action.getFirst())
 								.getTargetedEntityID() + " Number of constraints fixed: "
 						+ fixedConstraints.get(action));
-				lastFixed = fixedConstraints.get(action);
+				lastFixed = fixedConstraints.get(action)-fixedStrategies.get(action);
 				Node entity = dependencyGraph.getNodeWithID(((ActionEffect) action.getFirst())
 						.getTargetedEntityID());
 				if (fixedConstraints.get(action) > 0) {
@@ -306,7 +326,7 @@ public class PlanningGreedyAlgorithm implements Runnable {
 	public void run() {
 		while (true) {
 			try {
-				Thread.sleep(120000);
+				Thread.sleep(REFRESH_PERIOD);
 			} catch (InterruptedException e) {
 				// TODO Auto-generated catch block
 				PlanningLogger.logger.error(e.toString());

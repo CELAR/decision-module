@@ -73,7 +73,7 @@ public class ControlService{
 	
 	public void startSYBLProcessingAndPlanning(){
 		try {
-			//SYBLDirectivesEnforcementLogger.logger.info("Current graph is "+dependencyGraph.graphToString());
+			AnalysisLogger.logger.info("Current graph is "+dependencyGraph.graphToString());
 
 		//	at.ac.tuwien.dsg.sybl.monitorandenforcement.runtimeapi.Node clService = MappingToWS.mapNodeToNode(dependencyGraph.getCloudService());
 			Node node = new Node();
@@ -81,7 +81,8 @@ public class ControlService{
 			AnalysisLogger.logger.info(dependencyGraph.graphToString());
 			monitoringAPI = new MonitoringAPI();
 			monitoringAPI.setControlledService(node);
-			
+			AnalysisLogger.logger.info("Have just set the cloud service ");
+
 			enforcementAPI = new EnforcementAPI();
     
 			enforcementAPI.setControlledService(node);

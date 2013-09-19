@@ -128,11 +128,10 @@ public class MonitoringAPI implements MonitoringAPIInterface{
 	
 	public void setControlledService(Node controlledService) {
 		this.controlledService = controlledService;
-		controlledService.getAllRelatedNodes();
-	    RuntimeLogger.logger.info("Set the service "+ controlledService.toString());
+	   RuntimeLogger.logger.info("Setting the service "+ controlledService.toString());
 		offeredMonitoringMetrics  = OfferedMonitoredMetrics.getInstance(this.controlledService);
 		offeredMonitoringMetrics.submitServiceConfiguration(this.controlledService);
-	//    RuntimeLogger.logger.info("Set the service "+ controlledService.toString());
+	    RuntimeLogger.logger.info("Set the service configuration on the monitoring api to "+ controlledService.toString());
 
 	}
 	

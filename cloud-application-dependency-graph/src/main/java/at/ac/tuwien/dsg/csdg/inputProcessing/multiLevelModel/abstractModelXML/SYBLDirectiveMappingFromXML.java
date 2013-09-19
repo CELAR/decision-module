@@ -40,6 +40,7 @@ import at.ac.tuwien.dsg.csdg.elasticityInformation.elasticityRequirements.UnaryR
 import at.ac.tuwien.dsg.csdg.elasticityInformation.elasticityRequirements.BinaryRestriction.LeftHandSide;
 import at.ac.tuwien.dsg.csdg.elasticityInformation.elasticityRequirements.BinaryRestriction.RightHandSide;
 import at.ac.tuwien.dsg.csdg.elasticityInformation.elasticityRequirements.SYBLAnnotation.AnnotationType;
+import at.ac.tuwien.dsg.csdg.utils.DependencyGraphLogger;
 
 
 
@@ -100,7 +101,7 @@ public static String conditionToString(Condition condition){
 	if (condition.getBinaryRestriction().size()>0){
 		for( List<BinaryRestriction> binaryRestrictions : condition.getBinaryRestriction()){
 			if (condition.getBinaryRestriction().size()>1){
-				stringCondition+="(";
+				stringCondition+="( ";
 			}
 			for (BinaryRestriction binaryRestriction:binaryRestrictions){
 		String leftHandSide="";
@@ -139,7 +140,7 @@ public static String conditionToString(Condition condition){
 		
 		}
 			if (condition.getBinaryRestriction().size()>1){
-				stringCondition+=")";
+				stringCondition+=" )";
 				if (condition.getBinaryRestriction().get(condition.getBinaryRestriction().size()-1)!=binaryRestrictions){
 					stringCondition+=" OR ";
 				}
@@ -160,7 +161,7 @@ public static String conditionToString(Condition condition){
 				}
 			}
 			if (condition.getUnaryRestrictions().size()>1){
-				stringCondition+=")";
+				stringCondition+=" )";
 				if (condition.getUnaryRestrictions().get(condition.getUnaryRestrictions().size()-1)!=unaryRestrictions){
 					stringCondition+=" OR ";
 				}
@@ -193,7 +194,6 @@ public static String mapXMLConstraintToSYBLAnnotation(Constraint constraint){
 public static String mapFromXMLStrategyToSYBLAnnotation(Strategy strategy){
 	if (strategy.getCondition()!=null){
 	String strategies = strategy.getId()+":STRATEGY CASE ";
-
 	if (strategy.getCondition()!=null){
 		if (strategy.getCondition().getBinaryRestriction().size()>0){
 			strategies+=conditionToString(strategy.getCondition());
@@ -202,13 +202,13 @@ public static String mapFromXMLStrategyToSYBLAnnotation(Strategy strategy){
 	
 	 strategies +=" : ";
 	}
-	//System.err.println("EEEEEEEEEEEEEEEEEEEEEEEEEEEE  "+ strategies);
 
 	if (strategy.getToEnforce().getParameter()!=null && strategy.getToEnforce().getParameter()!=""){
 		strategies += strategy.getToEnforce().getActionName()+"("+strategy.getToEnforce().getParameter()+");";
 	}else
 	strategies += strategy.getToEnforce().getActionName()+";";
-	//System.err.println("EEEEEEEEEEEEEEEEEEEEEEEEEEEE Returning "+ strategies);
+
+	DependencyGraphLogger.logger.info(strategies);
 
 	return strategies;
 	}else{
@@ -438,12 +438,11 @@ public static Strategy mapFromSYBLAnnotationToXMLStrategy(String strategy){
 	c.setId(s[0]);
 	if (strategy.toLowerCase().contains("case")){
 	Condition cond = new Condition();
-
 	
 
 	if (s.length>5){
 	
-	if (s[7].equalsIgnoreCase("AND") || s[6].equalsIgnoreCase("AND")){
+	if (strategy.contains("AND")){
 		
 		if (s.length==8){
 			UnaryRestriction unaryRestriction = new UnaryRestriction();
@@ -465,14 +464,15 @@ public static Strategy mapFromSYBLAnnotationToXMLStrategy(String strategy){
 			BinaryRestriction binaryRestriction = new BinaryRestriction();
 			LeftHandSide leftHandSide2 = new LeftHandSide();
 			RightHandSide rightHandSide2 = new RightHandSide();
-			
-			if ((s[3].charAt(0)>='a' && s[3].charAt(0)<='z') ||(s[3].charAt(0)>='A' && s[3].charAt(0)<='Z')) leftHandSide2.setMetric(s[3]);
+			int index = 2;
+			int i=0;
+			if ((s[index+1].charAt(0)>='a' && s[index+1].charAt(0)<='z') ||(s[index+1].charAt(0)>='A' && s[index+1].charAt(0)<='Z')) leftHandSide2.setMetric(s[index+1]);
 			else
-			leftHandSide2.setNumber(s[3]);
-			if ((s[5].charAt(0)>='a' && s[5].charAt(0)<='z') ||(s[5].charAt(0)>='A' && s[5].charAt(0)<='Z')) rightHandSide2.setMetric(s[5]);
+				leftHandSide2.setNumber(s[index+1]);
+			if ((s[index+3].charAt(0)>='a' && s[index+3].charAt(0)<='z') ||(s[index+3].charAt(0)>='A' && s[index+3].charAt(0)<='Z')) rightHandSide2.setMetric(s[index+3]);
 			else
-				rightHandSide2.setNumber(s[5]);
-			switch(s[4]){
+				rightHandSide2.setNumber(s[index+3]);
+			switch(s[index+2]){
 			case "<":binaryRestriction.setType("lessThan");
 			break;
 			case ">":binaryRestriction.setType("greaterThan");
@@ -490,10 +490,16 @@ public static Strategy mapFromSYBLAnnotationToXMLStrategy(String strategy){
 			binaryRestriction.setRightHandSide(rightHandSide2);
 			ArrayList<BinaryRestriction> binaryRestrictions = new ArrayList<BinaryRestriction>();
 			binaryRestrictions.add(binaryRestriction);
-			cond.addBinaryRestrictionConjunction(binaryRestrictions);
-			int index = 0;
-			if (s[7].equalsIgnoreCase("AND")) index= 7;
-			else index = 6;
+			
+			 index = 0;
+			
+		
+			 i=0;
+			for (String x:s){
+				
+				if (x.equalsIgnoreCase("and")) index = i;
+						i++;
+			}
 			binaryRestriction = new BinaryRestriction();
 			 leftHandSide2 = new LeftHandSide();
 			 rightHandSide2 = new RightHandSide();
@@ -520,7 +526,7 @@ public static Strategy mapFromSYBLAnnotationToXMLStrategy(String strategy){
 			}
 			binaryRestriction.setLeftHandSide(leftHandSide2);
 			binaryRestriction.setRightHandSide(rightHandSide2);
-			 binaryRestrictions = new ArrayList<BinaryRestriction>();
+		
 				binaryRestrictions.add(binaryRestriction);
 			cond.addBinaryRestrictionConjunction(binaryRestrictions);
 		}
@@ -529,12 +535,15 @@ public static Strategy mapFromSYBLAnnotationToXMLStrategy(String strategy){
 			BinaryRestriction binaryRestriction = new BinaryRestriction();
 			LeftHandSide leftHandSide2 = new LeftHandSide();
 			RightHandSide rightHandSide2 = new RightHandSide();
-			if ((s[3].charAt(0)>='a' && s[3].charAt(0)<='z') ||(s[3].charAt(0)>='A' && s[3].charAt(0)<='Z')) leftHandSide2.setMetric(s[4]);
+			if (s[3].length()>0)
+			if ((s[3].charAt(0)>='a' && s[3].charAt(0)<='z') ||(s[3].charAt(0)>='A' && s[3].charAt(0)<='Z')) leftHandSide2.setMetric(s[3]);
 			else
 			leftHandSide2.setNumber(s[3]);
-			if ((s[5].charAt(0)>='a' && s[5].charAt(0)<='z') ||(s[5].charAt(0)>='A' && s[5].charAt(0)<='Z')) rightHandSide2.setMetric(s[6]);
+			if (s[5].length()>0)
+			if ((s[5].charAt(0)>='a' && s[5].charAt(0)<='z') ||(s[5].charAt(0)>='A' && s[5].charAt(0)<='Z')) rightHandSide2.setMetric(s[5]);
 			else
-			rightHandSide2.setMetric(s[5]);
+			rightHandSide2.setNumber(s[5]);
+			
 			switch(s[4]){
 			case "<":binaryRestriction.setType("lessThan");
 			break;

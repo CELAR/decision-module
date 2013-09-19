@@ -58,7 +58,8 @@ import at.ac.tuwien.dsg.rSybl.dataProcessingUnit.utils.RuntimeLogger;
 public class MELA_API implements MonitoringInterface{
     private boolean existsStructureData = false;
     private boolean serviceSet = false;
-   private static final String REST_API_URL = "http://localhost:8080/MELA-AnalysisService-0.1-SNAPSHOT/REST_WS";
+    private static final String REST_API_URL=Configuration.getMonitoringServiceURL();
+   //private static final String REST_API_URL = "http://localhost:8080/MELA-AnalysisService-0.1-SNAPSHOT/REST_WS";
    // private static final String REST_API_URL="http://localhost:8080/MELA-AnalysisService-1.0/REST_WS";
     private static final int MONITORING_DATA_REFRESH_INTERVAL = 5; //in seconds
     private MonitoredElementMonitoringSnapshot latestMonitoringData;
@@ -650,14 +651,14 @@ public class MELA_API implements MonitoringInterface{
                         serviceUnitElement.setId(serviceUnit.getId());
                         serviceUnitElement.setLevel(MonitoredElement.MonitoredElementLevel.SERVICE_UNIT);
                         for (Node vm: serviceUnit.getAllRelatedNodesOfType(RelationshipType.HOSTED_ON_RELATIONSHIP,NodeType.VIRTUAL_MACHINE)){
-                        	 RuntimeLogger.logger.info("Translating hosted on "+vm.getId()+" for node "+serviceUnitElement.getId());
-                        	MonitoredElement virtualMachine = new MonitoredElement();
+                        	// RuntimeLogger.logger.info("Translating hosted on "+vm.getId()+" for node "+serviceUnitElement.getId());
+                        	 MonitoredElement virtualMachine = new MonitoredElement();
                         	 virtualMachine.setId(vm.getId());
                         	 virtualMachine.setLevel(MonitoredElement.MonitoredElementLevel.VM);
                         	 serviceUnitElement.addElement(virtualMachine);
                         }
                         for (Node vm: serviceUnit.getAllRelatedNodesOfType(RelationshipType.ASSOCIATED_AT_RUNTIME_RELATIONSHIP,NodeType.VIRTUAL_MACHINE)){
-                        	MonitoredElement virtualMachine = new MonitoredElement();
+                        	 MonitoredElement virtualMachine = new MonitoredElement();
 	                       	 virtualMachine.setId(vm.getId());
 	                       	 boolean alreadyContained=false;
 	                       	 virtualMachine.setLevel(MonitoredElement.MonitoredElementLevel.VM);

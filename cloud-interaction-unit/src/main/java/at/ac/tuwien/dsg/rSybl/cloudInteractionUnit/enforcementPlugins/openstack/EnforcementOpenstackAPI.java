@@ -25,6 +25,7 @@ package at.ac.tuwien.dsg.rSybl.cloudInteractionUnit.enforcementPlugins.openstack
 import java.util.ArrayList;
 import java.util.List;
 
+import at.ac.tuwien.dsg.csdg.DependencyGraph;
 import at.ac.tuwien.dsg.csdg.Node;
 import at.ac.tuwien.dsg.csdg.Relationship;
 import at.ac.tuwien.dsg.csdg.Node.NodeType;
@@ -166,10 +167,13 @@ public class EnforcementOpenstackAPI implements EnforcementInterface{
 //		}
 	}
 	private void scaleOutComponent(Node o){
-		
-				String ip= cloudsOpenStackConnection.scaleOutAndWaitUntilNewServerBoots( o ,findControllerForComponent(o));
+				DependencyGraph graph=new DependencyGraph();
+				graph.setCloudService(controlledService);
+				String ip= cloudsOpenStackConnection.scaleOutAndWaitUntilNewServerBoots( o ,graph.findParentNode(o.getId()));
+				if (!ip.equalsIgnoreCase("err")){
 				Node node = new Node();
 	            node.setId(ip);
+	            
 	            node.getStaticInformation().put("IP",ip);
 	            node.setNodeType(NodeType.VIRTUAL_MACHINE);
 	            Relationship rel = new Relationship();
@@ -179,18 +183,31 @@ public class EnforcementOpenstackAPI implements EnforcementInterface{
 	            RuntimeLogger.logger.info("Adding to "+o.getId()+" vm with ip "+ip);
 	            
 	            o.addNode(node,rel);
+				}
 	            RuntimeLogger.logger.info("The controlled service is now "+controlledService.toString());
+	            
 	            monitoring.refreshServiceStructure(controlledService);
 	            
 		}
 	private void scaleInComponent(Node o){
 		
-				cloudsOpenStackConnection.scaleIn( o);
+				DependencyGraph d = new DependencyGraph();
+				d.setCloudService(controlledService);
+				if (d.getNodeWithID(o.getId()).getAllRelatedNodesOfType(RelationshipType.HOSTED_ON_RELATIONSHIP,NodeType.VIRTUAL_MACHINE).size()>0){
+				RuntimeLogger.logger.info(d.graphToString());
+				RuntimeLogger.logger.info("Will delete this.....: "+d.getNodeWithID(o.getId()));
+				Node tobeRemoved = d.getNodeWithID(o.getId());
+				cloudsOpenStackConnection.scaleIn( tobeRemoved);
+				RuntimeLogger.logger.info(d.graphToString());
+	            monitoring.refreshServiceStructure(controlledService);
+				}
+
 				
 	}
 	public Node findControllerForComponent(Node c){
 		Node res = null;
-		Node componentTopology =controlledService.getAllRelatedNodesOfType(RelationshipType.COMPOSITION_RELATIONSHIP,NodeType.SERVICE_TOPOLOGY).get(0);
+		List<Node> componentTopologies =controlledService.getAllRelatedNodesOfType(RelationshipType.COMPOSITION_RELATIONSHIP,NodeType.SERVICE_TOPOLOGY);
+		for (Node componentTopology:componentTopologies)
 		for (Node topology:componentTopology.getAllRelatedNodesOfType(RelationshipType.COMPOSITION_RELATIONSHIP,NodeType.SERVICE_TOPOLOGY)){
 			Node master = null ;
 			Node slave = null;
@@ -306,16 +323,16 @@ public class EnforcementOpenstackAPI implements EnforcementInterface{
 	
 	public void scaleIn(Node arg0){
 		RuntimeLogger.logger.info("Scaling in..."+arg0.getId());
-		Node o = findNode(arg0.getId());
-		if (o.getNodeType()==NodeType.CODE_REGION){
+
+		if (arg0.getNodeType()==NodeType.CODE_REGION){
 			scaleIn(findComponentOfCodeRegion(arg0));
 		}
 		
 		//TODO : enable just ComponentTopology level 
 		
 		
-		if (o.getNodeType()==NodeType.SERVICE_TOPOLOGY){
-			ArrayList<Node> comps = (ArrayList<Node>)  o.getAllRelatedNodesOfType(RelationshipType.COMPOSITION_RELATIONSHIP);
+		if (arg0.getNodeType()==NodeType.SERVICE_TOPOLOGY){
+			ArrayList<Node> comps = (ArrayList<Node>)  arg0.getAllRelatedNodesOfType(RelationshipType.COMPOSITION_RELATIONSHIP);
 			Node master =null ;
 			Node slave =null ;
 			
@@ -344,8 +361,9 @@ public class EnforcementOpenstackAPI implements EnforcementInterface{
 			}
 		}
 		
-		if (o.getAssociatedIps().size()>1 &&monitoring.getNumberInstances(o)>1){
-			scaleInComponent(((Node) o));
+		if (arg0.getAllRelatedNodesOfType(RelationshipType.HOSTED_ON_RELATIONSHIP, NodeType.VIRTUAL_MACHINE).size()>1){
+			//RuntimeLogger.logger.info("Scaling in "+arg0.getId());
+			scaleInComponent(((Node) arg0));
 		}
 	}
 public List<String> getElasticityCapabilities() {

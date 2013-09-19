@@ -40,15 +40,16 @@ import java.util.logging.Logger;
 import org.jclouds.ContextBuilder;
 import org.jclouds.compute.ComputeService;
 import org.jclouds.compute.ComputeServiceContext;
-import org.jclouds.logging.slf4j.config.SLF4JLoggingModule;
 import org.jclouds.openstack.nova.v2_0.NovaApi;
 import org.jclouds.openstack.nova.v2_0.NovaApiMetadata;
+import org.jclouds.openstack.nova.v2_0.domain.RebootType;
 import org.jclouds.openstack.nova.v2_0.domain.Server;
 import org.jclouds.openstack.nova.v2_0.domain.ServerCreated;
 import org.jclouds.openstack.nova.v2_0.features.ServerApi;
 import org.jclouds.openstack.nova.v2_0.options.CreateServerOptions;
 import org.jclouds.openstack.v2_0.domain.Resource;
 
+import at.ac.tuwien.dsg.csdg.DependencyGraph;
 import at.ac.tuwien.dsg.csdg.Node;
 import at.ac.tuwien.dsg.csdg.Node.NodeType;
 import at.ac.tuwien.dsg.csdg.Relationship;
@@ -80,12 +81,12 @@ public class JCloudsOpenStackConnection {
 	public JCloudsOpenStackConnection(Node controlledService){
 		this.controlledService = controlledService;
 
-		Iterable<Module> modules = ImmutableSet.<Module>of(
-                new SLF4JLoggingModule());
+//		Iterable<Module> modules = ImmutableSet.<Module>of(
+//                new SLF4JLoggingModule());
 		ComputeServiceContext context = ContextBuilder.newBuilder(Configuration.getCloudAPIType())
                 .credentials(Configuration.getCloudUser(), Configuration.getCloudPassword())
                 .endpoint(Configuration.getCloudAPIEndpoint())
-                .modules(modules)
+               // .modules(modules)
                 .buildView(ComputeServiceContext.class);
 
 
@@ -107,13 +108,13 @@ public class JCloudsOpenStackConnection {
 	 */
 	public void setControlledService(Node cloudService){
 		this.controlledService = controlledService;
-		Iterable<Module> modules = ImmutableSet.<Module>of(
-                new SLF4JLoggingModule());
+//		Iterable<Module> modules = ImmutableSet.<Module>of(
+//                new SLF4JLoggingModule());
 		ComputeServiceContext context = ContextBuilder.newBuilder(Configuration.getCloudAPIType())
                 .credentials(Configuration.getCloudUser(), 
                 		Configuration.getCloudPassword())
                 .endpoint(Configuration.getCloudAPIEndpoint())
-                .modules(modules)
+//                .modules(modules)
                 .buildView(ComputeServiceContext.class);
 
 
@@ -125,7 +126,7 @@ public class JCloudsOpenStackConnection {
 
         final String region = "myregion";
         for (Resource flavor : client.getFlavorApiForZone(region).list().concat()) {
-         // RuntimeLogger.logger.error( flavor.getId()+" "+flavor.getName());
+           RuntimeLogger.logger.error( flavor.getId()+" "+flavor.getName());
          }
         
         serverApi = client.getServerApiForZone(region);
@@ -137,57 +138,57 @@ public class JCloudsOpenStackConnection {
         Map<String, String> nodeMetaData = new HashMap<String, String>();
         
         String metadata ="";
-//        if (entity.getId().equalsIgnoreCase("CassandraNode"))metadata= "CASSANDRA_SEED_NODE_IP=10.99.0.147";
-//        else 
-//        	metadata="LOAD_BALANCER_IP=10.99.0.151";
-//        nodeMetaData.put(metadata, "");
-//        createNodeOptions.metadata(nodeMetaData);
-//        createNodeOptions.userData(metadata.getBytes());
-//        
-//        createNodeOptions.keyPairName(Configuration.getCertificateName());
-//        String vmName = entity.getId();
-//       // RuntimeLogger.logger.info("FLAVOR ID "+entity.getGetFlavorID());
-//        String flavorID = "";
-//        for (Resource flavor:client.getFlavorApiForZone("myregion").list().concat()){
-//    		//RuntimeLogger.logger.error("Flavor "+flavor.getName()+" "+ flavor.getId());
-//
-//        	if (((String)entity.getStaticInformation("DefaultFlavor")).equalsIgnoreCase(flavor.getName())){
-//        		RuntimeLogger.logger.info("Flavor found "+flavor.getId());
-//        		flavorID=flavor.getId();
-//        	}
-//        }
-//        RuntimeLogger.logger.info("Scaling out "+entity.getId()+" which has controller "+controller.getId());
-//        
-//        boolean serverCorrectlyCreated = false;
-//        ServerCreated serverCreated = null;
-//        while (!serverCorrectlyCreated){
-//         serverCreated = serverApi.create(vmName,((String)entity.getStaticInformation("DefaultImage")), ((String)entity.getStaticInformation("DefaultFlavor")),createNodeOptions);
-//         
-//        //wait for all to become ACTIVE
-//
-//            while(serverApi.get(serverCreated.getId()).getStatus() != Server.Status.ACTIVE){
-//                try {
-//                    Thread.sleep(1000);
-//                } catch (InterruptedException e) {
-//                    e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
-//                }
-//            }
-//            if (serverApi.get(serverCreated.getId()).getStatus() != Server.Status.ERROR){
-//            	RuntimeLogger.logger.info(serverApi.get(serverCreated.getId()).getStatus() );
-//            	serverCorrectlyCreated=true;
-//            }else{
-//            	serverApi.delete(serverCreated.getId());
-//            	RuntimeLogger.logger.error("Created with error new instance for "+entity.getId()+ " - deleting and retrying....");
-//            }
-//            
-//        }
-//            Server server = serverApi.get(serverCreated.getId());
-//        addRecursivelyIp(entity, server.getAddresses().get("private").iterator().next().getAddr());
-         SecureRandom random = new SecureRandom();  
-        return new BigInteger(130, random).toString(32);
+        if (entity.getId().equalsIgnoreCase("DataNodeServiceUnit"))metadata= "CASSANDRA_SEED_NODE_IP=10.99.0.147";
+        else 
+        	metadata="LOAD_BALANCER_IP=10.99.0.151";
+        nodeMetaData.put(metadata, "");
+        createNodeOptions.metadata(nodeMetaData);
+        createNodeOptions.userData(metadata.getBytes());
+        
+        createNodeOptions.keyPairName(Configuration.getCertificateName());
+        String vmName = entity.getId();
+       // RuntimeLogger.logger.info("FLAVOR ID "+(String)entity.getStaticInformation("DefaultImage")+" "+(String)entity.getStaticInformation("DefaultFlavor"));
+        String flavorID = "";
+        for (Resource flavor:client.getFlavorApiForZone("myregion").list().concat()){
+    	//	RuntimeLogger.logger.error("Enumerating possible flavors Flavor "+flavor.getName()+" "+ flavor.getId());
+
+        	if (((String)entity.getStaticInformation("DefaultFlavor")).equalsIgnoreCase(flavor.getName())){
+       // 		RuntimeLogger.logger.info("Flavor found "+flavor.getId());
+        		flavorID=flavor.getId();
+        	}
+        }
+    //    RuntimeLogger.logger.info("Scaling out "+entity.getId()+" which has controller "+controller);
+        
+        boolean serverCorrectlyCreated = false;
+        ServerCreated serverCreated = null;
+        while (!serverCorrectlyCreated){
+         serverCreated = serverApi.create(vmName,((String)entity.getStaticInformation("DefaultImage")), flavorID,createNodeOptions);
+         
+        //wait for all to become ACTIVE
+
+            while(serverApi.get(serverCreated.getId()).getStatus() != Server.Status.ACTIVE){
+                try {
+                    Thread.sleep(1000);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+                }
+            }
+            if (serverApi.get(serverCreated.getId()).getStatus() != Server.Status.ERROR){
+            	RuntimeLogger.logger.info(serverApi.get(serverCreated.getId()).getStatus() );
+            	serverCorrectlyCreated=true;
+            }else{
+            	serverApi.delete(serverCreated.getId());
+            	RuntimeLogger.logger.error("Created with error new instance for "+entity.getId()+ " - deleting and retrying....");
+            }
+            
+        }
+            Server server = serverApi.get(serverCreated.getId());
+        // SecureRandom random = new SecureRandom();  
+        return server.getAddresses().get("private").iterator().next().getAddr();
         }catch(Exception e){
+        	e.printStackTrace();
         	RuntimeLogger.logger.error("Error when scaling out "+e.getMessage()+e.toString());
-        	return "IPPP";
+        	return "ERR";
         }
 		 
     }
@@ -351,16 +352,7 @@ public class JCloudsOpenStackConnection {
 		}
 		return null;
 	}
-	private void addRecursivelyIp(Node entity,String ip){
-		Node currentNode = entity;
-		while (currentNode!=null){
-			if (!currentNode.getAssociatedIps().contains(ip)){
-				RuntimeLogger.logger.info("Adding ip "+ip+" to "+currentNode.getId());
-				currentNode.getAssociatedIps().add(ip);
-			}
-			currentNode=findParentNode(currentNode.getId());
-		}
-	}
+
 	private void removeIpFromNode(Node entity, String ip){
 		int indexSlave = entity.getAssociatedIps().indexOf(ip);
 		if (indexSlave>0)
@@ -540,20 +532,18 @@ public class JCloudsOpenStackConnection {
 	}
 	public void scaleIn(Node toBeScaled) {
 	
-		String slaveIP ="";
-			int nb=0;
-		 for (Server server:serverApi.listInDetail().concat()){
-			 if( server.getName().equalsIgnoreCase(toBeScaled.getId())){
-				 nb+=1;
-			 }
-		 }
-		 if (nb>1)
+			
+		 if (toBeScaled.getAllRelatedNodesOfType(RelationshipType.HOSTED_ON_RELATIONSHIP,NodeType.VIRTUAL_MACHINE).size()>1){
+			 Node toBeRemoved = toBeScaled.getAllRelatedNodesOfType(RelationshipType.HOSTED_ON_RELATIONSHIP, NodeType.VIRTUAL_MACHINE).get(0);
 			  for (Server server: serverApi.listInDetail().concat()) {
 		           if( server.getName().equalsIgnoreCase(toBeScaled.getId())){
+		        	  
 		        	   String cmd = "";
+		        	   
 		        	   String ip = server.getAddresses().get("private").iterator().next().getAddr();
-
-		        	   if (toBeScaled.getId().equalsIgnoreCase("webservice"))
+		        	   if (ip.equalsIgnoreCase(toBeRemoved.getId())){
+		        		   RuntimeLogger.logger.info("Removing node "+ip);
+		        	   if (toBeScaled.getId().equalsIgnoreCase("EventProcessingServiceUnit"))
 		        		   cmd = "decomissionWS " + ip;
 		        	   else
 		        		   cmd = "decomissionCassandra "+ip;
@@ -582,12 +572,20 @@ public class JCloudsOpenStackConnection {
 		   				// TODO Auto-generated catch block
 		   				e.printStackTrace();
 		   			}
-		   			
+		               
+		               toBeScaled.removeNode(toBeRemoved);
+	               
 		        	   serverApi.delete(server.getId());
+
 		        	   break;
+		        	   }else{
+		        		   RuntimeLogger.logger.info("Not removing "+ip);
+
+		        	   }
+		        	   
 		           }
 		         }
-			  
+		 }
 		
 	}
 

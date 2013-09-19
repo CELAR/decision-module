@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<CloudService id="CloudService">
+	<ServiceTopology id="MainTopology">
+		<Relationship>
+			<Master>YCSBClient</Master>
+			<Slave>CassandraNode</Slave>
+		</Relationship>
+		<ServiceUnit id="YCSBClient" />
+		<ServiceUnit id="CassandraNode" ></ServiceUnit>
+	</ServiceTopology>
+</CloudService>
+
+
+
