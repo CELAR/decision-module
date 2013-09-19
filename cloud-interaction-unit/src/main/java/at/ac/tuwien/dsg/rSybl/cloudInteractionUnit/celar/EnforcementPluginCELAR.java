@@ -26,7 +26,17 @@ public class EnforcementPluginCELAR implements EnforcementInterface {
 		try{
 		Process p = Runtime.getRuntime().exec(command);                                                                                                                                                     
 		BufferedReader stdInput = new BufferedReader(new InputStreamReader(p.getInputStream()));
-		ip= stdInput.readLine();
+		String s ="";
+		while ((s = stdInput.readLine()) != null) {
+	        if (s.contains("Adding")){
+	        	String[] x=s.split("[ :]");
+	        	if (x.length>=2)
+	        	if (x[1].charAt(0)>='0'&&x[1].charAt(0)<='9'){
+	        		ip=x[1];
+	        	}
+	        }
+			//System.out.println(s);
+		}
 		
 		if (ip.length()>0 && ip.charAt(0)>='0'&&ip.charAt(0)<='9'){
 			return ip;}
