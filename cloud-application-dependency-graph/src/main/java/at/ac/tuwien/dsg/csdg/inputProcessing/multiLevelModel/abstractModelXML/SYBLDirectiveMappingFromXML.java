@@ -483,6 +483,7 @@ public static Strategy mapFromSYBLAnnotationToXMLStrategy(String strategy){
 			break;
 			case "&lt;":binaryRestriction.setType("lessThan");
 			break;
+			case "&gt;" :binaryRestriction.setType("greaterThan");break;
 			default:binaryRestriction.setType("lessThan");
 				break;
 			}
@@ -519,6 +520,8 @@ public static Strategy mapFromSYBLAnnotationToXMLStrategy(String strategy){
 			break;
 			case ">=":binaryRestriction.setType("greaterThanOrEqual");
 			break;
+			case "&gt;" :binaryRestriction.setType("greaterThan");break;
+
 			case "&lt;":binaryRestriction.setType("lessThan");
 			break;
 			default:binaryRestriction.setType("lessThan");
@@ -553,6 +556,8 @@ public static Strategy mapFromSYBLAnnotationToXMLStrategy(String strategy){
 			break;
 			case ">=":binaryRestriction.setType("greaterThanOrEqual");
 			break;
+			case "&gt;" :binaryRestriction.setType("greaterThan");break;
+
 			case "&lt;":binaryRestriction.setType("lessThan");
 			break;
 			default:binaryRestriction.setType("lessThan");
@@ -607,6 +612,8 @@ public static Monitoring mapFromSYBLAnnotationToXMLMonitoring(String monitor){
 		break;
 		case "&lt;":binaryRestriction.setType("lessThan");
 		break;
+		case "&gt;" :binaryRestriction.setType("greaterThan");break;
+
 		default:binaryRestriction.setType("lessThan");
 			break;
 		}
@@ -644,6 +651,7 @@ public static Priority mapFromSYBLAnnotationToXMLPriority(String p){
 	break;
 	case ">=":binaryRestriction.setType("greaterThanOrEqual");
 	break;
+	case "&gt;" :binaryRestriction.setType("greaterThan");break;
 	case "&lt;":binaryRestriction.setType("lessThan");
 	break;
 	default:binaryRestriction.setType("lessThan");
