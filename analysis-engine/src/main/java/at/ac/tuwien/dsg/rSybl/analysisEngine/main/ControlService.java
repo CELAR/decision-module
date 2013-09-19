@@ -122,7 +122,7 @@ public class ControlService{
 	public void loadEverythingFromConfigurationFiles(){
 		InputProcessing input = new InputProcessing();
 		dependencyGraph=input.loadDependencyGraphFromFile();
-	
+		AnalysisLogger.logger.info("Loaded graph from files ");
 		startSYBLProcessingAndPlanning();
 	}
 	public void writeCurrentDirectivesToFile(String file){

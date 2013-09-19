@@ -6,7 +6,8 @@
 			<Slave>CassandraNode</Slave>
 		</Relationship>
 		<ServiceUnit id="YCSBClient" />
-		<ServiceUnit id="CassandraNode" ></ServiceUnit>
+		<ServiceUnit id="CassandraNode" >
+		<SYBLDirective Constraints="Co1:CONSTRAINT cpuUsage &lt; 95%"/></ServiceUnit>
 	</ServiceTopology>
 </CloudService>
 

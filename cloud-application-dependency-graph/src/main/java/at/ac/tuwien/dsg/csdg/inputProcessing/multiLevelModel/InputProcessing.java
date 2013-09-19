@@ -283,7 +283,6 @@ public class InputProcessing {
 					serviceTopology.addNode(serviceTopology2, rel);
 					nodes.put(serviceTopology2.getId(), serviceTopology2);
 					remainingServiceTopologies.add(serviceTopologyXML2);
-					//GraphLogger.logger.info("Added service topology "+serviceTopology2.getId()+" to service topology "+serviceTopology);
 				}
 			nodes.put(serviceTopology.getId(), serviceTopology);
 			remainingServiceTopologies.remove(0);
@@ -300,9 +299,11 @@ public class InputProcessing {
 			
 			Node node = graph.getNodeWithID(deploymentUnit.getServiceUnitID());
 			if (node!=null){
+				if (deploymentUnit.getDefaultFlavor()!=null)
 				node.getStaticInformation().put("DefaultFlavor", deploymentUnit.getDefaultFlavor());
+				if (deploymentUnit.getDefaultImage()!=null)
 				node.getStaticInformation().put("DefaultImage", deploymentUnit.getDefaultImage());
-				//DependencyGraphLogger.logger.info("Adding vm "+deploymentUnit.getAssociatedVM().size());
+				DependencyGraphLogger.logger.info("Adding vm "+deploymentUnit.getAssociatedVM().size());
 
 				if (deploymentUnit.getAssociatedVM()!=null && deploymentUnit.getAssociatedVM().size()>0){
 					for (AssociatedVM associatedVM:deploymentUnit.getAssociatedVM()){
@@ -326,6 +327,7 @@ public class InputProcessing {
 		
 		
 		//Populate with elasticity requirements information
+		if (syblSpecifications.getSyblSpecifications()!=null)
 		for (SYBLSpecification specification: syblSpecifications.getSyblSpecifications()){
 			ElasticityRequirement elRequirement = new ElasticityRequirement();
 			elRequirement.setAnnotation(SYBLDirectiveMappingFromXML.mapFromXMLRepresentation(specification));
