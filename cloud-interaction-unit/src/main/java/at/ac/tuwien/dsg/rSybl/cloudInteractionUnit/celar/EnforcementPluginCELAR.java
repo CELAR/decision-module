@@ -10,12 +10,17 @@ import at.ac.tuwien.dsg.csdg.Relationship;
 import at.ac.tuwien.dsg.csdg.Node.NodeType;
 import at.ac.tuwien.dsg.csdg.Relationship.RelationshipType;
 import at.ac.tuwien.dsg.rSybl.cloudInteractionUnit.enforcementPlugins.interfaces.EnforcementInterface;
+import at.ac.tuwien.dsg.rSybl.cloudInteractionUnit.enforcementPlugins.openstack.JCloudsOpenStackConnection;
 import at.ac.tuwien.dsg.rSybl.cloudInteractionUnit.utils.RuntimeLogger;
 import at.ac.tuwien.dsg.rSybl.dataProcessingUnit.api.MonitoringAPIInterface;
 
 public class EnforcementPluginCELAR implements EnforcementInterface {
 	private MonitoringAPIInterface monitoringAPI;
 	private Node cloudService;
+	public EnforcementPluginCELAR(Node cloudService){
+		this.cloudService=cloudService;
+		
+	}
 	public String executeCommand(String command){
 		String ip = "";
 		try{
@@ -51,6 +56,7 @@ public class EnforcementPluginCELAR implements EnforcementInterface {
 		newVM.setId(ip);
 		toBeScaled.addNode(newVM,rel);
 		}
+		monitoringAPI.refreshServiceStructure(cloudService);
 		
 	}
 
@@ -63,7 +69,8 @@ public class EnforcementPluginCELAR implements EnforcementInterface {
 			Node toBeDel = dep.getNodeWithID(ip);
 			toBeScaled.removeNode(toBeDel);
 		}
-			
+		monitoringAPI.refreshServiceStructure(cloudService);
+
 	}
 
 	@Override
