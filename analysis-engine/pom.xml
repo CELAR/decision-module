@@ -14,7 +14,7 @@
     <artifactId>decision-making-pom</artifactId>
     <version>0.1-SNAPSHOT</version>
   </parent>
-
+	
    <dependencies>
         <dependency>
             <groupId>javax.servlet</groupId>
@@ -181,6 +181,7 @@
 	
 	</dependencies>
 	<build>
+	    <finalName>rSYBL</finalName>
     <plugins>
 <!-- 			<plugin> -->
 <!-- 				<groupId>org.jvnet.jax-ws-commons</groupId> -->
