@@ -3,7 +3,7 @@
   <modelVersion>4.0.0</modelVersion>
   
   <groupId>eu.celar.decision-making</groupId>
-  <artifactId>decision-making-pom</artifactId>
+  <artifactId>rSYBL-decision-making-pom</artifactId>
   <version>0.1-SNAPSHOT</version>
   <name>CELAR Decision-Making Module (DMM) main POM</name>
 
@@ -20,13 +20,14 @@
   <packaging>pom</packaging>
 
   <modules>
-    <module>data-processing-unit</module>
-    <module>analysis-engine</module>
-    <module>planning-engine</module>
-    <module>learning-engine</module>
-    <module>cloud-interaction-unit</module>
-    <module>cloud-application-dependency-graph</module>
-    <module>sybl-processing-unit</module>
+    <module>rSYBL-data-processing-unit</module>
+    <module>rSYBL-analysis-engine</module>
+    <module>rSYBL-planning-engine</module>
+    <module>rSYBL-learning-engine</module>
+    <module>rSYBL-cloud-interaction-unit</module>
+    <module>rSYBL-cloud-application-dependency-graph</module>
+    <module>rSYBL-sybl-processing-unit</module>
+    <module>rSYBL-client</module>
   </modules>
 
 
