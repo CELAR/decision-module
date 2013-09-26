@@ -46,7 +46,7 @@ public class EnforcementPluginCELAR implements EnforcementInterface {
 			return "";
 		}
 		}catch(Exception e ){
-			RuntimeLogger.logger.info("Answer from scale command "+ip+" ");
+			RuntimeLogger.logger.info("Answer from scale command "+ip+" "+e.getMessage());
 			return "";
 		}
 		
@@ -56,7 +56,7 @@ public class EnforcementPluginCELAR implements EnforcementInterface {
 	public void scaleOut(Node toBeScaled) {
 		
 		String ip = executeCommand("/root/addNode.sh");
-		if (!ip.equalsIgnoreCase("")){
+		
 		Node newVM = new Node();
 		newVM.setNodeType(NodeType.VIRTUAL_MACHINE);
 		Relationship rel = new Relationship();
@@ -65,7 +65,7 @@ public class EnforcementPluginCELAR implements EnforcementInterface {
 		rel.setType(RelationshipType.HOSTED_ON_RELATIONSHIP);
 		newVM.setId(ip);
 		toBeScaled.addNode(newVM,rel);
-		}
+		
 		monitoringAPI.refreshServiceStructure(cloudService);
 		
 	}
