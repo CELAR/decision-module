@@ -61,7 +61,7 @@ public class MELA_API implements MonitoringInterface{
     private static final String REST_API_URL=Configuration.getMonitoringServiceURL();
    //private static final String REST_API_URL = "http://localhost:8080/MELA-AnalysisService-0.1-SNAPSHOT/REST_WS";
    // private static final String REST_API_URL="http://localhost:8080/MELA-AnalysisService-1.0/REST_WS";
-    private static final int MONITORING_DATA_REFRESH_INTERVAL = 5; //in seconds
+    private static final int MONITORING_DATA_REFRESH_INTERVAL = 20; //in seconds
     private MonitoredElementMonitoringSnapshot latestMonitoringData;
     private AtomicBoolean monitoringDataUsed;
     private Node controlService;
@@ -197,7 +197,10 @@ public class MELA_API implements MonitoringInterface{
             }
 
         } catch (Exception e) {
-            Logger.getLogger(MELA_API.class.getName()).log(Level.SEVERE, e.getMessage(), e);
+           // Logger.getLogger(MELA_API.class.getName()).log(Level.SEVERE, e.getMessage(), e);
+        	Logger.getLogger(MELA_API.class.getName()).log(Level.SEVERE, "Trying to connect to MELA - failing ... . Retrying later", e);
+        	RuntimeLogger.logger.error("Failing to connect to MELA");
+        	
         } finally {
             if (connection != null) {
                 connection.disconnect();
