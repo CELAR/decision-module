@@ -55,7 +55,7 @@ public class EnforcementPluginCELAR implements EnforcementInterface {
 	@Override
 	public void scaleOut(Node toBeScaled) {
 		
-		String ip = executeCommand("/root/addNode.sh");
+		String ip = executeCommand("/root/scripts/addNode.sh");
 		
 		Node newVM = new Node();
 		newVM.setNodeType(NodeType.VIRTUAL_MACHINE);
@@ -72,7 +72,7 @@ public class EnforcementPluginCELAR implements EnforcementInterface {
 
 	@Override
 	public void scaleIn(Node toBeScaled) {
-		String ip = executeCommand("/root/removeNode.sh");
+		String ip = executeCommand("/root/scripts/removeNode.sh");
 		if (!ip.equalsIgnoreCase("")){
 			DependencyGraph dep = new DependencyGraph();
 			dep.setCloudService(cloudService);
