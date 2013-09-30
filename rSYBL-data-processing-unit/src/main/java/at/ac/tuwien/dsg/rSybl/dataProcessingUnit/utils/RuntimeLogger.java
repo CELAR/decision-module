@@ -33,7 +33,7 @@ public class RuntimeLogger {
 			   Date date = new Date();
 			   
 			try {
-				appender = new FileAppender(layout,"../webapps/logs/RuntimeLogger_"+date.getDay()+"_"+date.getMonth()+"_"+date.getHours()+"_"+date.getMinutes()+".txt",false);
+				appender = new FileAppender(layout,"../logs/rSYBL_RuntimeLogger_"+date.getDay()+"_"+date.getMonth()+"_"+date.getHours()+"_"+date.getMinutes()+".txt",false);
 			} catch (IOException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();

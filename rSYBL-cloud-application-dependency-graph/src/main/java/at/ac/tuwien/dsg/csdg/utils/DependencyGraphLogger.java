@@ -39,7 +39,7 @@ public class DependencyGraphLogger {
 			   FileAppender appender=null;
 			   Date date = new Date();
 			try {
-				appender = new FileAppender(layout,"../webapps/logs/DependencyGraphLogger_"+date.getHours()+"_"+date.getMinutes()+".txt",false);
+				appender = new FileAppender(layout,"../logs/rSYBL_DependencyGraphLogger_"+date.getHours()+"_"+date.getMinutes()+".txt",false);
 			} catch (IOException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
