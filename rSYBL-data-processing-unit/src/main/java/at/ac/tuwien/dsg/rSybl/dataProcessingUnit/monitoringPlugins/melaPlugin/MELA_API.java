@@ -235,6 +235,7 @@ public class MELA_API implements MonitoringInterface{
 
         URL url = null;
         HttpURLConnection connection = null;
+        while (true){
         try {
             url = new URL(REST_API_URL + "/servicedescription");
             connection = (HttpURLConnection) url.openConnection();
@@ -268,16 +269,24 @@ public class MELA_API implements MonitoringInterface{
                     Logger.getLogger(MELA_API.class.getName()).log(Level.SEVERE, line);
                 }
             }
-
+            submitCompositionRules();
+            serviceSet = true;
         } catch (Exception e) {
-            Logger.getLogger(MELA_API.class.getName()).log(Level.SEVERE, e.getMessage(), e);
-        } finally {
+        	Logger.getLogger(MELA_API.class.getName()).log(Level.WARNING, "Trying to connect to MELA - failing ... . Retrying later");
+        	RuntimeLogger.logger.error("Failing to connect to MELA");
+        	try {
+				Thread.sleep(5000);
+			} catch (InterruptedException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			}
+        	} finally {
             if (connection != null) {
                 connection.disconnect();
             }
         }
-        submitCompositionRules();
-        serviceSet = true;
+        }
+        
      
     }
     public void refreshServiceStructure(Node cloudService) {
