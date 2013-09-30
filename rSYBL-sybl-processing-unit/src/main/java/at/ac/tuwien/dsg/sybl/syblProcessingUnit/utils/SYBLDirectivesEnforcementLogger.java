@@ -35,11 +35,16 @@ import org.apache.log4j.SimpleLayout;
 public class SYBLDirectivesEnforcementLogger {
 	   public static Logger logger;
 	   static{
-		      SimpleLayout layout = new SimpleLayout();    
-			   FileAppender appender=null;
-			   Date date = new Date();
+//		      SimpleLayout layout = new SimpleLayout();    
+//			   FileAppender appender=null;
+//			   Date date = new Date();
 			   
 //			try {
+			    String date = new Date().toString();
+                date = date.replace(" ", "_");
+                date = date.replace(":", "_");
+                System.getProperties().put("recording_date", date);
+
 				PropertyConfigurator.configure(SYBLDirectivesEnforcementLogger.class.getResourceAsStream("/config/SYBL_Log4j.properties"));
 				logger = Logger.getLogger("rSYBLProcessingLogger");
 			//	appender = new FileAppender(layout,"../logs/rSYBL_SYBLDirectivesEnforcementLogger_"+date.getDay()+"_"+date.getMonth()+"_"+date.getHours()+"_"+date.getMinutes()+".log",false);

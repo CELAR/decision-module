@@ -42,6 +42,11 @@ public class RuntimeLogger {
 //			   Date date = new Date();
 //			   
 //			try {
+		    String date = new Date().toString();
+            date = date.replace(" ", "_");
+            date = date.replace(":", "_");
+            System.getProperties().put("recording_date", date);
+
 				PropertyConfigurator.configure(RuntimeLogger.class.getResourceAsStream("/config/Log4j.properties"));
 				logger = Logger.getLogger("rSYBLLogger");
 

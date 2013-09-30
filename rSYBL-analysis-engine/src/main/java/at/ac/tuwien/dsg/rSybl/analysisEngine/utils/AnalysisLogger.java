@@ -40,9 +40,14 @@ public class AnalysisLogger {
 		      SimpleLayout layout = new SimpleLayout();    
 			   FileAppender appender=null;
 			   
-			   Date date = new Date();
 //			try {
-	            PropertyConfigurator.configure(Configuration.class.getResourceAsStream("/config/Log4j.properties"));
+			   
+	            PropertyConfigurator.configure(AnalysisLogger.class.getResourceAsStream("/config/Log4j.properties"));
+	                String date = new Date().toString();
+	                date = date.replace(" ", "_");
+	                date = date.replace(":", "_");
+	                System.getProperties().put("recording_date", date);
+
 				logger = Logger.getLogger("rSYBLLogger");
 //				appender = new FileAppender(layout,"../logs/rSYBL_AnalysisService_"+date.getHours()+"_"+date.getMinutes()+".log",false);
 //
