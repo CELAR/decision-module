@@ -198,7 +198,7 @@ public class MELA_API implements MonitoringInterface{
 
         } catch (Exception e) {
            // Logger.getLogger(MELA_API.class.getName()).log(Level.SEVERE, e.getMessage(), e);
-        	Logger.getLogger(MELA_API.class.getName()).log(Level.SEVERE, "Trying to connect to MELA - failing ... . Retrying later", e);
+        	Logger.getLogger(MELA_API.class.getName()).log(Level.WARNING, "Trying to connect to MELA - failing ... . Retrying later");
         	RuntimeLogger.logger.error("Failing to connect to MELA");
         	
         } finally {
