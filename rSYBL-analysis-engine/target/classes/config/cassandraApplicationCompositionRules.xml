@@ -6,7 +6,7 @@
             <Operation value="100" type="ADD">
                   <Operation value="-1" type="MUL">
                          <Operation MetricSourceMonitoredElementLevel="VM" type="AVG">
-                   		 <ReferenceMetric type="RESOURCE" measurementUnit="%"  name="cpu_idle"/>
+                   		 <ReferenceMetric type="RESOURCE" measurementUnit="%"  name="cpuIdle"/>
                 </Operation>
             </Operation>
             </Operation>
