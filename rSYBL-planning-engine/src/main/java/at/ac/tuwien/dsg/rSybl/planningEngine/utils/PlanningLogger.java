@@ -33,24 +33,24 @@ import org.apache.log4j.SimpleLayout;
 
 
 public class PlanningLogger {
-	   public static Logger logger = Logger.getLogger(PlanningLogger.class);
+	   public static Logger logger ;
 	   static{
-		      SimpleLayout layout = new SimpleLayout();    
-			   FileAppender appender=null;
-			   Date date = new Date();
+//		      SimpleLayout layout = new SimpleLayout();    
+//			   FileAppender appender=null;
+//			   Date date = new Date();
 			   
-			try {
+//			try {
 				PropertyConfigurator.configure(PlanningLogger.class.getResourceAsStream("/config/Log4j.properties"));
-				logger = Logger.getLogger(PlanningLogger.class);
+				logger = Logger.getLogger("rSYBLLogger");
 
-				appender = new FileAppender(layout,"../logs/rSYBL_PlanningLogger_"+date.getHours()+"_"+date.getMinutes()+".log",false);
-			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}    
-			      logger.addAppender(appender);
-
-			      logger.setLevel((Level) Level.DEBUG);
+//				appender = new FileAppender(layout,"../logs/rSYBL_PlanningLogger_"+date.getHours()+"_"+date.getMinutes()+".log",false);
+//			} catch (IOException e) {
+//				// TODO Auto-generated catch block
+//				e.printStackTrace();
+//			}    
+//			      logger.addAppender(appender);
+//
+//			      logger.setLevel((Level) Level.DEBUG);
 
 	   }
 }

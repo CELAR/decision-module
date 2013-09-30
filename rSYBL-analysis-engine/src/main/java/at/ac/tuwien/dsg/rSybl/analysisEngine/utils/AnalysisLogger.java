@@ -41,16 +41,16 @@ public class AnalysisLogger {
 			   FileAppender appender=null;
 			   
 			   Date date = new Date();
-			try {
+//			try {
 	            PropertyConfigurator.configure(Configuration.class.getResourceAsStream("/config/Log4j.properties"));
-				logger = Logger.getLogger(AnalysisLogger.class);
-				appender = new FileAppender(layout,"../logs/rSYBL_AnalysisService_"+date.getHours()+"_"+date.getMinutes()+".log",false);
-
-			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}    
-			      logger.addAppender(appender);
+				logger = Logger.getLogger("rSYBLLogger");
+//				appender = new FileAppender(layout,"../logs/rSYBL_AnalysisService_"+date.getHours()+"_"+date.getMinutes()+".log",false);
+//
+//			} catch (IOException e) {
+//				// TODO Auto-generated catch block
+//				e.printStackTrace();
+//			}    
+//			      logger.addAppender(appender);
 
 
 	   }

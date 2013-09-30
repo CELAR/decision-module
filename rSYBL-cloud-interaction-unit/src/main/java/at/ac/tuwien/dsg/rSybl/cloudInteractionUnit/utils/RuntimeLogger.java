@@ -35,24 +35,24 @@ import org.apache.log4j.SimpleLayout;
 
 
 public class RuntimeLogger {
-	   public static Logger logger = Logger.getLogger(RuntimeLogger.class);
+	   public static Logger logger ;
 	   static{
-		      SimpleLayout layout = new SimpleLayout();    
-			   FileAppender appender=null;
-			   Date date = new Date();
-			   
-			try {
+//		      SimpleLayout layout = new SimpleLayout();    
+//			   FileAppender appender=null;
+//			   Date date = new Date();
+//			   
+//			try {
 				PropertyConfigurator.configure(RuntimeLogger.class.getResourceAsStream("/config/Log4j.properties"));
-				logger = Logger.getLogger(RuntimeLogger.class);
+				logger = Logger.getLogger("rSYBLLogger");
 
-				appender = new FileAppender(layout,"../logs/rSYBL_RuntimeLogger_"+date.getDay()+"_"+date.getMonth()+"_"+date.getHours()+"_"+date.getMinutes()+".log",false);
-			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}    
-			      logger.addAppender(appender);
-
-			      logger.setLevel((Level) Level.DEBUG);
+//				appender = new FileAppender(layout,"../logs/rSYBL_RuntimeLogger_"+date.getDay()+"_"+date.getMonth()+"_"+date.getHours()+"_"+date.getMinutes()+".log",false);
+//			} catch (IOException e) {
+//				// TODO Auto-generated catch block
+//				e.printStackTrace();
+//			}    
+//			      logger.addAppender(appender);
+//
+//			      logger.setLevel((Level) Level.DEBUG);
 
 	   }
 	

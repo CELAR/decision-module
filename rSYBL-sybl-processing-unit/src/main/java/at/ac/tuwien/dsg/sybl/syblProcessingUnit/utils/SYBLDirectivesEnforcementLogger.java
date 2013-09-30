@@ -39,17 +39,17 @@ public class SYBLDirectivesEnforcementLogger {
 			   FileAppender appender=null;
 			   Date date = new Date();
 			   
-			try {
-				PropertyConfigurator.configure(SYBLDirectivesEnforcementLogger.class.getResourceAsStream("/config/Log4j.properties"));
-				logger = Logger.getLogger(SYBLDirectivesEnforcementLogger.class);
-				appender = new FileAppender(layout,"../logs/rSYBL_SYBLDirectivesEnforcementLogger_"+date.getDay()+"_"+date.getMonth()+"_"+date.getHours()+"_"+date.getMinutes()+".log",false);
-			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}    
-			      logger.addAppender(appender);
+//			try {
+				PropertyConfigurator.configure(SYBLDirectivesEnforcementLogger.class.getResourceAsStream("/config/SYBL_Log4j.properties"));
+				logger = Logger.getLogger("rSYBLProcessingLogger");
+			//	appender = new FileAppender(layout,"../logs/rSYBL_SYBLDirectivesEnforcementLogger_"+date.getDay()+"_"+date.getMonth()+"_"+date.getHours()+"_"+date.getMinutes()+".log",false);
+//			} catch (IOException e) {
+//				// TODO Auto-generated catch block
+//				e.printStackTrace();
+//			}    
+			  //  logger.addAppender(appender);
 
-			      logger.setLevel((Level) Level.DEBUG);
+//			      logger.setLevel((Level) Level.DEBUG);
 
 	   }
 }
