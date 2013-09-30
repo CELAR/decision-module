@@ -35,7 +35,7 @@ public class EnforcementPluginCELAR implements EnforcementInterface {
 	        		ip=x[1];
 	        	}
 	        }
-			//System.out.println(s);
+	        RuntimeLogger.logger.info("From scaling command " +s);
 		}
 		
 		if (ip.length()>0 && ip.charAt(0)>='0'&&ip.charAt(0)<='9'){
@@ -56,7 +56,7 @@ public class EnforcementPluginCELAR implements EnforcementInterface {
 	public void scaleOut(Node toBeScaled) {
 		
 		String ip = executeCommand("/root/scripts/addNode.sh");
-		
+		if (!ip.equalsIgnoreCase("")){
 		Node newVM = new Node();
 		newVM.setNodeType(NodeType.VIRTUAL_MACHINE);
 		Relationship rel = new Relationship();
@@ -67,12 +67,13 @@ public class EnforcementPluginCELAR implements EnforcementInterface {
 		toBeScaled.addNode(newVM,rel);
 		
 		monitoringAPI.refreshServiceStructure(cloudService);
-		
+}
 	}
 
 	@Override
 	public void scaleIn(Node toBeScaled) {
 		String ip = executeCommand("/root/scripts/removeNode.sh");
+		
 		if (!ip.equalsIgnoreCase("")){
 			DependencyGraph dep = new DependencyGraph();
 			dep.setCloudService(cloudService);
