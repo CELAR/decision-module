@@ -47,7 +47,7 @@ public class PlanningLogger {
 
 				PropertyConfigurator.configure(PlanningLogger.class.getResourceAsStream("/config/Log4j.properties"));
 				logger = Logger.getLogger("rSYBLLogger");
-
+				logger.info("This is the planning logger ");
 //				appender = new FileAppender(layout,"../logs/rSYBL_PlanningLogger_"+date.getHours()+"_"+date.getMinutes()+".log",false);
 //			} catch (IOException e) {
 //				// TODO Auto-generated catch block

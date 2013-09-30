@@ -49,6 +49,7 @@ public class AnalysisLogger {
 	                System.getProperties().put("recording_date", date);
 
 				logger = Logger.getLogger("rSYBLLogger");
+				logger.info("Analysis logger .. ");
 //				appender = new FileAppender(layout,"../logs/rSYBL_AnalysisService_"+date.getHours()+"_"+date.getMinutes()+".log",false);
 //
 //			} catch (IOException e) {

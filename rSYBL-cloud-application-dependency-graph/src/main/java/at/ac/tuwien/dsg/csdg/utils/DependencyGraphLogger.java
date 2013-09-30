@@ -49,7 +49,7 @@ public class DependencyGraphLogger {
 
 				PropertyConfigurator.configure(Configuration.class.getResourceAsStream("/config/Log4j.properties"));
 							logger = Logger.getLogger("rSYBLLogger");
-
+							logger.info("Cloud application dependency graph ");
 //				appender = new FileAppender(layout,"../logs/rSYBL_DependencyGraphLogger_"+date.getHours()+"_"+date.getMinutes()+".log",false);
 //			
 //			} catch (IOException e) {
