@@ -52,7 +52,6 @@ public class AnalysisLogger {
 			}    
 			      logger.addAppender(appender);
 
-			      logger.setLevel((Level) Level.ALL);
 
 	   }
 }

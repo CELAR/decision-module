@@ -332,7 +332,7 @@ public static Constraint mapSYBLAnnotationToXMLConstraint(String constraint ){
 	
 	String [] s = constraint.split("CONSTRAINT ")[1].split(" ");
 	Constraint c = new Constraint();
-	DependencyGraphLogger.logger.info("The constraint is "+constraint+"s[0]="+s[0]+"s[1]="+s[1]+"s[2]="+s[2]+"s[3]="+"constraint.split(CONSTRAINT)[0]"+constraint.split("CONSTRAINT")[0]);
+	//DependencyGraphLogger.logger.info("The constraint is "+constraint+"s[0]="+s[0]+"s[1]="+s[1]+"s[2]="+s[2]+"s[3]="+"constraint.split(CONSTRAINT)[0]"+constraint.split("CONSTRAINT")[0]);
 	Condition toEnforce = new Condition();
 	Condition cond = new Condition();
 	c.setId(constraint.split(":")[0]);
