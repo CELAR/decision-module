@@ -30,23 +30,29 @@ import java.util.Date;
 import org.apache.log4j.FileAppender;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
+import org.apache.log4j.PropertyConfigurator;
 import org.apache.log4j.SimpleLayout;
 
+
 public class AnalysisLogger {
-	   public static Logger logger = Logger.getLogger(AnalysisLogger.class);
+	   public static Logger logger ;
 	   static{
 		      SimpleLayout layout = new SimpleLayout();    
 			   FileAppender appender=null;
+			   
 			   Date date = new Date();
 			try {
-				appender = new FileAppender(layout,"../logs/rSYBL_AnalysisLogger_"+date.getHours()+"_"+date.getMinutes()+".log",false);
+	            PropertyConfigurator.configure(Configuration.class.getResourceAsStream("/config/Log4j.properties"));
+				logger = Logger.getLogger(AnalysisLogger.class);
+				appender = new FileAppender(layout,"../logs/rSYBL_AnalysisService_"+date.getHours()+"_"+date.getMinutes()+".log",false);
+
 			} catch (IOException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}    
 			      logger.addAppender(appender);
 
-			      logger.setLevel((Level) Level.DEBUG);
+			      logger.setLevel((Level) Level.ALL);
 
 	   }
 }

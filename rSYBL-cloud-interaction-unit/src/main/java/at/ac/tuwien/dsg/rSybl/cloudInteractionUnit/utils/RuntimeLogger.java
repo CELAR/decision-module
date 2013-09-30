@@ -29,7 +29,9 @@ import java.util.Date;
 import org.apache.log4j.FileAppender;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
+import org.apache.log4j.PropertyConfigurator;
 import org.apache.log4j.SimpleLayout;
+
 
 
 public class RuntimeLogger {
@@ -40,6 +42,9 @@ public class RuntimeLogger {
 			   Date date = new Date();
 			   
 			try {
+				PropertyConfigurator.configure(RuntimeLogger.class.getResourceAsStream("/config/Log4j.properties"));
+				logger = Logger.getLogger(RuntimeLogger.class);
+
 				appender = new FileAppender(layout,"../logs/rSYBL_RuntimeLogger_"+date.getDay()+"_"+date.getMonth()+"_"+date.getHours()+"_"+date.getMinutes()+".log",false);
 			} catch (IOException e) {
 				// TODO Auto-generated catch block

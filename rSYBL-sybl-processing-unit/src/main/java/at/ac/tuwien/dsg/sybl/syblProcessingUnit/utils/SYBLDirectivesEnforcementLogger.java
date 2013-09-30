@@ -28,16 +28,20 @@ import java.util.Date;
 import org.apache.log4j.FileAppender;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
+import org.apache.log4j.PropertyConfigurator;
 import org.apache.log4j.SimpleLayout;
 
+
 public class SYBLDirectivesEnforcementLogger {
-	   public static Logger logger = Logger.getLogger(SYBLDirectivesEnforcementLogger.class);
+	   public static Logger logger;
 	   static{
 		      SimpleLayout layout = new SimpleLayout();    
 			   FileAppender appender=null;
 			   Date date = new Date();
 			   
 			try {
+				PropertyConfigurator.configure(SYBLDirectivesEnforcementLogger.class.getResourceAsStream("/config/Log4j.properties"));
+				logger = Logger.getLogger(SYBLDirectivesEnforcementLogger.class);
 				appender = new FileAppender(layout,"../logs/rSYBL_SYBLDirectivesEnforcementLogger_"+date.getDay()+"_"+date.getMonth()+"_"+date.getHours()+"_"+date.getMinutes()+".log",false);
 			} catch (IOException e) {
 				// TODO Auto-generated catch block

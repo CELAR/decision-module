@@ -30,7 +30,10 @@ import java.util.Date;
 import org.apache.log4j.FileAppender;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
+import org.apache.log4j.PropertyConfigurator;
 import org.apache.log4j.SimpleLayout;
+
+
 
 public class DependencyGraphLogger {
 	   public static Logger logger = Logger.getLogger(DependencyGraphLogger.class);
@@ -39,14 +42,18 @@ public class DependencyGraphLogger {
 			   FileAppender appender=null;
 			   Date date = new Date();
 			try {
+				PropertyConfigurator.configure(Configuration.class.getResourceAsStream("/config/Log4j.properties"));
+							logger = Logger.getLogger(DependencyGraphLogger.class);
+
 				appender = new FileAppender(layout,"../logs/rSYBL_DependencyGraphLogger_"+date.getHours()+"_"+date.getMinutes()+".log",false);
+			
 			} catch (IOException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}    
 			      logger.addAppender(appender);
 
-			      logger.setLevel((Level) Level.DEBUG);
+			      logger.setLevel((Level) Level.ALL);
 
 	   }
 }

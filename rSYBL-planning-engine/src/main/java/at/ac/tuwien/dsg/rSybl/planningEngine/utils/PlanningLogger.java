@@ -28,7 +28,9 @@ import java.util.Date;
 import org.apache.log4j.FileAppender;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
+import org.apache.log4j.PropertyConfigurator;
 import org.apache.log4j.SimpleLayout;
+
 
 public class PlanningLogger {
 	   public static Logger logger = Logger.getLogger(PlanningLogger.class);
@@ -38,6 +40,9 @@ public class PlanningLogger {
 			   Date date = new Date();
 			   
 			try {
+				PropertyConfigurator.configure(PlanningLogger.class.getResourceAsStream("/config/Log4j.properties"));
+				logger = Logger.getLogger(PlanningLogger.class);
+
 				appender = new FileAppender(layout,"../logs/rSYBL_PlanningLogger_"+date.getHours()+"_"+date.getMinutes()+".log",false);
 			} catch (IOException e) {
 				// TODO Auto-generated catch block
