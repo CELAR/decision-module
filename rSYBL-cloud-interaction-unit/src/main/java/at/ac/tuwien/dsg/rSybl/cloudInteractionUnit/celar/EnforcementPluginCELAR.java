@@ -141,6 +141,10 @@ public class EnforcementPluginCELAR implements EnforcementInterface {
 		
 		String ip = executeCommand("addvm");
 		if (!ip.equalsIgnoreCase("")){
+		DependencyGraph dependencyGraph=new DependencyGraph();
+		dependencyGraph.setCloudService(cloudService);
+		
+			Node toAdd = dependencyGraph.getNodeWithID(toBeScaled.getId());
 		Node newVM = new Node();
 		newVM.setNodeType(NodeType.VIRTUAL_MACHINE);
 		Relationship rel = new Relationship();
@@ -148,8 +152,8 @@ public class EnforcementPluginCELAR implements EnforcementInterface {
 		rel.setTargetElement(ip);
 		rel.setType(RelationshipType.HOSTED_ON_RELATIONSHIP);
 		newVM.setId(ip);
-		toBeScaled.addNode(newVM,rel);
-		
+		toAdd.addNode(newVM,rel);
+		RuntimeLogger.logger("Cloud new service is "+dependencyGraph.graphToString());
 		monitoringAPI.refreshServiceStructure(cloudService);
 }
 	}
@@ -163,8 +167,11 @@ public class EnforcementPluginCELAR implements EnforcementInterface {
 			dep.setCloudService(cloudService);
 			Node toBeDel = dep.getNodeWithID(ip);
 			toBeScaled.removeNode(toBeDel);
+			RuntimeLogger.logger("Cloud new service is "+dep.graphToString());
+
+			monitoringAPI.refreshServiceStructure(cloudService);
+
 		}
-		monitoringAPI.refreshServiceStructure(cloudService);
 
 	}
 
