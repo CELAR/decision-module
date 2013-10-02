@@ -26,7 +26,11 @@
 	<artifactId>openstack-nova-ec2</artifactId>
 	<version>1.6.0</version>
 </dependency>
-		
+		        <dependency>
+            <groupId>org.json</groupId>
+            <artifactId>json</artifactId>
+            <version>20090211</version>
+        </dependency>
 	<dependency>
 			<groupId>com.jcraft</groupId>
 			<artifactId>jsch</artifactId>

@@ -1,61 +1,145 @@
 package at.ac.tuwien.dsg.rSybl.cloudInteractionUnit.celar;
 
 import java.io.BufferedReader;
+import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.net.HttpURLConnection;
+import java.net.URL;
+import java.nio.charset.Charset;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
+import javax.xml.bind.JAXBContext;
+
+import org.json.JSONArray;
+import org.json.JSONObject;
 
 import at.ac.tuwien.dsg.csdg.DependencyGraph;
 import at.ac.tuwien.dsg.csdg.Node;
 import at.ac.tuwien.dsg.csdg.Relationship;
 import at.ac.tuwien.dsg.csdg.Node.NodeType;
 import at.ac.tuwien.dsg.csdg.Relationship.RelationshipType;
+import at.ac.tuwien.dsg.mela.common.monitoringConcepts.MonitoredElementMonitoringSnapshot;
 import at.ac.tuwien.dsg.rSybl.cloudInteractionUnit.enforcementPlugins.interfaces.EnforcementInterface;
 import at.ac.tuwien.dsg.rSybl.cloudInteractionUnit.enforcementPlugins.openstack.JCloudsOpenStackConnection;
 import at.ac.tuwien.dsg.rSybl.cloudInteractionUnit.utils.RuntimeLogger;
 import at.ac.tuwien.dsg.rSybl.dataProcessingUnit.api.MonitoringAPIInterface;
+import at.ac.tuwien.dsg.rSybl.dataProcessingUnit.monitoringPlugins.melaPlugin.MELA_API;
 
 public class EnforcementPluginCELAR implements EnforcementInterface {
 	private MonitoringAPIInterface monitoringAPI;
 	private Node cloudService;
+	public static String API_URL="http://83.212.117.112/celar-orchestrator/deployment/resize/?action=";
 	public EnforcementPluginCELAR(Node cloudService){
 		this.cloudService=cloudService;
 		
 	}
-	public String executeCommand(String command){
+	public static String executeCommand(String actionType){
 		String ip = "";
-		try{
-		Process p = Runtime.getRuntime().exec(command);                                                                                                                                                     
-		BufferedReader stdInput = new BufferedReader(new InputStreamReader(p.getInputStream()));
-		String s ="";
-		while ((s = stdInput.readLine()) != null) {
-	        if (s.contains("Adding")){
-	        	String[] x=s.split("[ :]");
-	        	if (x.length>=2)
-	        	if (x[1].charAt(0)>='0'&&x[1].charAt(0)<='9'){
-	        		ip=x[1];
-	        	}
+		 URL url = null;
+	        HttpURLConnection connection = null;
+	        try {
+	            url = new URL(API_URL+ actionType);
+	       
+
+	            InputStream is = url.openStream();
+	            try {
+	              BufferedReader rd = new BufferedReader(new InputStreamReader(is, Charset.forName("UTF-8")));
+
+	              StringBuilder sb = new StringBuilder();
+
+
+	              String cp = new String();
+
+	              while((cp=rd.readLine())!=null){
+
+	                  sb.append(cp);
+	              }
+	               
+	              String jsonText = sb.toString();
+
+	              JSONObject array = new JSONObject(jsonText);
+
+	              if (array.getJSONObject("1").getString("stderr").equalsIgnoreCase("")){
+	             // System.out.println(array.getJSONObject("1").getString("stdout"));
+	              if ((array.getJSONObject("1").getString("stdout")).contains("Removing:"))
+	              {
+	            	  String strs[]=(array.getJSONObject("1").getString("stdout")).split("Removing: ");
+	            	
+
+	            	  return strs[strs.length-1];
+	              }
+	            	  else{
+	            		  if((array.getJSONObject("1").getString("stdout")).contains("Adding: ")){
+	            			  String strs[]=(array.getJSONObject("1").getString("stdout")).split("Adding: ");
+	            			//  System.out.println(strs[strs.length-1].split("xss")[0]);
+	    	            	 // System.out.println(strs[strs.length-1].split("xss")[1]);
+	    	            	  return strs[strs.length-1].split("xss")[0];  
+	            		  }
+	            	  }
+	              if (array.getJSONObject("1").getString("stdout").charAt(0)>='0'&&array.getJSONObject("1").getString("stdout").charAt(0)<='9')
+	            		  return array.getJSONObject("1").getString("stdout");
+	              else
+	            	  return "";
+	              }else
+	              {
+	    	        RuntimeLogger.logger.error("Error when calling orchestrator API for "+actionType);
+	    	        
+	            	  return "";
+	              }
+	            } finally {
+	              is.close();
+	            }
+	            
+	        } catch (Exception e) {
+	           // Logger.getLogger(MELA_API.class.getName()).log(Level.SEVERE, e.getMessage(), e);
+	        	e.printStackTrace();
+	        	Logger.getLogger(EnforcementPluginCELAR.class.getName()).log(Level.WARNING, "Trying to connect to the Orchestrator - failing ... . Retrying later");
+	        	RuntimeLogger.logger.error("Failing to connect to Orchestrator");
+	        	
+	        } finally {
+	            if (connection != null) {
+	                connection.disconnect();
+	            }
 	        }
-	        RuntimeLogger.logger.info("From scaling command " +s);
-		}
-		
-		if (ip.length()>0 && ip.charAt(0)>='0'&&ip.charAt(0)<='9'){
-			return ip;}
-		else
-		{
-			RuntimeLogger.logger.info("Answer from scale command "+ip+" ");
-			return "";
-		}
-		}catch(Exception e ){
-			RuntimeLogger.logger.info("Answer from scale command "+ip+" "+e.getMessage());
-			return "";
-		}
+	        return "";
+//		try{
+//		Process p = Runtime.getRuntime().exec(command);                                                                                                                                                     
+//		BufferedReader stdInput = new BufferedReader(new InputStreamReader(p.getInputStream()));
+//		String s ="";
+//		while ((s = stdInput.readLine()) != null) {
+//	        if (s.contains("Adding")){
+//	        	String[] x=s.split("[ :]");
+//	        	if (x.length>=2)
+//	        	if (x[1].charAt(0)>='0'&&x[1].charAt(0)<='9'){
+//	        		ip=x[1];
+//	        	}
+//	        }
+//	        RuntimeLogger.logger.info("From scaling command " +s);
+//		}
+//		
+//		if (ip.length()>0 && ip.charAt(0)>='0'&&ip.charAt(0)<='9'){
+//			return ip;}
+//		else
+//		{
+//			RuntimeLogger.logger.info("Answer from scale command "+ip+" ");
+//			return "";
+//		}
+//		}catch(Exception e ){
+//			RuntimeLogger.logger.info("Answer from scale command "+ip+" "+e.getMessage());
+//			return "";
+//		}
 		
 	}
 
+	public static void main(String[] args){
+		System.err.println(executeCommand("removevm"));
+	}
 	@Override
 	public void scaleOut(Node toBeScaled) {
 		
-		String ip = executeCommand("/root/scripts/addNode.sh");
+		String ip = executeCommand("addvm");
 		if (!ip.equalsIgnoreCase("")){
 		Node newVM = new Node();
 		newVM.setNodeType(NodeType.VIRTUAL_MACHINE);
@@ -72,7 +156,7 @@ public class EnforcementPluginCELAR implements EnforcementInterface {
 
 	@Override
 	public void scaleIn(Node toBeScaled) {
-		String ip = executeCommand("/root/scripts/removeNode.sh");
+		String ip = executeCommand("removevm");
 		
 		if (!ip.equalsIgnoreCase("")){
 			DependencyGraph dep = new DependencyGraph();
