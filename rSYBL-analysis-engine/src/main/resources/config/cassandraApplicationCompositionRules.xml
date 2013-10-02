@@ -41,7 +41,7 @@
                 </Operation>
         </CompositionRule>
         
-        <CompositionRule TargetMonitoredElementLevel="ERVICE">
+        <CompositionRule TargetMonitoredElementLevel="SERVICE">
             <ResultingMetric type="RESOURCE" measurementUnit="%" name="cpuUsage"/>
                          <Operation MetricSourceMonitoredElementLevel="SERVICE_TOPOLOGY" type="AVG">
                    		 <ReferenceMetric type="RESOURCE" measurementUnit="%"  name="cpuUsage"/>
