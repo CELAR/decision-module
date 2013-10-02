@@ -12,14 +12,12 @@
             </Operation>
         </CompositionRule> 
           <CompositionRule TargetMonitoredElementLevel="VM">
-            <ResultingMetric type="RESOURCE" measurementUnit="ms" name="numberOfVMs"/>
+            <ResultingMetric type="RESOURCE" measurementUnit="no" name="numberOfVMs"/>
             <Operation value="1" type="SET_VALUE"/>
         </CompositionRule>
 
- 
- 
-        <CompositionRule TargetMonitoredElementLevel="SERVICE_UNIT">
-            <ResultingMetric type="RESOURCE" measurementUnit="ms" name="numberOfVMs"/>
+          <CompositionRule TargetMonitoredElementLevel="SERVICE_UNIT">
+            <ResultingMetric type="RESOURCE" measurementUnit="no" name="numberOfVMs"/>
             <Operation MetricSourceMonitoredElementLevel="VM" type="SUM">
                 <ReferenceMetric type="RESOURCE" name="numberOfVMs"/>
             </Operation>
@@ -43,31 +41,17 @@
                 </Operation>
         </CompositionRule>
         
-        <CompositionRule TargetMonitoredElementLevel="CLOUD_SERVICE">
+        <CompositionRule TargetMonitoredElementLevel="ERVICE">
             <ResultingMetric type="RESOURCE" measurementUnit="%" name="cpuUsage"/>
                          <Operation MetricSourceMonitoredElementLevel="SERVICE_TOPOLOGY" type="AVG">
                    		 <ReferenceMetric type="RESOURCE" measurementUnit="%"  name="cpuUsage"/>
                		 </Operation>
         </CompositionRule> 
-         <CompositionRule TargetMonitoredElementLevel="CLOUD_SERVICE">
+         <CompositionRule TargetMonitoredElementLevel="SERVICE">
             <ResultingMetric type="RESOURCE" measurementUnit="$" name="cost"/>
                 <Operation MetricSourceMonitoredElementLevel="SERVICE_TOPOLOGY" type="SUM">
                     <ReferenceMetric type="RESOURCE" name="cost"/>
                 </Operation>
         </CompositionRule>
            </MetricsCompositionRules>
-    <HistoricalMetricsCompositionRules>
-       <CompositionRule TargetMonitoredElementLevel="SERVICE_UNIT">
-            <ResultingMetric type="RESOURCE" measurementUnit="%" name="cpuUsage"/>
-            <Operation MetricSourceMonitoredElementLevel="VM" type="AVG">
-                <ReferenceMetric type="RESOURCE" name="cpuUsage"/>
-            </Operation>
-        </CompositionRule>
-             <CompositionRule TargetMonitoredElementLevel="SERVICE_TOPOLOGY">
-            <ResultingMetric type="RESOURCE" measurementUnit="%" name="cpuUsage"/>
-            <Operation MetricSourceMonitoredElementLevel="SERVICE_UNIT" type="AVG">
-                <ReferenceMetric type="RESOURCE" name="cpuUsage"/>
-            </Operation>
-        </CompositionRule>
-    </HistoricalMetricsCompositionRules>
-</CompositionRulesConfiguration>
+   </CompositionRulesConfiguration>
