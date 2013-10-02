@@ -156,7 +156,7 @@ public class PlanningGreedyAlgorithm implements Runnable {
 	
 		int numberOfRemainingConstraints=numberOfBrokenConstraints;
 		while (contextRepresentation.countViolatedConstraints() > 0
-				&& numberOfRemainingConstraints > 0) {
+				&& numberOfRemainingConstraints > 0 && lastFixed>0) {
 			Date date = new Date();
 			PlanningLogger.logger.info("At " + date.getDay() + "_"
 					+ date.getMonth() + "_" + date.getHours() + "_"
@@ -262,7 +262,7 @@ public class PlanningGreedyAlgorithm implements Runnable {
 						+ ((ActionEffect) action.getFirst())
 								.getTargetedEntityID() + " Number of constraints fixed: "
 						+ fixedConstraints.get(action));
-				lastFixed = fixedConstraints.get(action)-fixedStrategies.get(action);
+				lastFixed = fixedConstraints.get(action);
 				Node entity = dependencyGraph.getNodeWithID(((ActionEffect) action.getFirst())
 						.getTargetedEntityID());
 				if (fixedConstraints.get(action) > 0) {
