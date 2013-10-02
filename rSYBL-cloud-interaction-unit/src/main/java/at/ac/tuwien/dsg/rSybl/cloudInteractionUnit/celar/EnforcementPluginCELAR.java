@@ -10,22 +10,16 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import javax.xml.bind.JAXBContext;
-
-import org.json.JSONArray;
 import org.json.JSONObject;
 
 import at.ac.tuwien.dsg.csdg.DependencyGraph;
 import at.ac.tuwien.dsg.csdg.Node;
-import at.ac.tuwien.dsg.csdg.Relationship;
 import at.ac.tuwien.dsg.csdg.Node.NodeType;
+import at.ac.tuwien.dsg.csdg.Relationship;
 import at.ac.tuwien.dsg.csdg.Relationship.RelationshipType;
-import at.ac.tuwien.dsg.mela.common.monitoringConcepts.MonitoredElementMonitoringSnapshot;
 import at.ac.tuwien.dsg.rSybl.cloudInteractionUnit.enforcementPlugins.interfaces.EnforcementInterface;
-import at.ac.tuwien.dsg.rSybl.cloudInteractionUnit.enforcementPlugins.openstack.JCloudsOpenStackConnection;
 import at.ac.tuwien.dsg.rSybl.cloudInteractionUnit.utils.RuntimeLogger;
 import at.ac.tuwien.dsg.rSybl.dataProcessingUnit.api.MonitoringAPIInterface;
-import at.ac.tuwien.dsg.rSybl.dataProcessingUnit.monitoringPlugins.melaPlugin.MELA_API;
 
 public class EnforcementPluginCELAR implements EnforcementInterface {
 	private MonitoringAPIInterface monitoringAPI;
@@ -153,7 +147,7 @@ public class EnforcementPluginCELAR implements EnforcementInterface {
 		rel.setType(RelationshipType.HOSTED_ON_RELATIONSHIP);
 		newVM.setId(ip);
 		toAdd.addNode(newVM,rel);
-		RuntimeLogger.logger("Cloud new service is "+dependencyGraph.graphToString());
+		RuntimeLogger.logger.info("Cloud new service is "+dependencyGraph.graphToString());
 		monitoringAPI.refreshServiceStructure(cloudService);
 }
 	}
@@ -167,7 +161,7 @@ public class EnforcementPluginCELAR implements EnforcementInterface {
 			dep.setCloudService(cloudService);
 			Node toBeDel = dep.getNodeWithID(ip); 
 			toBeScaled.removeNode(toBeDel);
-			RuntimeLogger.logger("Cloud new service is "+dep.graphToString());
+			RuntimeLogger.logger.info("Cloud new service is "+dep.graphToString());
 
 			monitoringAPI.refreshServiceStructure(cloudService);
 
