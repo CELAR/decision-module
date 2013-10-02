@@ -165,7 +165,7 @@ public class EnforcementPluginCELAR implements EnforcementInterface {
 		if (!ip.equalsIgnoreCase("")){
 			DependencyGraph dep = new DependencyGraph();
 			dep.setCloudService(cloudService);
-			Node toBeDel = dep.getNodeWithID(ip);
+			Node toBeDel = dep.getNodeWithID(ip); 
 			toBeScaled.removeNode(toBeDel);
 			RuntimeLogger.logger("Cloud new service is "+dep.graphToString());
 
