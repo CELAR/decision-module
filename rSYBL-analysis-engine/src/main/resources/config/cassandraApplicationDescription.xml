@@ -7,7 +7,7 @@
 		</Relationship>
 		<ServiceUnit id="YCSBClient" />
 		<ServiceUnit id="CassandraNode" >
-		<SYBLDirective Constraints="Co1:CONSTRAINT cpuUsage &lt; 85 % ; Co2: CONSTRAINT cpuUsage &gt; 50 %;"/></ServiceUnit>
+		<SYBLDirective Constraints="Co1:CONSTRAINT cpuUsage &lt; 80 % ; Co2: CONSTRAINT cpuUsage &gt; 20 %;"/></ServiceUnit>
 	</ServiceTopology>
 </CloudService>
 
