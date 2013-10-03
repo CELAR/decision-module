@@ -56,7 +56,6 @@ public class EnforcementPluginCELAR implements EnforcementInterface {
 	              JSONObject array = new JSONObject(jsonText);
 
 	              if (array.getJSONObject("1").getString("stderr").equalsIgnoreCase("")){
-	             // System.out.println(array.getJSONObject("1").getString("stdout"));
 	              if ((array.getJSONObject("1").getString("stdout")).contains("Removing:"))
 	              {
 	            	  String strs[]=(array.getJSONObject("1").getString("stdout")).split("Removing: ");
@@ -78,9 +77,35 @@ public class EnforcementPluginCELAR implements EnforcementInterface {
 	            	  return "";
 	              }else
 	              {
-	    	        RuntimeLogger.logger.error("Error when calling orchestrator API for "+actionType);
-	    	        
-	            	  return "";
+	            	  System.err.println(array.getJSONObject("1").getString("stderr"));
+	    	        try{
+	    		              if ((array.getJSONObject("1").getString("stdout")).contains("Removing:"))
+	    		              {
+	    		            	  String strs[]=(array.getJSONObject("1").getString("stdout")).split("Removing: ");
+	    		            	
+
+	    		            	  return strs[strs.length-1];
+	    		              }
+	    		            	  else{
+	    		            		  if((array.getJSONObject("1").getString("stdout")).contains("Adding: ")){
+	    		            			  String strs[]=(array.getJSONObject("1").getString("stdout")).split("Adding: ");
+	    		            			//  System.out.println(strs[strs.length-1].split("xss")[0]);
+	    		    	            	 // System.out.println(strs[strs.length-1].split("xss")[1]);
+	    		    	            	  return strs[strs.length-1].split("xss")[0];  
+	    		            		  }
+	    		            	  }
+	    		    	        RuntimeLogger.logger.error("Error when calling orchestrator API for "+actionType+" error is "+array.getJSONObject("1").getString("stderr"));
+
+	    		              if (array.getJSONObject("1").getString("stdout").charAt(0)>='0'&&array.getJSONObject("1").getString("stdout").charAt(0)<='9')
+	    		            		  return array.getJSONObject("1").getString("stdout");
+	    		              else
+	    		            	  return "";
+	    		              
+	    	        }catch(Exception e){
+		    	        RuntimeLogger.logger.error("Error when calling orchestrator API for "+actionType+" error is "+array.getJSONObject("1").getString("stderr"));
+	    	        	return "";
+	    	        }
+
 	              }
 	            } finally {
 	              is.close();
@@ -128,16 +153,23 @@ public class EnforcementPluginCELAR implements EnforcementInterface {
 	}
 
 	public static void main(String[] args){
-		System.err.println(executeCommand("removevm"));
+		String ip=executeCommand("removevm");
+		if (!ip.equalsIgnoreCase("")){
+			System.err.println(ip);
+		}else{
+			System.err.println("IP is empty "+ip);
+		}
+
+		//System.err.println(executeCommand("removevm"));
 	}
 	@Override
 	public void scaleOut(Node toBeScaled) {
 		
 		String ip = executeCommand("addvm");
 		if (!ip.equalsIgnoreCase("")){
+			RuntimeLogger.logger.info("The IP of the Virtual Machine to be ADDED is "+ip);	
 		DependencyGraph dependencyGraph=new DependencyGraph();
 		dependencyGraph.setCloudService(cloudService);
-		
 			Node toAdd = dependencyGraph.getNodeWithID(toBeScaled.getId());
 		Node newVM = new Node();
 		newVM.setNodeType(NodeType.VIRTUAL_MACHINE);
@@ -149,6 +181,8 @@ public class EnforcementPluginCELAR implements EnforcementInterface {
 		toAdd.addNode(newVM,rel);
 		RuntimeLogger.logger.info("Cloud new service is "+dependencyGraph.graphToString());
 		monitoringAPI.refreshServiceStructure(cloudService);
+}else{
+	System.err.println("IP is empty "+ip);
 }
 	}
 
@@ -157,14 +191,13 @@ public class EnforcementPluginCELAR implements EnforcementInterface {
 		String ip = executeCommand("removevm");
 		
 		if (!ip.equalsIgnoreCase("")){
+			RuntimeLogger.logger.info("The IP of the Virtual Machine to be ADDED is "+ip);	
 			DependencyGraph dep = new DependencyGraph();
 			dep.setCloudService(cloudService);
 			Node toBeDel = dep.getNodeWithID(ip); 
 			toBeScaled.removeNode(toBeDel);
 			RuntimeLogger.logger.info("Cloud new service is "+dep.graphToString());
-
 			monitoringAPI.refreshServiceStructure(cloudService);
-
 		}
 
 	}
