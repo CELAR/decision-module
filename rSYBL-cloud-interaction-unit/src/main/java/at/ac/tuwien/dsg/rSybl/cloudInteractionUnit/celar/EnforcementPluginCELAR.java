@@ -188,10 +188,15 @@ public class EnforcementPluginCELAR implements EnforcementInterface {
 
 	@Override
 	public void scaleIn(Node toBeScaled) {
+
+		DependencyGraph d = new DependencyGraph();
+		d.setCloudService(cloudService);
+		if (d.getNodeWithID(toBeScaled.getId()).getAllRelatedNodesOfType(RelationshipType.HOSTED_ON_RELATIONSHIP,NodeType.VIRTUAL_MACHINE).size()>1){
+			
 		String ip = executeCommand("removevm");
 		
 		if (!ip.equalsIgnoreCase("")){
-			RuntimeLogger.logger.info("The IP of the Virtual Machine to be ADDED is "+ip);	
+			RuntimeLogger.logger.info("The IP of the Virtual Machine to be REMOVED is "+ip);	
 			DependencyGraph dep = new DependencyGraph();
 			dep.setCloudService(cloudService);
 			Node toBeDel = dep.getNodeWithID(ip); 
@@ -199,7 +204,7 @@ public class EnforcementPluginCELAR implements EnforcementInterface {
 			RuntimeLogger.logger.info("Cloud new service is "+dep.graphToString());
 			monitoringAPI.refreshServiceStructure(cloudService);
 		}
-
+		}
 	}
 
 	@Override
