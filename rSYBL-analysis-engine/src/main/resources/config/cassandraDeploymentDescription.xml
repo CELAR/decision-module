@@ -2,10 +2,21 @@
 <DeploymentDescription CloudServiceID="CloudService" AccessIP="localhost">
 	<DeploymentUnit serviceUnitID="YCSBClient">
 	<AssociatedVM IP="83.212.115.199"/>
+	<AssociatedVM IP="83.212.121.127"/>
+	<AssociatedVM IP="83.212.125.101"/>
 	
 	</DeploymentUnit>
 	<DeploymentUnit serviceUnitID="CassandraNode">
 			<AssociatedVM IP="83.212.116.239"/>
-			<AssociatedVM IP="83.212.117.119"/>		    
+			<AssociatedVM IP="83.212.116.154"/>
+			<AssociatedVM IP="83.212.117.31"/>
+			<AssociatedVM IP="83.212.117.11"/>
+			<AssociatedVM IP="83.212.117.123"/>
+			<AssociatedVM IP="83.212.117.124"/>
+			<AssociatedVM IP="83.212.117.125"/>
+			<AssociatedVM IP="83.212.117.108"/>
+			<AssociatedVM IP="83.212.117.126"/>		
+			<AssociatedVM IP="83.212.117.119"/>	    
 		</DeploymentUnit>
+
 </DeploymentDescription>
