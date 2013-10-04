@@ -11,11 +11,28 @@
             </Operation>
             </Operation>
         </CompositionRule> 
+        
+        
           <CompositionRule TargetMonitoredElementLevel="VM">
             <ResultingMetric type="RESOURCE" measurementUnit="no" name="numberOfVMs"/>
             <Operation value="1" type="SET_VALUE"/>
         </CompositionRule>
-
+  			
+  			<CompositionRule TargetMonitoredElementLevel="SERVICE_UNIT">
+               <TargetMonitoredElementID>YCSBClient</TargetMonitoredElementID>
+           <ResultingMetric type="RESOURCE" measurementUnit="ms" name="latency"/>
+            <Operation MetricSourceMonitoredElementLevel="VM" type="AVG">
+                  <ReferenceMetric type="RESOURCE" measurementUnit="ms"  name="ycsb_lambda"/>
+            </Operation>
+        </CompositionRule>
+        
+          <CompositionRule TargetMonitoredElementLevel="SERVICE_UNIT">
+            <ResultingMetric type="RESOURCE" measurementUnit="ops" name="throughput"/>
+            <Operation MetricSourceMonitoredElementLevel="VM" type="AVG">
+                  <ReferenceMetric type="RESOURCE" measurementUnit="ops"  name="ycsb_throughput"/>     
+            </Operation>
+        </CompositionRule>
+        
           <CompositionRule TargetMonitoredElementLevel="SERVICE_UNIT">
             <ResultingMetric type="RESOURCE" measurementUnit="no" name="numberOfVMs"/>
             <Operation MetricSourceMonitoredElementLevel="VM" type="SUM">
