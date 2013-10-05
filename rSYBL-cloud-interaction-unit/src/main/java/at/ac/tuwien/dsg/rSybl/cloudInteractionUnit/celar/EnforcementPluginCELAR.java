@@ -165,7 +165,7 @@ public class EnforcementPluginCELAR implements EnforcementInterface {
 	@Override
 	public void scaleOut(Node toBeScaled) {
 		
-		String ip = executeCommand("addvm");
+		String ip = "";// executeCommand("addvm");
 		if (!ip.equalsIgnoreCase("")){
 			RuntimeLogger.logger.info("The IP of the Virtual Machine to be ADDED is "+ip);	
 		DependencyGraph dependencyGraph=new DependencyGraph();
@@ -193,7 +193,7 @@ public class EnforcementPluginCELAR implements EnforcementInterface {
 		d.setCloudService(cloudService);
 		if (d.getNodeWithID(toBeScaled.getId()).getAllRelatedNodesOfType(RelationshipType.HOSTED_ON_RELATIONSHIP,NodeType.VIRTUAL_MACHINE).size()>1){
 			
-		String ip = executeCommand("removevm");
+		String ip = "";//executeCommand("removevm");
 		
 		if (!ip.equalsIgnoreCase("")){
 			RuntimeLogger.logger.info("The IP of the Virtual Machine to be REMOVED is "+ip);	
