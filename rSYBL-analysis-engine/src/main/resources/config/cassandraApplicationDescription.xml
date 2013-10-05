@@ -1,13 +1,11 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <CloudService id="CloudService">
 	<ServiceTopology id="MainTopology">
-	<SYBLDirective Strategies="St1: CASE cost>6 AND violated(Co3):scalein(CassandraNode)"/>
 		<Relationship>
 			<Master>YCSBClient</Master>
 			<Slave>CassandraNode</Slave>
 		</Relationship>
-		<ServiceUnit id="YCSBClient" >
-		<SYBLDirective Constraints="Co3: CONSTRAINT latency &lt; 950 ms"/></ServiceUnit>
+		<ServiceUnit id="YCSBClient" />
 		<ServiceUnit id="CassandraNode" >
 		<SYBLDirective Constraints="Co1:CONSTRAINT cpuUsage &lt; 70 % ; Co2: CONSTRAINT cpuUsage &gt; 35 %;"/></ServiceUnit>
 	</ServiceTopology>

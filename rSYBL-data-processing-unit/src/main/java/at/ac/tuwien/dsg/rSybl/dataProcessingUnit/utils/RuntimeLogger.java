@@ -41,7 +41,7 @@ public class RuntimeLogger {
             System.getProperties().put("recording_date", date);
 
 				PropertyConfigurator.configure(RuntimeLogger.class.getResourceAsStream("/config/Log4j.properties"));
-				logger = Logger.getLogger("rSYBLLogger");
+				logger = Logger.getLogger("rootLogger");
 
 //				appender = new FileAppender(layout,"../logs/rSYBL_RuntimeLogger_"+date.getDay()+"_"+date.getMonth()+"_"+date.getHours()+"_"+date.getMinutes()+".log",false);
 //			} catch (IOException e) {

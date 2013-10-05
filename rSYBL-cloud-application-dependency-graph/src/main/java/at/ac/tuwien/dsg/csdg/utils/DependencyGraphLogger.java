@@ -27,6 +27,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.util.Date;
 
+import org.apache.log4j.BasicConfigurator;
 import org.apache.log4j.FileAppender;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
@@ -46,9 +47,9 @@ public class DependencyGraphLogger {
             date = date.replace(" ", "_");
             date = date.replace(":", "_");
             System.getProperties().put("recording_date", date);
-
+//            BasicConfigurator.configure();
 				PropertyConfigurator.configure(Configuration.class.getResourceAsStream("/config/Log4j.properties"));
-							logger = Logger.getLogger("rSYBLLogger");
+							logger = Logger.getLogger("rootLogger");
 							logger.info("Cloud application dependency graph ");
 //				appender = new FileAppender(layout,"../logs/rSYBL_DependencyGraphLogger_"+date.getHours()+"_"+date.getMinutes()+".log",false);
 //			

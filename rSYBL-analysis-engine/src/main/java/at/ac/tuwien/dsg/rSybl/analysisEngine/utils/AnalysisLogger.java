@@ -27,6 +27,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.util.Date;
 
+import org.apache.log4j.BasicConfigurator;
 import org.apache.log4j.FileAppender;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
@@ -41,14 +42,16 @@ public class AnalysisLogger {
 			   FileAppender appender=null;
 			   
 //			try {
-			   
+			  // BasicConfigurator.configure();
 	            PropertyConfigurator.configure(AnalysisLogger.class.getResourceAsStream("/config/Log4j.properties"));
+	           // System.err.println("Log4j "+AnalysisLogger.class.getResourceAsStream("/config/Log4j.properties"));
+	           
 	                String date = new Date().toString();
 	                date = date.replace(" ", "_");
 	                date = date.replace(":", "_");
 	                System.getProperties().put("recording_date", date);
-
-				logger = Logger.getLogger("rSYBLLogger");
+	            
+				logger = Logger.getLogger("rootLogger");
 				logger.info("Analysis logger .. ");
 //				appender = new FileAppender(layout,"../logs/rSYBL_AnalysisService_"+date.getHours()+"_"+date.getMinutes()+".log",false);
 //
