@@ -41,6 +41,7 @@ import at.ac.tuwien.dsg.rSybl.planningEngine.utils.PlanningLogger;
 
 public class PlanningGreedyAlgorithm implements Runnable {
 	private Thread t;
+	private boolean toCleanup=true;
 	private ContextRepresentation contextRepresentation;
 	private MonitoringAPIInterface monitoringAPI;
 	private EnforcementAPIInterface enforcementAPI;
@@ -155,6 +156,13 @@ public class PlanningGreedyAlgorithm implements Runnable {
 		ArrayList<Pair<ActionEffect, Integer>> result = new ArrayList<Pair<ActionEffect, Integer>>();
 	
 		int numberOfRemainingConstraints=numberOfBrokenConstraints;
+		if (contextRepresentation.countViolatedConstraints()==0){
+			//check values for metrics - if low 
+			
+			//do cleanup actions
+			enforcementAPI.enforceAction("cleanup", null);
+			toCleanup=false;
+		}
 		while (contextRepresentation.countViolatedConstraints() > 0
 				&& numberOfRemainingConstraints > 0 && lastFixed>0) {
 			Date date = new Date();
@@ -216,6 +224,7 @@ public class PlanningGreedyAlgorithm implements Runnable {
 							}
 						}
 					}
+				toCleanup=true;
 			}
 
 			int maxAction = -20;

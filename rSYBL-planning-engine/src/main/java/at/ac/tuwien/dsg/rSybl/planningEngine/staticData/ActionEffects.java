@@ -49,7 +49,7 @@ public class ActionEffects {
 			scaleOutEffectForCassandraDB.setTargetedEntityID("CassandraNode");
 			scaleOutEffectForCassandraDB.setActionEffectForMetric("cpuUsage", -30.0f,"CassandraNode");
 //			scaleOutEffectForCassandraDB.setActionEffectForMetric("cpuUsage", -40.0f,"DataControllerServiceUnit");
-//			scaleOutEffectForCassandraDB.setActionEffectForMetric("latency", -30.0f,"DataNodeServiceUnit");
+			scaleOutEffectForCassandraDB.setActionEffectForMetric("latency", -500.0f,"YCSBClient");
 //			scaleOutEffectForCassandraDB.setActionEffectForMetric("cost", 0.12f,"DataNodeServiceUnit");
 			scaleOutEffectForCassandraDB.setActionName("scaleOutEffectForDataNode");
 			scaleOutEffectForCassandraDB.setActionType("scaleout");
@@ -81,7 +81,7 @@ public class ActionEffects {
 		{
 			scaleInEffectForCassandraDB.setTargetedEntityID("CassandraNode");
 			scaleInEffectForCassandraDB.setActionEffectForMetric("cpuUsage", 35.0f,"CassandraNode");
-//			scaleInEffectForCassandraDB.setActionEffectForMetric("latency", 0.0001f,"DataNodeServiceUnit");
+			scaleInEffectForCassandraDB.setActionEffectForMetric("latency", 50f,"YCSBClient");
 //			scaleInEffectForCassandraDB.setActionEffectForMetric("cost", -0.12f,"DataNodeServiceUnit");
 			scaleInEffectForCassandraDB.setActionName("scaleInEffectForDataNode");
 			scaleInEffectForCassandraDB.setActionType("scalein");

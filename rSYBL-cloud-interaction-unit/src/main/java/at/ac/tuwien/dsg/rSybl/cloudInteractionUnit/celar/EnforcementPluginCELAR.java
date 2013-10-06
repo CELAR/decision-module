@@ -24,17 +24,19 @@ import at.ac.tuwien.dsg.rSybl.dataProcessingUnit.api.MonitoringAPIInterface;
 public class EnforcementPluginCELAR implements EnforcementInterface {
 	private MonitoringAPIInterface monitoringAPI;
 	private Node cloudService;
-	public static String API_URL="http://83.212.117.112/celar-orchestrator/deployment/resize/?action=";
+	boolean cleanupGoingOn =false;
+	public static String API_URL="http://83.212.117.112/celar-orchestrator/deployment/";
+	
 	public EnforcementPluginCELAR(Node cloudService){
 		this.cloudService=cloudService;
 		
 	}
-	public static String executeCommand(String actionType){
+	public static String executeResizingCommand(String actionType){
 		String ip = "";
 		 URL url = null;
 	        HttpURLConnection connection = null;
 	        try {
-	            url = new URL(API_URL+ actionType);
+	            url = new URL(API_URL+"resize/?action="+ actionType);
 	       
 
 	            InputStream is = url.openStream();
@@ -71,13 +73,13 @@ public class EnforcementPluginCELAR implements EnforcementInterface {
 	    	            	  return strs[strs.length-1].split("xss")[0];  
 	            		  }
 	            	  }
-	              if (array.getJSONObject("1").getString("stdout").charAt(0)>='0'&&array.getJSONObject("1").getString("stdout").charAt(0)<='9')
+	              if (array.getJSONObject("1").getString("stdout").charAt(0)>='0'&&array.getJSONObject("1").getString("stdout").charAt(0)<='9'&& !array.getJSONObject("1").getString("stdout").contains(" "))
 	            		  return array.getJSONObject("1").getString("stdout");
 	              else
 	            	  return "";
 	              }else
 	              {
-	            	  System.err.println(array.getJSONObject("1").getString("stderr"));
+	            	  RuntimeLogger.logger.error(array.getJSONObject("1").getString("stderr"));
 	    	        try{
 	    		              if ((array.getJSONObject("1").getString("stdout")).contains("Removing:"))
 	    		              {
@@ -96,7 +98,7 @@ public class EnforcementPluginCELAR implements EnforcementInterface {
 	    		            	  }
 	    		    	        RuntimeLogger.logger.error("Error when calling orchestrator API for "+actionType+" error is "+array.getJSONObject("1").getString("stderr"));
 
-	    		              if (array.getJSONObject("1").getString("stdout").charAt(0)>='0'&&array.getJSONObject("1").getString("stdout").charAt(0)<='9')
+	    		              if (array.getJSONObject("1").getString("stdout").charAt(0)>='0'&&array.getJSONObject("1").getString("stdout").charAt(0)<='9' && !array.getJSONObject("1").getString("stdout").contains(" "))
 	    		            		  return array.getJSONObject("1").getString("stdout");
 	    		              else
 	    		            	  return "";
@@ -153,7 +155,7 @@ public class EnforcementPluginCELAR implements EnforcementInterface {
 	}
 
 	public static void main(String[] args){
-		String ip=executeCommand("addvm");
+		String ip=executeResizingCommand("addvm");
 		if (!ip.equalsIgnoreCase("")){
 			System.err.println(ip);
 		}else{
@@ -162,10 +164,76 @@ public class EnforcementPluginCELAR implements EnforcementInterface {
 
 		//System.err.println(executeCommand("removevm"));
 	}
+	public void cleanup(){
+		 URL url = null;
+	        try {
+	            url = new URL(API_URL+"resizestatus/?action=cleanup");            
+	              
+	              while (checkStatus("","cleanup")){
+	      			try {
+	      				Thread.sleep(10000);
+	      			} catch (InterruptedException e) {
+	      				// TODO Auto-generated catch block
+	      				e.printStackTrace();
+	      			}
+	      		}
+	        }catch(Exception e ){
+	        	RuntimeLogger.logger.error("Error at cleanup"+e.getMessage()+" "+e.getCause());
+	        }
+	}
+	public boolean checkStatus(String ip, String action){
+		 URL url = null;
+	        HttpURLConnection connection = null;
+	        try {
+	        	if (!ip.equalsIgnoreCase(""))
+	            url = new URL(API_URL+"resizestatus/?action="+ action+"&ip="+ip);
+	        	else
+		            url = new URL(API_URL+"resizestatus/?action="+ action);
+
+
+	            InputStream is = url.openStream();
+	               BufferedReader rd = new BufferedReader(new InputStreamReader(is, Charset.forName("UTF-8")));
+
+	              StringBuilder sb = new StringBuilder();
+
+
+	              String cp = new String();
+
+	              while((cp=rd.readLine())!=null){
+
+	                  sb.append(cp);
+	              }
+	              JSONObject jsonObject=new JSONObject(sb);
+	             String status= (String) jsonObject.get("finished");
+	             if (status.equalsIgnoreCase("true"))return true;
+	             else return false;
+	            }catch(Exception e){
+	            	RuntimeLogger.logger.error("Error when checking for status of "+ip+" with action "+action);
+	            	return false;
+	            }
+	              
+	              
+	}
 	@Override
 	public void scaleOut(Node toBeScaled) {
-		
-		String ip = "";// executeCommand("addvm");
+		while (cleanupGoingOn){
+			try {
+				Thread.sleep(10000);
+			} catch (InterruptedException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
+		String ip = executeResizingCommand("addvm");
+		while (checkStatus(ip,"addvm")){
+			try {
+				Thread.sleep(10000);
+			} catch (InterruptedException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
+
 		if (!ip.equalsIgnoreCase("")){
 			RuntimeLogger.logger.info("The IP of the Virtual Machine to be ADDED is "+ip);	
 		DependencyGraph dependencyGraph=new DependencyGraph();
@@ -182,19 +250,33 @@ public class EnforcementPluginCELAR implements EnforcementInterface {
 		RuntimeLogger.logger.info("Cloud new service is "+dependencyGraph.graphToString());
 		monitoringAPI.refreshServiceStructure(cloudService);
 }else{
-	System.err.println("IP is empty "+ip);
+	RuntimeLogger.logger.error("IP is empty "+ip);
 }
 	}
 
 	@Override
 	public void scaleIn(Node toBeScaled) {
-
+		while (cleanupGoingOn){
+			try {
+				Thread.sleep(10000);
+			} catch (InterruptedException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
 		DependencyGraph d = new DependencyGraph();
 		d.setCloudService(cloudService);
 		if (d.getNodeWithID(toBeScaled.getId()).getAllRelatedNodesOfType(RelationshipType.HOSTED_ON_RELATIONSHIP,NodeType.VIRTUAL_MACHINE).size()>1){
 			
-		String ip = "";//executeCommand("removevm");
-		
+		String ip = executeResizingCommand("removevm");
+		while (checkStatus(ip,"removevm")){
+			try {
+				Thread.sleep(10000);
+			} catch (InterruptedException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
 		if (!ip.equalsIgnoreCase("")){
 			RuntimeLogger.logger.info("The IP of the Virtual Machine to be REMOVED is "+ip);	
 			DependencyGraph dep = new DependencyGraph();
@@ -215,7 +297,11 @@ public class EnforcementPluginCELAR implements EnforcementInterface {
 
 	@Override
 	public void enforceAction(String actionName, Node entity) {
-		// TODO Auto-generated method stub
+	if (actionName.equalsIgnoreCase("cleanup")){
+		cleanupGoingOn=true;
+		cleanup();
+		cleanupGoingOn=false;
+	}
 		
 	}
 
