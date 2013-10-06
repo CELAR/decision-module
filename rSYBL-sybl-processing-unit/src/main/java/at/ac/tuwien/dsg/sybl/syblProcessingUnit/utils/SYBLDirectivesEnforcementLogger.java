@@ -45,7 +45,7 @@ public class SYBLDirectivesEnforcementLogger {
                 date = date.replace(":", "_");
                 System.getProperties().put("recording_date", date);
 
-				PropertyConfigurator.configure(SYBLDirectivesEnforcementLogger.class.getResourceAsStream("/config/SYBL_Log4j.properties"));
+				PropertyConfigurator.configure(SYBLDirectivesEnforcementLogger.class.getResourceAsStream("/config/Log4j.properties"));
 				logger = Logger.getLogger("rootLogger");
 			//	appender = new FileAppender(layout,"../logs/rSYBL_SYBLDirectivesEnforcementLogger_"+date.getDay()+"_"+date.getMonth()+"_"+date.getHours()+"_"+date.getMinutes()+".log",false);
 //			} catch (IOException e) {
