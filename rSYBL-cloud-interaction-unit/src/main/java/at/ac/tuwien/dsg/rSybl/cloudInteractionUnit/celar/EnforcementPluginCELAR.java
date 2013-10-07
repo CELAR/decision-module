@@ -208,7 +208,7 @@ public class EnforcementPluginCELAR implements EnforcementInterface {
 	              }
 	              RuntimeLogger.logger.info("This is what we get from the status" +sb);
 	              JSONObject jsonObject=new JSONObject(sb);
-	             String status= (String) jsonObject.get("finished");
+	             String status= jsonObject.getString("finished");
 	             RuntimeLogger.logger.info("From status " + status);
 	             if (status.equalsIgnoreCase("true"))return true;
 	             else return false;
