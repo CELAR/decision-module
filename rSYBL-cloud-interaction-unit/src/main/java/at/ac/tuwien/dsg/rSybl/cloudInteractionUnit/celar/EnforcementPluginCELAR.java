@@ -169,7 +169,7 @@ public class EnforcementPluginCELAR implements EnforcementInterface {
 	        try {
 	            url = new URL(API_URL+"resizestatus/?action=cleanup");            
 	              
-	              while (checkStatus("","cleanup")){
+	              while (!checkStatus("","cleanup")){
 	      			try {
 	      				Thread.sleep(10000);
 	      			} catch (InterruptedException e) {
@@ -230,7 +230,7 @@ public class EnforcementPluginCELAR implements EnforcementInterface {
 			}
 		}
 		String ip = executeResizingCommand("addvm");
-		while (checkStatus(ip,"addvm")){
+		while (!checkStatus(ip,"addvm")){
 			try {
 				RuntimeLogger.logger.info("Waiting for scale out...");
 				Thread.sleep(10000);
@@ -276,7 +276,7 @@ public class EnforcementPluginCELAR implements EnforcementInterface {
 		if (d.getNodeWithID(toBeScaled.getId()).getAllRelatedNodesOfType(RelationshipType.HOSTED_ON_RELATIONSHIP,NodeType.VIRTUAL_MACHINE).size()>1){
 			
 		String ip = executeResizingCommand("removevm");
-		while (checkStatus(ip,"removevm")){
+		while (!checkStatus(ip,"removevm")){
 			try {
 				RuntimeLogger.logger.info("Waiting for scale in...");
 				Thread.sleep(10000);
