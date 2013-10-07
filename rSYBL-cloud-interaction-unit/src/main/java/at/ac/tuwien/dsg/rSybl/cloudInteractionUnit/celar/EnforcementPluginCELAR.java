@@ -185,11 +185,14 @@ public class EnforcementPluginCELAR implements EnforcementInterface {
 		 URL url = null;
 	        HttpURLConnection connection = null;
 	        try {
+	        	
 	        	if (!ip.equalsIgnoreCase(""))
 	            url = new URL(API_URL+"resizestatus/?action="+ action+"&ip="+ip);
-	        	else
+	        	else{
 		            url = new URL(API_URL+"resizestatus/?action="+ action);
+		              RuntimeLogger.logger.info("Check cleanup status " +url);
 
+	        	}
 
 	            InputStream is = url.openStream();
 	               BufferedReader rd = new BufferedReader(new InputStreamReader(is, Charset.forName("UTF-8")));
