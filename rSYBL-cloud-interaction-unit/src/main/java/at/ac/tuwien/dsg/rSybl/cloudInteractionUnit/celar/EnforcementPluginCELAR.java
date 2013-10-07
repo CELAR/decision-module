@@ -167,7 +167,20 @@ public class EnforcementPluginCELAR implements EnforcementInterface {
 		 URL url = null;
 	        try {
 	            url = new URL(API_URL+"resizestatus/?action=cleanup");            
-	              
+	            InputStream is = url.openStream();
+	               BufferedReader rd = new BufferedReader(new InputStreamReader(is, Charset.forName("UTF-8")));
+
+	              StringBuilder sb = new StringBuilder();
+
+
+	              String cp = new String();
+	              String s = "";
+	              while((cp=rd.readLine())!=null){
+
+	                  sb.append(cp);
+	                  s+=cp;
+	              }
+	              RuntimeLogger.logger.info("Cleanup returning "+s);
 	              while (!checkStatus("","cleanup")){
 	      			try {
 	      				Thread.sleep(10000);
