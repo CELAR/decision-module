@@ -28,7 +28,7 @@
         
           <CompositionRule TargetMonitoredElementLevel="SERVICE_UNIT">
             <ResultingMetric type="RESOURCE" measurementUnit="ops" name="throughput"/>
-            <Operation MetricSourceMonitoredElementLevel="VM" type="AVG">
+            <Operation MetricSourceMonitoredElementLevel="VM" type="SUM">
                   <ReferenceMetric type="RESOURCE" measurementUnit="ops"  name="ycsb_throughput"/>     
             </Operation>
         </CompositionRule>
