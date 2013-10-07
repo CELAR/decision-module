@@ -206,7 +206,7 @@ public class EnforcementPluginCELAR implements EnforcementInterface {
 
 	                  sb.append(cp);
 	              }
-	              RuntimeLogger.logger.info("This is what we get from the status" +cp);
+	              RuntimeLogger.logger.info("This is what we get from the status" +sb);
 	              JSONObject jsonObject=new JSONObject(sb);
 	             String status= (String) jsonObject.get("finished");
 	             RuntimeLogger.logger.info("From status " + status);
