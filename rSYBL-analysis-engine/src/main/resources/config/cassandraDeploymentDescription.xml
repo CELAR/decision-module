@@ -13,8 +13,9 @@
 			<AssociatedVM IP="83.212.117.125"/>
 			<AssociatedVM IP="83.212.117.126"/>
 			<AssociatedVM IP="83.212.117.11"/>
-				<AssociatedVM IP="83.212.117.31"/>
-	
+			<AssociatedVM IP="83.212.117.31"/>
+			<AssociatedVM IP="83.212.117.123"/>
+
 		</DeploymentUnit>
 
 </DeploymentDescription>

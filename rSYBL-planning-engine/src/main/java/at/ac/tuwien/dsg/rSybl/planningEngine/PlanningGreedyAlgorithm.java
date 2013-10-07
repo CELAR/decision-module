@@ -156,7 +156,7 @@ public class PlanningGreedyAlgorithm implements Runnable {
 		ArrayList<Pair<ActionEffect, Integer>> result = new ArrayList<Pair<ActionEffect, Integer>>();
 	
 		int numberOfRemainingConstraints=numberOfBrokenConstraints;
-		if (contextRepresentation.countViolatedConstraints()==0){
+		if (contextRepresentation.countViolatedConstraints()==0 && !toCleanup){
 			//check values for metrics - if low 
 			
 			//do cleanup actions

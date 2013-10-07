@@ -56,7 +56,6 @@ public class EnforcementPluginCELAR implements EnforcementInterface {
 	              String jsonText = sb.toString();
 
 	              JSONObject array = new JSONObject(jsonText);
-	              System.out.println(array);
 	              if (array.getJSONObject("1").getString("stderr").equalsIgnoreCase("")){
 	              if ((array.getJSONObject("1").getString("stdout")).contains("Removing:"))
 	              {
