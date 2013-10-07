@@ -32,6 +32,7 @@ import org.junit.BeforeClass;
 import at.ac.tuwien.dsg.csdg.DependencyGraph;
 import at.ac.tuwien.dsg.csdg.Node;
 import at.ac.tuwien.dsg.csdg.Node.NodeType;
+import at.ac.tuwien.dsg.csdg.Relationship.RelationshipType;
 import at.ac.tuwien.dsg.rSybl.cloudInteractionUnit.api.EnforcementAPIInterface;
 import at.ac.tuwien.dsg.rSybl.dataProcessingUnit.api.MonitoringAPIInterface;
 import at.ac.tuwien.dsg.rSybl.planningEngine.utils.Configuration;
@@ -116,27 +117,14 @@ public class PlanningGreedyAlgorithm implements Runnable {
 		if (actionEffect.getActionType().equalsIgnoreCase("scalein")) {
 			if (entity.getNodeType()==NodeType.CLOUD_SERVICE) {
 				List<String> ips = entity.getAssociatedIps();
-				int numberPrivateIps = 0;
-				for (String ip : ips) {
-					if (ip.split("\\.")[0].length() == 2) {
-						numberPrivateIps++;
-					}
-				}
-				// System.out.println("Private ips for "+numberPrivateIps);
-				if (numberPrivateIps > 1)
+				if (entity.getAllRelatedNodesOfType(RelationshipType.HOSTED_ON_RELATIONSHIP, NodeType.VIRTUAL_MACHINE).size() > 1)
 					return true;
 			}
 			if (entity.getNodeType()==NodeType.SERVICE_TOPOLOGY) {
 				
 				Node master = dependencyGraph.findParentNode(entity.getId());
-				List<String> ips = master.getAssociatedIps();
-				int numberPrivateIps = 0;
-				for (String ip : ips) {
-					if (ip.split("\\.")[0].length() == 2) {
-						numberPrivateIps++;
-					}
-				}
-				if (numberPrivateIps > 1)
+			
+				if (entity.getAllRelatedNodesOfType(RelationshipType.HOSTED_ON_RELATIONSHIP, NodeType.VIRTUAL_MACHINE).size() > 1)
 					return true;
 			}
 		}
