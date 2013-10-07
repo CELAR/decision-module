@@ -227,7 +227,9 @@ public class EnforcementPluginCELAR implements EnforcementInterface {
 		String ip = executeResizingCommand("addvm");
 		while (checkStatus(ip,"addvm")){
 			try {
+				RuntimeLogger.logger.info("Waiting for scale out...");
 				Thread.sleep(10000);
+				
 			} catch (InterruptedException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
@@ -271,6 +273,7 @@ public class EnforcementPluginCELAR implements EnforcementInterface {
 		String ip = executeResizingCommand("removevm");
 		while (checkStatus(ip,"removevm")){
 			try {
+				RuntimeLogger.logger.info("Waiting for scale in...");
 				Thread.sleep(10000);
 			} catch (InterruptedException e) {
 				// TODO Auto-generated catch block
