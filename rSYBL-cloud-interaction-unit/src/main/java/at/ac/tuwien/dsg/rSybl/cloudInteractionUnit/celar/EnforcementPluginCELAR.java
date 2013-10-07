@@ -166,7 +166,7 @@ public class EnforcementPluginCELAR implements EnforcementInterface {
 	public void cleanup(){
 		 URL url = null;
 	        try {
-	            url = new URL(API_URL+"resizestatus/?action=cleanup");            
+	            url = new URL(API_URL+"resize/?action=cleanup");            
 	            InputStream is = url.openStream();
 	               BufferedReader rd = new BufferedReader(new InputStreamReader(is, Charset.forName("UTF-8")));
 
