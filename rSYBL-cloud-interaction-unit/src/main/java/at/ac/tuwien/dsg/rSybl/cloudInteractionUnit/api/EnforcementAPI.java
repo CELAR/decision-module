@@ -92,7 +92,7 @@ public class EnforcementAPI implements EnforcementAPIInterface{
 
 		offeredCapabilities.enforceAction(actionName, e);
 		executingControlAction=false;
-		RuntimeLogger.logger.info("Finished enforcing action "+actionName+" on the node "+e.getId()+" ...");
+		RuntimeLogger.logger.info("Finished enforcing action "+actionName+" on the node "+e+" ...");
 
 	}
 
