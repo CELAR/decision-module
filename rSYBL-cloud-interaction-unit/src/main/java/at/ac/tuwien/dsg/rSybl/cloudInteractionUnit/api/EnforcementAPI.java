@@ -86,7 +86,7 @@ public class EnforcementAPI implements EnforcementAPIInterface{
 
 	@Override
 	public void enforceAction(String actionName, Node e) {
-		RuntimeLogger.logger.info("Enforcing action "+actionName+" on the node "+e.getId()+" ...");
+		RuntimeLogger.logger.info("Enforcing action "+actionName+" on the node "+e+" ...");
 
 		executingControlAction=true;
 
