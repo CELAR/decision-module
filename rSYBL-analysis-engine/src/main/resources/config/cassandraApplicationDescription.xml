@@ -1,13 +1,16 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <CloudService id="CloudService">
+	<SYBLDirective Constraints="Co1: cost &lt; 1.5 $;" Strategies="St1: CASE fulfilled(Co2) : minimize(cost);"/>
 	<ServiceTopology id="MainTopology">
 		<Relationship>
 			<Master>YCSBClient</Master>
 			<Slave>CassandraNode</Slave>
 		</Relationship>
-		<ServiceUnit id="YCSBClient" />
+		<ServiceUnit id="YCSBClient" >
+		<SYBLDirective Constraints="Co2:CONSTRAINT latency &lt; 1000 ms ;"/>
+		</ServiceUnit>
 		<ServiceUnit id="CassandraNode" >
-		<SYBLDirective Constraints="Co1:CONSTRAINT cpuUsage &lt; 70 % ; Co2: CONSTRAINT cpuUsage &gt; 35 %;"/></ServiceUnit>
+		<SYBLDirective Constraints="Co3:CONSTRAINT cpuUsage &lt; 70 % ; Co4: CONSTRAINT cpuUsage &gt; 35 %;"/></ServiceUnit>
 	</ServiceTopology>
 </CloudService>
 

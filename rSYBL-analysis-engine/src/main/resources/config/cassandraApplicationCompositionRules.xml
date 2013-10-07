@@ -2,6 +2,7 @@
 <CompositionRulesConfiguration>
     <MetricsCompositionRules>
        <CompositionRule TargetMonitoredElementLevel="SERVICE_UNIT">
+               <TargetMonitoredElementID>CassandraNode</TargetMonitoredElementID>
             <ResultingMetric type="RESOURCE" measurementUnit="%" name="cpuUsage"/>
             <Operation value="100" type="ADD">
                   <Operation value="-1" type="MUL">
@@ -45,25 +46,26 @@
 			       <ReferenceMetric type="RESOURCE" name="numberOfVMs"/>
             </Operation>
         </CompositionRule>   
-              <CompositionRule TargetMonitoredElementLevel="SERVICE_TOPOLOGY">
-            <ResultingMetric type="RESOURCE" measurementUnit="%" name="cpuUsage"/>
-                         <Operation MetricSourceMonitoredElementLevel="SERVICE_UNIT" type="AVG">
-                   		 <ReferenceMetric type="RESOURCE" measurementUnit="%"  name="cpuUsage"/>
-               		 </Operation>
-        </CompositionRule>    
+                 <CompositionRule TargetMonitoredElementLevel="SERVICE_TOPOLOGY">
+            <ResultingMetric type="RESOURCE" measurementUnit="ms" name="latency"/>
+                <Operation MetricSourceMonitoredElementLevel="SERVICE_UNIT" type="KEEP">
+                    <ReferenceMetric type="RESOURCE" name="latency"/>
+                </Operation>
+        </CompositionRule>
+        
          <CompositionRule TargetMonitoredElementLevel="SERVICE_TOPOLOGY">
             <ResultingMetric type="RESOURCE" measurementUnit="$" name="cost"/>
                 <Operation MetricSourceMonitoredElementLevel="SERVICE_UNIT" type="SUM">
                     <ReferenceMetric type="RESOURCE" name="cost"/>
                 </Operation>
         </CompositionRule>
-        
-        <CompositionRule TargetMonitoredElementLevel="SERVICE">
-            <ResultingMetric type="RESOURCE" measurementUnit="%" name="cpuUsage"/>
-                         <Operation MetricSourceMonitoredElementLevel="SERVICE_TOPOLOGY" type="AVG">
-                   		 <ReferenceMetric type="RESOURCE" measurementUnit="%"  name="cpuUsage"/>
-               		 </Operation>
-        </CompositionRule> 
+          <CompositionRule TargetMonitoredElementLevel="SERVICE">
+            <ResultingMetric type="RESOURCE" measurementUnit="ms" name="latency"/>
+                <Operation MetricSourceMonitoredElementLevel="SERVICE_TOPOLOGY" type="KEEP">
+                    <ReferenceMetric type="RESOURCE" name="latency"/>
+                </Operation>
+        </CompositionRule>
+      
          <CompositionRule TargetMonitoredElementLevel="SERVICE">
             <ResultingMetric type="RESOURCE" measurementUnit="$" name="cost"/>
                 <Operation MetricSourceMonitoredElementLevel="SERVICE_TOPOLOGY" type="SUM">
