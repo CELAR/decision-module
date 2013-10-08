@@ -310,9 +310,12 @@ public class PlanningGreedyAlgorithm implements Runnable {
 	}
 	public void findAndExecuteBestActions() {
 		
-		if (contextRepresentation.countViolatedConstraints()==0 && toCleanup ){
-			enforcementAPI.enforceAction("cleanup", null);
-			toCleanup=false;
+		if (contextRepresentation.countViolatedConstraints()==0 ){
+			boolean actions=findActionsForStrategies();
+			PlanningLogger.logger.info("Found actions for enabling strategies");
+			
+			//enforcementAPI.enforceAction("cleanup", null);
+			//toCleanup=false;
 		}
 		HashMap<String, List<ActionEffect>> actionEffects = ActionEffects
 				.getActionEffects(dependencyGraph,monitoringAPI);

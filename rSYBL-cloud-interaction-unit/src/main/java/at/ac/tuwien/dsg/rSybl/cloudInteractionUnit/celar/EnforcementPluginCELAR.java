@@ -25,7 +25,7 @@ public class EnforcementPluginCELAR implements EnforcementInterface {
 	private MonitoringAPIInterface monitoringAPI;
 	private Node cloudService;
 	boolean cleanupGoingOn =false;
-	public static String API_URL="http://83.212.117.112/celar-orchestrator/deployment/";
+	public static String API_URL="http://localhost:8080/celar-orchestrator/deployment/";
 	
 	public EnforcementPluginCELAR(Node cloudService){
 		this.cloudService=cloudService;
