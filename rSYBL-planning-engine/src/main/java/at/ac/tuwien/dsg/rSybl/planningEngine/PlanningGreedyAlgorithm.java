@@ -310,7 +310,7 @@ public class PlanningGreedyAlgorithm implements Runnable {
 	}
 	public void findAndExecuteBestActions() {
 		
-		if (!findActionsForStrategies()&&contextRepresentation.countViolatedConstraints()==0 && toCleanup ){
+		if (contextRepresentation.countViolatedConstraints()==0 && toCleanup ){
 			enforcementAPI.enforceAction("cleanup", null);
 			toCleanup=false;
 		}

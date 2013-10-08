@@ -8,7 +8,7 @@
 	</DeploymentUnit>
 	<DeploymentUnit serviceUnitID="CassandraNode">
 			<AssociatedVM IP="83.212.116.239"/>
-			<AssociatedVM IP="83.212.117.11"/>
+			<AssociatedVM IP="83.212.117.126"/>
 		</DeploymentUnit>
 
 </DeploymentDescription>
