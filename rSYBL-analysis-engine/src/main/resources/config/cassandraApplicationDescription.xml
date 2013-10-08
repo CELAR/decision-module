@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <CloudService id="CloudService">
-	<SYBLDirective Constraints="Co1: cost &lt; 1.5 $;" Strategies="St1: CASE fulfilled(Co2) : minimize(cost);"/>
+	<SYBLDirective Constraints="Co1: CONSTRAINT cost &lt; 1.5 $;" Strategies="St1: CASE fulfilled(Co2) : minimize(cost);"/>
 	<ServiceTopology id="MainTopology">
 		<Relationship>
 			<Master>YCSBClient</Master>
