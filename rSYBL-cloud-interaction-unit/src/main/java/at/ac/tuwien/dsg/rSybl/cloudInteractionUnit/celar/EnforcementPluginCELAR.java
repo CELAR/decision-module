@@ -18,6 +18,7 @@ import at.ac.tuwien.dsg.csdg.Node.NodeType;
 import at.ac.tuwien.dsg.csdg.Relationship;
 import at.ac.tuwien.dsg.csdg.Relationship.RelationshipType;
 import at.ac.tuwien.dsg.rSybl.cloudInteractionUnit.enforcementPlugins.interfaces.EnforcementInterface;
+import at.ac.tuwien.dsg.rSybl.cloudInteractionUnit.utils.Configuration;
 import at.ac.tuwien.dsg.rSybl.cloudInteractionUnit.utils.RuntimeLogger;
 import at.ac.tuwien.dsg.rSybl.dataProcessingUnit.api.MonitoringAPIInterface;
 
@@ -29,6 +30,7 @@ public class EnforcementPluginCELAR implements EnforcementInterface {
 	
 	public EnforcementPluginCELAR(Node cloudService){
 		this.cloudService=cloudService;
+		API_URL=Configuration.getEnforcementServiceURL();
 		
 	}
 	public static String executeResizingCommand(String actionType){

@@ -102,7 +102,10 @@ public class Configuration {
     	return configuration.getProperty("CloudUser");
     }
     
-    
+    public static String getEnforcementServiceURL()
+    {
+    	return configuration.getProperty("EnforcementServiceURL");
+    }
    
     public static String getAccessIP()
     {
