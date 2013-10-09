@@ -286,6 +286,7 @@ public class EnforcementPluginCELAR implements EnforcementInterface {
 		}
 		DependencyGraph d = new DependencyGraph();
 		d.setCloudService(cloudService);
+		RuntimeLogger.logger.info("Executing scaling action, number of VMs available for node "+ toBeScaled.getId()+" "d.getNodeWithID(toBeScaled.getId()).getAllRelatedNodesOfType(RelationshipType.HOSTED_ON_RELATIONSHIP,NodeType.VIRTUAL_MACHINE).size());
 		if (d.getNodeWithID(toBeScaled.getId()).getAllRelatedNodesOfType(RelationshipType.HOSTED_ON_RELATIONSHIP,NodeType.VIRTUAL_MACHINE).size()>1){
 			
 		String ip = executeResizingCommand("removevm");

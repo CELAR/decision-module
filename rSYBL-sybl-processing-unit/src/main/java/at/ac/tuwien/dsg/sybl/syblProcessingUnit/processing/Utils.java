@@ -180,9 +180,14 @@ public void processPriorities(String priorities,ArrayList<Rule> rules) {
 				}else{
 					if (ruleText.contains("CASE")){
 						String cond = ruleText.split("CASE ")[1].split(":")[0];
-							if (evaluateCondition(cond)){
-							SYBLDirectivesEnforcementLogger.logger.info("Evaluating condition "+cond+" of the higher importance rule");
-								disableLessImpRule=true;
+							try {
+								if (evaluateCondition(cond)){
+								SYBLDirectivesEnforcementLogger.logger.info("Evaluating condition "+cond+" of the higher importance rule");
+									disableLessImpRule=true;
+								}
+							} catch (NoSuchMethodException | SecurityException e) {
+								// TODO Auto-generated catch block
+								e.printStackTrace();
 							}
 				
 					}else
@@ -223,7 +228,12 @@ public void processConstraints(String constraints)
 		if (!disabledRules.contains(r)){
 		if (x[1].contains("WHEN "))
 			try {
-				processComplexConstraint(r);
+				try {
+					processComplexConstraint(r);
+				} catch (NoSuchMethodException | SecurityException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
 			} catch (ConstraintViolationException e) {
 				// TODO Auto-generated catch block
 				SYBLDirectivesEnforcementLogger.logger.info(e.getMessage());
@@ -232,7 +242,12 @@ public void processConstraints(String constraints)
 			processCompositeConstraint(r);
 		else
 			try {
-				processSimpleConstraint(r);
+				try {
+					processSimpleConstraint(r);
+				} catch (NoSuchMethodException | SecurityException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
 			} catch (ConstraintViolationException e) {
 				// TODO Auto-generated catch block
 				SYBLDirectivesEnforcementLogger.logger.info(e.getMessage());
@@ -260,7 +275,12 @@ public void processMonitoring(String monitoring) {
 		r.setText(x[1]);
 		if (x[1].contains("WHEN "))
 			try {
-				processComplexMonitoringRule(r);
+				try {
+					processComplexMonitoringRule(r);
+				} catch (NoSuchMethodException | SecurityException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
 			} catch (MethodNotFoundException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
@@ -296,64 +316,26 @@ public void processStrategy(Rule r) {
 		//SYBLDirectivesEnforcementLogger.logger.info(r.getText());
 		String condition = s[0].split("CASE ")[1];
 		try {
-			if ((condition.contains("AND") && evaluateCompositeCondition(condition))||(!condition.contains("AND") &&evaluateCondition(condition)) ){
-				if (s[1].contains("(")){
-					//SYBLDirectivesEnforcementLogger.logger.info("s[1]= " +s[1]);
-				String actionName = s[1].split("[(]")[0];
-				if (!actionName.contains("minimize") &&  !actionName.contains("maximize")){
-					
-				String parameter = eliminateSpaces(s[1].split("[(]")[1].split("[)]")[0]);
-				//SYBLDirectivesEnforcementLogger.logger.info("Parametor for " +actionName+" is "+ parameter+" ");
-				if (!parameter.equals("")){
-				actionName = eliminateSpaces(actionName);
-
-				try {
-					Class partypes[] = new Class[1];
-
-					Object[] parameters = new Object[1];
-					Node entity = currentEntity;
-					entity.setId(parameter);
-					parameters[0]=entity;
-					partypes[0]=Node.class;
-					
-					Method actionMethod = EnforcementAPIInterface.class.getMethod(
-							actionName, partypes);
-
-					actionMethod.invoke(enforcementAPI, parameters);
-				} catch (NoSuchMethodException ex1)  {
-					// TODO Auto-generated catch block
-					ex1.printStackTrace();
-				}catch ( SecurityException ex2){
-					 
-							// TODO Auto-generated catch block
-							ex2.printStackTrace();
+			try {
+				if ((condition.contains("AND") && evaluateCompositeCondition(condition))||(!condition.contains("AND") &&evaluateCondition(condition)) ){
+					if (s[1].contains("(")){
+						//SYBLDirectivesEnforcementLogger.logger.info("s[1]= " +s[1]);
+					String actionName = s[1].split("[(]")[0];
+					if (!actionName.contains("minimize") &&  !actionName.contains("maximize")){
 						
-				}catch ( IllegalAccessException ex3){
-					ex3.printStackTrace();
+					String parameter = eliminateSpaces(s[1].split("[(]")[1].split("[)]")[0]);
+					//SYBLDirectivesEnforcementLogger.logger.info("Parametor for " +actionName+" is "+ parameter+" ");
+					if (!parameter.equals("")){
+					actionName = eliminateSpaces(actionName);
 
-				}catch (IllegalArgumentException ex4){
-					ex4.printStackTrace();
-
-				}
-				catch(InvocationTargetException ex5){
-					ex5.printStackTrace();
-
-				}
-				}else{
-					
-				}
-
-			}
-				}else{
-					
-					Class partypes[] = new Class[1];
-					String actionName = eliminateSpaces(s[1]);
-					if (!actionName.toLowerCase().contains("minimize") &&  !actionName.toLowerCase().contains("maximize")){
-						
-					Object[] parameters = new Object[1];
-					parameters[0]=currentEntity;
-					partypes[0]=Node.class;
 					try {
+						Class partypes[] = new Class[1];
+
+						Object[] parameters = new Object[1];
+						Node entity = currentEntity;
+						entity.setId(parameter);
+						parameters[0]=entity;
+						partypes[0]=Node.class;
 						
 						Method actionMethod = EnforcementAPIInterface.class.getMethod(
 								actionName, partypes);
@@ -361,27 +343,72 @@ public void processStrategy(Rule r) {
 						actionMethod.invoke(enforcementAPI, parameters);
 					} catch (NoSuchMethodException ex1)  {
 						// TODO Auto-generated catch block
-						ex1.printStackTrace();
+						SYBLDirectivesEnforcementLogger.logger.info("Error in processing strategy "+ex1.getMessage());
 					}catch ( SecurityException ex2){
 						 
 								// TODO Auto-generated catch block
-								ex2.printStackTrace();
+						SYBLDirectivesEnforcementLogger.logger.info("Error in processing strategy "+ex2.getMessage());
 							
 					}catch ( IllegalAccessException ex3){
-						ex3.printStackTrace();
+						SYBLDirectivesEnforcementLogger.logger.info("Error in processing strategy "+ex3.getMessage());
+
 
 					}catch (IllegalArgumentException ex4){
-						ex4.printStackTrace();
+						SYBLDirectivesEnforcementLogger.logger.info("Error in processing strategy "+ex4.getMessage());
 
 					}
 					catch(InvocationTargetException ex5){
-						ex5.printStackTrace();
+						SYBLDirectivesEnforcementLogger.logger.info("Error in processing strategy "+ex5.getMessage());
 
 					}
+					}else{
+						
 					}
+
 				}
-			}else{
-				SYBLDirectivesEnforcementLogger.logger.info("Condition not true for strategy "+r.getName() );
+					}else{
+						
+						Class partypes[] = new Class[1];
+						String actionName = eliminateSpaces(s[1]);
+						if (!actionName.toLowerCase().contains("minimize") &&  !actionName.toLowerCase().contains("maximize")){
+							
+						Object[] parameters = new Object[1];
+						parameters[0]=currentEntity;
+						partypes[0]=Node.class;
+						try {
+							
+							Method actionMethod = EnforcementAPIInterface.class.getMethod(
+									actionName, partypes);
+
+							actionMethod.invoke(enforcementAPI, parameters);
+						}catch (NoSuchMethodException ex1)  {
+							// TODO Auto-generated catch block
+							SYBLDirectivesEnforcementLogger.logger.info("Error in processing strategy "+ex1.getMessage());
+						}catch ( SecurityException ex2){
+							 
+									// TODO Auto-generated catch block
+							SYBLDirectivesEnforcementLogger.logger.info("Error in processing strategy "+ex2.getMessage());
+								
+						}catch ( IllegalAccessException ex3){
+							SYBLDirectivesEnforcementLogger.logger.info("Error in processing strategy "+ex3.getMessage());
+
+
+						}catch (IllegalArgumentException ex4){
+							SYBLDirectivesEnforcementLogger.logger.info("Error in processing strategy "+ex4.getMessage());
+
+						}
+						catch(InvocationTargetException ex5){
+							SYBLDirectivesEnforcementLogger.logger.info("Error in processing strategy "+ex5.getMessage());
+
+						}
+						}
+					}
+				}else{
+					SYBLDirectivesEnforcementLogger.logger.info("Condition not true for strategy "+r.getName() );
+				}
+			} catch (NoSuchMethodException | SecurityException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
 			}
 		} catch (MethodNotFoundException e) {
 			e.printStackTrace();
@@ -405,22 +432,23 @@ public void processStrategy(Rule r) {
 					actionMethod.invoke(enforcementAPI, parameters);
 				} catch (NoSuchMethodException ex1)  {
 					// TODO Auto-generated catch block
-					ex1.printStackTrace();
+					SYBLDirectivesEnforcementLogger.logger.info("Error in processing strategy "+ex1.getMessage());
 				}catch ( SecurityException ex2){
 					 
 							// TODO Auto-generated catch block
-							ex2.printStackTrace();
+					SYBLDirectivesEnforcementLogger.logger.info("Error in processing strategy "+ex2.getMessage());
 						
 				}catch ( IllegalAccessException ex3){
-					ex3.printStackTrace();
+					SYBLDirectivesEnforcementLogger.logger.info("Error in processing strategy "+ex3.getMessage());
+
 
 				}catch (IllegalArgumentException ex4){
-					ex4.printStackTrace();
+					SYBLDirectivesEnforcementLogger.logger.info("Error in processing strategy "+ex4.getMessage());
 
 				}
 				catch(InvocationTargetException ex5){
-					ex5.printStackTrace();
-
+					SYBLDirectivesEnforcementLogger.logger.info("Error in processing strategy "+ex5.getMessage());
+					
 				}
 			}
 			}
@@ -539,7 +567,7 @@ private String eliminateSpaces(String spaceFull) {
 }
 
 public void processComplexMonitoringRule(Rule r)
-		throws MethodNotFoundException {
+		throws MethodNotFoundException, NoSuchMethodException, SecurityException {
 	String[] s = r.getText().split("WHEN ");
 	String monitoring = s[0].split("MONITORING ")[1];
 	String condition = s[1];
@@ -549,9 +577,11 @@ public void processComplexMonitoringRule(Rule r)
 	}
 }
 
-/**************** Constraints Processing *****************************/
+/**************** Constraints Processing 
+ * @throws SecurityException 
+ * @throws NoSuchMethodException *****************************/
 public void processComplexConstraint(Rule constraint)
-		throws MethodNotFoundException, ConstraintViolationException {
+		throws MethodNotFoundException, ConstraintViolationException, NoSuchMethodException, SecurityException {
 	String[] s = constraint.getText().split("WHEN ");
 	String constr = s[0].split("CONSTRAINT ")[1];
 	String condition = s[1];
@@ -573,7 +603,7 @@ public void processCompositeConstraint(Rule constraint)
 		{
 	
 }
-public boolean evaluateCompositeCondition (String compCond)throws MethodNotFoundException{
+public boolean evaluateCompositeCondition (String compCond)throws MethodNotFoundException, NoSuchMethodException, SecurityException{
 	if (compCond.contains("AND")){
 	String [] s= compCond.split("AND ");
 	//SYBLDirectivesEnforcementLogger.logger.info("Condition "+s[0]+" is "+evaluateCondition(s[0]));
@@ -584,7 +614,7 @@ public boolean evaluateCompositeCondition (String compCond)throws MethodNotFound
 	}
 	return false;
 }
-public Comparable evaluateTerm(String term)  {
+public Comparable evaluateTerm(String term) throws NoSuchMethodException, SecurityException  {
 	Float result = 0.0f;
 	SYBLDescriptionParser descriptionParser = new SYBLDescriptionParser();
 	
@@ -593,7 +623,6 @@ public Comparable evaluateTerm(String term)  {
 
 		String methodName = descriptionParser.getMethod(term);
 		if (!methodName.equals("")) {
-			try {
 				
 				Class partypes[] = new Class[1];
 
@@ -604,14 +633,10 @@ public Comparable evaluateTerm(String term)  {
 				Method method = MonitoringAPIInterface.class.getMethod(methodName,partypes);
 				result= (Float) method.invoke(monitoringAPI, parameters);
 
-			} catch (Exception e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-				SYBLDirectivesEnforcementLogger.logger.info("Method not defined in the API for metric "+methodName+" entity "+currentEntity);
-			}
+			
 
 		} else {
-			try{
+			
 			EnvironmentVariable myVar = null;
 
 			for (EnvironmentVariable variable : monitoredVariables.keySet()) {
@@ -624,10 +649,7 @@ public Comparable evaluateTerm(String term)  {
 
 			}else
 			result= (Float) monitoredVariables.get(myVar);
-			}catch(Exception e){
-				SYBLDirectivesEnforcementLogger.logger.error("Not managed to find value for metric "+ term);
-				result = 0.0f;
-			}
+			
 		}
 			
 	} else {
@@ -641,7 +663,7 @@ public Comparable evaluateTerm(String term)  {
 }
 
 @SuppressWarnings("unchecked")
-public  boolean evaluateCondition(String condition)
+public  boolean evaluateCondition(String condition) throws NoSuchMethodException, SecurityException
 		 {
 	String[] s = condition.split(" ");
 	if (condition.toLowerCase().contains("violated") || condition.toLowerCase().contains("fulfilled")){
@@ -729,7 +751,7 @@ public  boolean evaluateCondition(String condition)
 }
 
 public void processSimpleConstraint(Rule constraint)
-		throws MethodNotFoundException, ConstraintViolationException {
+		throws MethodNotFoundException, ConstraintViolationException, NoSuchMethodException, SecurityException {
 	String s[] = constraint.getText().split("CONSTRAINT ");
 	if (s[1].contains("AND"))
 	{
