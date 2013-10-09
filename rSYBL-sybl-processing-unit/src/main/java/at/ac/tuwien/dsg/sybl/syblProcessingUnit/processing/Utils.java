@@ -132,7 +132,7 @@ public class Utils {
 
 	}
 // ==========================processing code========================================//
-public void processPriorities(String priorities,ArrayList<Rule> rules) {
+public void processPriorities(String priorities,ArrayList<Rule> rules)  {
 	String[] s = priorities.split(";");
 	for (String c : s) {
 		String[] x = c.split(":");
@@ -185,7 +185,7 @@ public void processPriorities(String priorities,ArrayList<Rule> rules) {
 								SYBLDirectivesEnforcementLogger.logger.info("Evaluating condition "+cond+" of the higher importance rule");
 									disableLessImpRule=true;
 								}
-							} catch (NoSuchMethodException | SecurityException e) {
+							} catch (NoSuchMethodException | SecurityException | IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
 								// TODO Auto-generated catch block
 								e.printStackTrace();
 							}
@@ -230,7 +230,7 @@ public void processConstraints(String constraints)
 			try {
 				try {
 					processComplexConstraint(r);
-				} catch (NoSuchMethodException | SecurityException e) {
+				} catch (NoSuchMethodException | SecurityException | IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}
@@ -244,7 +244,7 @@ public void processConstraints(String constraints)
 			try {
 				try {
 					processSimpleConstraint(r);
-				} catch (NoSuchMethodException | SecurityException e) {
+				} catch (NoSuchMethodException | SecurityException | IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}
@@ -277,7 +277,7 @@ public void processMonitoring(String monitoring) {
 			try {
 				try {
 					processComplexMonitoringRule(r);
-				} catch (NoSuchMethodException | SecurityException e) {
+				} catch (NoSuchMethodException | SecurityException | IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}
@@ -406,7 +406,7 @@ public void processStrategy(Rule r) {
 				}else{
 					SYBLDirectivesEnforcementLogger.logger.info("Condition not true for strategy "+r.getName() );
 				}
-			} catch (NoSuchMethodException | SecurityException e) {
+			} catch (NoSuchMethodException | SecurityException | IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
@@ -567,7 +567,7 @@ private String eliminateSpaces(String spaceFull) {
 }
 
 public void processComplexMonitoringRule(Rule r)
-		throws MethodNotFoundException, NoSuchMethodException, SecurityException {
+		throws MethodNotFoundException, NoSuchMethodException, SecurityException, IllegalAccessException, IllegalArgumentException, InvocationTargetException {
 	String[] s = r.getText().split("WHEN ");
 	String monitoring = s[0].split("MONITORING ")[1];
 	String condition = s[1];
@@ -579,9 +579,12 @@ public void processComplexMonitoringRule(Rule r)
 
 /**************** Constraints Processing 
  * @throws SecurityException 
- * @throws NoSuchMethodException *****************************/
+ * @throws NoSuchMethodException 
+ * @throws InvocationTargetException 
+ * @throws IllegalArgumentException 
+ * @throws IllegalAccessException *****************************/
 public void processComplexConstraint(Rule constraint)
-		throws MethodNotFoundException, ConstraintViolationException, NoSuchMethodException, SecurityException {
+		throws MethodNotFoundException, ConstraintViolationException, NoSuchMethodException, SecurityException, IllegalAccessException, IllegalArgumentException, InvocationTargetException {
 	String[] s = constraint.getText().split("WHEN ");
 	String constr = s[0].split("CONSTRAINT ")[1];
 	String condition = s[1];
@@ -603,7 +606,7 @@ public void processCompositeConstraint(Rule constraint)
 		{
 	
 }
-public boolean evaluateCompositeCondition (String compCond)throws MethodNotFoundException, NoSuchMethodException, SecurityException{
+public boolean evaluateCompositeCondition (String compCond)throws MethodNotFoundException, NoSuchMethodException, SecurityException, IllegalAccessException, IllegalArgumentException, InvocationTargetException{
 	if (compCond.contains("AND")){
 	String [] s= compCond.split("AND ");
 	//SYBLDirectivesEnforcementLogger.logger.info("Condition "+s[0]+" is "+evaluateCondition(s[0]));
@@ -614,7 +617,7 @@ public boolean evaluateCompositeCondition (String compCond)throws MethodNotFound
 	}
 	return false;
 }
-public Comparable evaluateTerm(String term) throws NoSuchMethodException, SecurityException  {
+public Comparable evaluateTerm(String term) throws NoSuchMethodException, SecurityException, IllegalAccessException, IllegalArgumentException, InvocationTargetException  {
 	Float result = 0.0f;
 	SYBLDescriptionParser descriptionParser = new SYBLDescriptionParser();
 	
@@ -663,7 +666,7 @@ public Comparable evaluateTerm(String term) throws NoSuchMethodException, Securi
 }
 
 @SuppressWarnings("unchecked")
-public  boolean evaluateCondition(String condition) throws NoSuchMethodException, SecurityException
+public  boolean evaluateCondition(String condition) throws NoSuchMethodException, SecurityException, IllegalAccessException, IllegalArgumentException, InvocationTargetException
 		 {
 	String[] s = condition.split(" ");
 	if (condition.toLowerCase().contains("violated") || condition.toLowerCase().contains("fulfilled")){
@@ -751,7 +754,7 @@ public  boolean evaluateCondition(String condition) throws NoSuchMethodException
 }
 
 public void processSimpleConstraint(Rule constraint)
-		throws MethodNotFoundException, ConstraintViolationException, NoSuchMethodException, SecurityException {
+		throws MethodNotFoundException, ConstraintViolationException, NoSuchMethodException, SecurityException, IllegalAccessException, IllegalArgumentException, InvocationTargetException {
 	String s[] = constraint.getText().split("CONSTRAINT ");
 	if (s[1].contains("AND"))
 	{
