@@ -230,6 +230,7 @@ public class DependencyGraph implements Serializable{
 	}
 	public ArrayList<ElasticityRequirement> getAllElasticityRequirements(){
 		ArrayList<ElasticityRequirement> elasticityRequirements= new ArrayList<ElasticityRequirement>();
+		elasticityRequirements.addAll(cloudService.getElasticityRequirements());
 		for (Node n:getAllServiceTopologies()){
 			elasticityRequirements.addAll(n.getElasticityRequirements());
 			

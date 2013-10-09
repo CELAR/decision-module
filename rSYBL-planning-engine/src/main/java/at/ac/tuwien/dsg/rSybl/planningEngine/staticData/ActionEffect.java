@@ -33,6 +33,7 @@ import at.ac.tuwien.dsg.csdg.Node;
 import at.ac.tuwien.dsg.csdg.Node.NodeType;
 import at.ac.tuwien.dsg.csdg.Relationship.RelationshipType;
 import at.ac.tuwien.dsg.rSybl.dataProcessingUnit.api.MonitoringAPIInterface;
+import at.ac.tuwien.dsg.rSybl.planningEngine.utils.PlanningLogger;
 
 
 
@@ -169,7 +170,11 @@ public class ActionEffect {
 			String currentEntityID = iterator.next();
 //		PlanningLogger.logger.error("Entity id is "+currentEntityID);
 		Node currentEntity = dependencyGraph.getNodeWithID(currentEntityID);
-		if (effects.get(currentEntityID)==null)
+		if (currentEntity==null)
+		{
+			PlanningLogger.logger.error("The id "+currentEntityID+" is null");
+		}
+			if (effects.get(currentEntityID)==null)
 		{
 				HashMap<String, Float> metrics = new HashMap<String,Float>();
 

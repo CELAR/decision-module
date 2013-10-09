@@ -37,6 +37,7 @@ import at.ac.tuwien.dsg.csdg.elasticityInformation.elasticityRequirements.Constr
 import at.ac.tuwien.dsg.csdg.elasticityInformation.elasticityRequirements.Monitoring;
 import at.ac.tuwien.dsg.csdg.elasticityInformation.elasticityRequirements.SYBLSpecification;
 import at.ac.tuwien.dsg.csdg.elasticityInformation.elasticityRequirements.Strategy;
+import at.ac.tuwien.dsg.csdg.elasticityInformation.elasticityRequirements.UnaryRestriction;
 import at.ac.tuwien.dsg.csdg.inputProcessing.multiLevelModel.abstractModelXML.SYBLDirectiveMappingFromXML;
 import at.ac.tuwien.dsg.rSybl.dataProcessingUnit.api.MonitoringAPIInterface;
 import at.ac.tuwien.dsg.rSybl.dataProcessingUnit.monitoringPlugins.interfaces.MonitoringInterface;
@@ -427,7 +428,7 @@ public class ContextRepresentation {
 		float currentRightValue = 0;
 		if (binaryRestriction.getLeftHandSide().getMetric()!=null){
 			String metric = binaryRestriction.getLeftHandSide().getMetric();
-			//PlanningLogger.logger.info(monitoredEntity.getId()+" "+metric);
+			PlanningLogger.logger.info(monitoredEntity+" "+metric);
 			currentLeftValue = monitoredEntity.getMonitoredValue(metric);
 			if (currentLeftValue<0){
 				if (monitoredEntity.getMonitoredVar(metric)!=null)
@@ -524,7 +525,11 @@ public class ContextRepresentation {
 	}
 	public boolean evaluateCondition(Condition c, MonitoredEntity monitoredEntity){
 		if (c==null) return true;
-
+		
+		if (monitoredEntity==null) {
+			PlanningLogger.logger.info("Monitored entity is null ");
+			return true;
+		}
 			boolean oneEvaluatedToTrueFound=false;
 
 			for (ArrayList<BinaryRestriction> restrictions:c.getBinaryRestriction()){
@@ -532,12 +537,34 @@ public class ContextRepresentation {
 			for (BinaryRestriction binaryRestriction:restrictions){
 				if (!evaluateBinaryRestriction(binaryRestriction, monitoredEntity)) value =false;
 				}
+			
 			if (value==true) oneEvaluatedToTrueFound=true;
-			}				
+			}	
+			
+			for (ArrayList<UnaryRestriction> restrictions:c.getUnaryRestrictions()){
+				boolean value=true;
+			for (UnaryRestriction unaryRestriction:restrictions){
+				if (!evaluateUnaryRestriction(unaryRestriction, monitoredEntity)) value =false;
+				}
+			
+			if (value==true) oneEvaluatedToTrueFound=true;
+			}
+			
 		if (oneEvaluatedToTrueFound)
 			return true;
 		else return false;
 
+	}
+	public boolean evaluateUnaryRestriction(UnaryRestriction unaryRestriction, MonitoredEntity monitoredEntity){
+		if (unaryRestriction.getReferenceTo().getFunction().equalsIgnoreCase("fulfilled")){
+			if (getViolatedConstraints().contains(unaryRestriction.getReferenceTo().getName()))
+				return false;
+			else return true;
+		}else{
+			if (getViolatedConstraints().contains(unaryRestriction.getReferenceTo().getName()))
+				return true;
+			else return false;
+		}
 	}
 	public float getValueForMetric(MonitoredEntity monitoredEntity,String metricName){
 		return findMonitoredEntity(monitoredEntity.getId()).getMonitoredValue(metricName);

@@ -98,6 +98,7 @@ public static SYBLAnnotation mapFromXMLRepresentation(SYBLSpecification syblSpec
 }
 public static String conditionToString(Condition condition){
 	String stringCondition = "";
+
 	if (condition.getBinaryRestriction().size()>0){
 		for( List<BinaryRestriction> binaryRestrictions : condition.getBinaryRestriction()){
 			if (condition.getBinaryRestriction().size()>1){
@@ -151,9 +152,12 @@ public static String conditionToString(Condition condition){
 	if (condition.getUnaryRestrictions()!=null && condition.getUnaryRestrictions().size()>0){
 		for (List<UnaryRestriction> unaryRestrictions:condition.getUnaryRestrictions()){
 			for(UnaryRestriction unaryRestriction:unaryRestrictions){
-			 if (unaryRestriction.getReferenceTo().getValue()!="") stringCondition += unaryRestriction.getReferenceTo().getValue();
+	
+			 if (unaryRestriction.getReferenceTo().getValue()!=null&&!unaryRestriction.getReferenceTo().getValue().equalsIgnoreCase("")) stringCondition += unaryRestriction.getReferenceTo().getValue();
 			 else
-			 if (unaryRestriction.getReferenceTo().getName()!="") stringCondition += unaryRestriction.getReferenceTo().getFunction()+"("+unaryRestriction.getReferenceTo().getName()+")";
+			 if (unaryRestriction.getReferenceTo().getName()!=null&&!unaryRestriction.getReferenceTo().getName().equalsIgnoreCase("")) 
+				 	stringCondition += unaryRestriction.getReferenceTo().getFunction()+"("+unaryRestriction.getReferenceTo().getName()+")";
+			
 			 if (unaryRestrictions.size()>1){
 					if (unaryRestrictions.get(unaryRestrictions.size()-1)!=unaryRestriction){
 						stringCondition+=" AND ";
@@ -170,7 +174,6 @@ public static String conditionToString(Condition condition){
 		
 		}
 	}
-	
 	return stringCondition;
 }
 public static String mapXMLConstraintToSYBLAnnotation(Constraint constraint){
@@ -195,7 +198,8 @@ public static String mapFromXMLStrategyToSYBLAnnotation(Strategy strategy){
 	if (strategy.getCondition()!=null){
 	String strategies = strategy.getId()+":STRATEGY CASE ";
 	if (strategy.getCondition()!=null){
-		if (strategy.getCondition().getBinaryRestriction().size()>0){
+
+		if (strategy.getCondition().getBinaryRestriction().size()>0 || strategy.getCondition().getUnaryRestrictions().size()>0){
 			strategies+=conditionToString(strategy.getCondition());
 		}
     
@@ -446,7 +450,6 @@ public static Strategy mapFromSYBLAnnotationToXMLStrategy(String strategy){
 	if (s.length>5){
 	
 	if (strategy.contains("AND")){
-		
 		if (s.length==8){
 			UnaryRestriction unaryRestriction = new UnaryRestriction();
 			ReferenceTo referenceTo = new ReferenceTo();
@@ -461,13 +464,31 @@ public static Strategy mapFromSYBLAnnotationToXMLStrategy(String strategy){
 			unaryRestriction.setReferenceTo(referenceTo);
 			 unaryRestrictions = new ArrayList<UnaryRestriction>();
 			unaryRestrictions.add(unaryRestriction);
-			cond.addUnaryRestrictionConjunction(unaryRestrictions);
-			
+			cond.addUnaryRestrictionConjunction(unaryRestrictions);	
 		}else{
 			BinaryRestriction binaryRestriction = new BinaryRestriction();
 			LeftHandSide leftHandSide2 = new LeftHandSide();
 			RightHandSide rightHandSide2 = new RightHandSide();
 			int index = 2;
+			if (s[index+1].contains("fulfilled")||s[index+1].contains("violated") || s[index+3].contains("fulfilled")||s[index+3].contains("violated")){
+				String check = "";
+				if (s[index+1].contains("fulfilled")||s[index+1].contains("violated")) check = s[index+1];
+				else check=s[index+3];
+				UnaryRestriction unaryRestriction = new UnaryRestriction();
+				ReferenceTo func = new ReferenceTo();
+				if (check.contains("fulfilled"))
+				func.setFunction("fulfilled");
+				else
+					func.setFunction("violated");
+				String []a = check.split("[ ( ) ]");
+				//System.err.println("a[0]="+a[0]);
+				func.setName(a[1]);
+				
+				unaryRestriction.setReferenceTo(func);
+				ArrayList<UnaryRestriction> unaryRestrictions = new ArrayList<UnaryRestriction>();
+					unaryRestrictions.add(unaryRestriction);
+				cond.addUnaryRestrictionConjunction(unaryRestrictions);	
+			}else{
 			int i=0;
 			if ((s[index+1].charAt(0)>='a' && s[index+1].charAt(0)<='z') ||(s[index+1].charAt(0)>='A' && s[index+1].charAt(0)<='Z')) leftHandSide2.setMetric(s[index+1]);
 			else
@@ -492,13 +513,15 @@ public static Strategy mapFromSYBLAnnotationToXMLStrategy(String strategy){
 			}
 			binaryRestriction.setLeftHandSide(leftHandSide2);
 			binaryRestriction.setRightHandSide(rightHandSide2);
-			ArrayList<BinaryRestriction> binaryRestrictions = new ArrayList<BinaryRestriction>();
+			}
+					ArrayList<BinaryRestriction> binaryRestrictions = new ArrayList<BinaryRestriction>();
+			if(binaryRestriction!=null)
 			binaryRestrictions.add(binaryRestriction);
 			
 			 index = 0;
 			
 		
-			 i=0;
+			 int i=0;
 			for (String x:s){
 				
 				if (x.equalsIgnoreCase("and")) index = i;
@@ -537,7 +560,27 @@ public static Strategy mapFromSYBLAnnotationToXMLStrategy(String strategy){
 			cond.addBinaryRestrictionConjunction(binaryRestrictions);
 		}
 	}else{
-			
+
+	
+		if (s[3].contains("fulfilled")||s[3].contains("violated") || s[5].contains("fulfilled")||s[5].contains("violated")){
+				String check = "";
+				if (s[3].contains("fulfilled")||s[3].contains("violated")) check = s[3];
+				else check=s[5];
+				UnaryRestriction unaryRestriction = new UnaryRestriction();
+				ReferenceTo func = new ReferenceTo();
+				if (check.contains("fulfilled"))
+				func.setFunction("fulfilled");
+				else
+					func.setFunction("violated");
+				String []a = check.split("[ ( ) ]");
+				func.setName(a[1]);
+				
+				unaryRestriction.setReferenceTo(func);
+				
+				ArrayList<UnaryRestriction> unaryRestrictions = new ArrayList<UnaryRestriction>();
+					unaryRestrictions.add(unaryRestriction);
+				cond.addUnaryRestrictionConjunction(unaryRestrictions);	
+			}else{
 			BinaryRestriction binaryRestriction = new BinaryRestriction();
 			LeftHandSide leftHandSide2 = new LeftHandSide();
 			RightHandSide rightHandSide2 = new RightHandSide();
@@ -571,16 +614,20 @@ public static Strategy mapFromSYBLAnnotationToXMLStrategy(String strategy){
 			ArrayList<BinaryRestriction> binaryRestrictions = new ArrayList<BinaryRestriction>();
 			binaryRestrictions.add(binaryRestriction);
 			cond.addBinaryRestrictionConjunction(binaryRestrictions);
+			}
 	}
 	}else{
 		UnaryRestriction unaryRestriction = new UnaryRestriction();
 		ReferenceTo referenceTo = new ReferenceTo();
 		referenceTo.setValue(s[3]);
+		
 		unaryRestriction.setReferenceTo(referenceTo);
 		 ArrayList<UnaryRestriction>unaryRestrictions = new ArrayList<UnaryRestriction>();
 			unaryRestrictions.add(unaryRestriction);
 		cond.addUnaryRestrictionConjunction(unaryRestrictions);
 	}
+//	Condition condition = new Condition();
+
 	c.setCondition(cond);
 	}
 	return c;

@@ -27,6 +27,8 @@ import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.HashMap;
 
+import org.jclouds.openstack.nova.v2_0.compute.functions.RemoveFloatingIpFromNodeAndDeallocate;
+
 import at.ac.tuwien.dsg.csdg.DependencyGraph;
 import at.ac.tuwien.dsg.csdg.Node;
 import at.ac.tuwien.dsg.rSybl.cloudInteractionUnit.api.EnforcementAPIInterface;
@@ -40,17 +42,17 @@ import at.ac.tuwien.dsg.sybl.syblProcessingUnit.utils.SYBLDirectivesEnforcementL
 
 
 public class Utils {
-	ArrayList<MonitoringThread> monitoringThreads = new ArrayList<MonitoringThread>();
+	private ArrayList<MonitoringThread> monitoringThreads = new ArrayList<MonitoringThread>();
 	
-	HashMap<EnvironmentVariable, Comparable> monitoredVariables = new HashMap<EnvironmentVariable, Comparable>();
-    public HashMap<String,Boolean> cons= new HashMap<String,Boolean>();
-    MonitoringAPIInterface monitoringAPI ;
-    EnforcementAPIInterface enforcementAPI;
-	ArrayList<Rule> disabledRules = new ArrayList<Rule>();
-	String monitoring= "";
-	String constraints = "";
-	String strategies ="";
-	String priorities="";
+	private HashMap<EnvironmentVariable, Comparable> monitoredVariables = new HashMap<EnvironmentVariable, Comparable>();
+    public static HashMap<String,Boolean> cons= new HashMap<String,Boolean>();
+    private MonitoringAPIInterface monitoringAPI ;
+    private EnforcementAPIInterface enforcementAPI;
+	private ArrayList<Rule> disabledRules = new ArrayList<Rule>();
+	private String monitoring= "";
+	private String constraints = "";
+	private String strategies ="";
+	private String priorities="";
 	private Node currentEntity;
 	private DependencyGraph dependencyGraph;
 	public Utils(Node currentEntity,String priorities, String monitoring, String constraints, String strategies,MonitoringAPIInterface monitoringAPI, EnforcementAPIInterface enforcementAPI, DependencyGraph dependencyGraph){
@@ -237,12 +239,15 @@ public void processConstraints(String constraints)
 			}
 		
 	}else{
-		this.cons.put(x[0], false);
+		this.cons.put(eliminateSpaces(x[0]), false);
 		SYBLDirectivesEnforcementLogger.logger.info(x[0]+" is not evaluated because other constraint of higher importance overrides it");
 	}
 		}
 	}
-
+//	for ( String current:cons.keySet()){
+//		SYBLDirectivesEnforcementLogger.logger.info("The constraint  "+current+" "+cons.get(current));
+//
+//	}
 }
 
 public void processMonitoring(String monitoring) {
@@ -288,14 +293,17 @@ public void processStrategies(String strategies) {
 public void processStrategy(Rule r) {
 	if (r.getText().contains("CASE")) {
 		String s[] = r.getText().split(":");
+		//SYBLDirectivesEnforcementLogger.logger.info(r.getText());
 		String condition = s[0].split("CASE ")[1];
 		try {
 			if ((condition.contains("AND") && evaluateCompositeCondition(condition))||(!condition.contains("AND") &&evaluateCondition(condition)) ){
-				if (s[1].contains("\\(")){
+				if (s[1].contains("(")){
+					//SYBLDirectivesEnforcementLogger.logger.info("s[1]= " +s[1]);
 				String actionName = s[1].split("[(]")[0];
 				if (!actionName.contains("minimize") &&  !actionName.contains("maximize")){
 					
-				String parameter = eliminateSpaces(s[1].split("[(]")[1].split("[,\\)]")[0]);
+				String parameter = eliminateSpaces(s[1].split("[(]")[1].split("[)]")[0]);
+				//SYBLDirectivesEnforcementLogger.logger.info("Parametor for " +actionName+" is "+ parameter+" ");
 				if (!parameter.equals("")){
 				actionName = eliminateSpaces(actionName);
 
@@ -307,6 +315,7 @@ public void processStrategy(Rule r) {
 					entity.setId(parameter);
 					parameters[0]=entity;
 					partypes[0]=Node.class;
+					
 					Method actionMethod = EnforcementAPIInterface.class.getMethod(
 							actionName, partypes);
 
@@ -330,6 +339,8 @@ public void processStrategy(Rule r) {
 					ex5.printStackTrace();
 
 				}
+				}else{
+					
 				}
 
 			}
@@ -630,7 +641,7 @@ public Comparable evaluateTerm(String term)  {
 }
 
 @SuppressWarnings("unchecked")
-public boolean evaluateCondition(String condition)
+public  boolean evaluateCondition(String condition)
 		 {
 	String[] s = condition.split(" ");
 	if (condition.toLowerCase().contains("violated") || condition.toLowerCase().contains("fulfilled")){
@@ -640,8 +651,8 @@ public boolean evaluateCondition(String condition)
 		String name = condition.split("[()]")[1];
 	
 		//SYBLDirectivesEnforcementLogger.logger.info("The constraint is "+name+" "+constraints.get(name));
-		if (cons.get(name)==null) return false;
-		if (cons.get(name))return false;
+		if (cons.get(eliminateSpaces(name.toLowerCase()))==null) return false;
+		if (cons.get(eliminateSpaces(name.toLowerCase())))return false;
 		else return true;
 	
 	} 
@@ -649,8 +660,14 @@ public boolean evaluateCondition(String condition)
 		//Get constraint and check if it is violated
 		
 		String name = condition.split("[()]")[1];
-		//SYBLDirectivesEnforcementLogger.logger.info("The constraint is "+name+" "+constraints.get(name));
-		return cons.get(name);
+//		for ( String current:cons.keySet()){
+//			SYBLDirectivesEnforcementLogger.logger.info("The constraint  "+current+" "+cons.get(current));
+//
+//		}
+		SYBLDirectivesEnforcementLogger.logger.info("The constraint is "+eliminateSpaces(name.toLowerCase())+" "+cons.get(eliminateSpaces(name.toLowerCase())));
+		if (!cons.containsKey(eliminateSpaces(name.toLowerCase())))
+		return true;
+		else return cons.get(eliminateSpaces(name.toLowerCase()));
 	} 
 	
 	}else{
