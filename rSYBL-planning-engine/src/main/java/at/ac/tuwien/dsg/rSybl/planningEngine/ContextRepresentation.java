@@ -422,13 +422,44 @@ public class ContextRepresentation {
 		}
 		return constr;
 	}
+	public String getImprovedStrategies(ContextRepresentation previousContextRepresentation){
+		String str = "";
+		for (ElasticityRequirement elReq:dependencyGraph.getAllElasticityRequirements()){
+			SYBLSpecification syblSpecification = SYBLDirectiveMappingFromXML.mapFromSYBLAnnotation(elReq.getAnnotation());
+		//System.out.println("Searching for monitored entity "+syblSpecification.getComponentId());
+				MonitoredEntity monitoredEntity = findMonitoredEntity(syblSpecification.getComponentId());
+				if (monitoredEntity==null) PlanningLogger.logger.info("Not finding monitored entity "+monitoredEntity+ " "+syblSpecification.getComponentId());
+			for (Strategy strategy:syblSpecification.getStrategy()){
+				Condition condition = strategy.getCondition();		
+				
+				if (evaluateCondition(condition, monitoredEntity)){
+				if (strategy.getToEnforce().getActionName().toLowerCase().contains("maximize")||strategy.getToEnforce().getActionName().toLowerCase().contains("minimize")){
+					if (strategy.getToEnforce().getActionName().toLowerCase().contains("maximize")){
+						//PlanningLogger.logger.info("Current value for "+ strategy.getToEnforce().getParameter()+" is "+ monitoredEntity.getMonitoredValue(strategy.getToEnforce().getParameter())+" .Previous value was "+previousContextRepresentation.getValueForMetric(monitoredEntity,strategy.getToEnforce().getParameter()));
+						
+						if (monitoredEntity.getMonitoredValue(strategy.getToEnforce().getParameter())>previousContextRepresentation.getValueForMetric(monitoredEntity, strategy.getToEnforce().getParameter())){
+							str+=strategy.getId()+ " ";
+						}
+					}
+					if (strategy.getToEnforce().getActionName().toLowerCase().contains("minimize")){
+					//	PlanningLogger.logger.info("Current value for "+ strategy.getToEnforce().getParameter()+" is "+ monitoredEntity.getMonitoredValue(strategy.getToEnforce().getParameter())+" .Previous value was "+previousContextRepresentation.getValueForMetric(monitoredEntity,strategy.getToEnforce().getParameter()));
+						
+						if (monitoredEntity.getMonitoredValue(strategy.getToEnforce().getParameter())<previousContextRepresentation.getValueForMetric(monitoredEntity,strategy.getToEnforce().getParameter())){
+							str+=strategy.getId()+ " ";
+						}
+					}
+				}
+			}
+			}
+		}
+		return str;	}
 	public boolean evaluateBinaryRestriction(BinaryRestriction binaryRestriction,MonitoredEntity monitoredEntity){
 		boolean fulfilled=true;
 		float currentLeftValue=0;
 		float currentRightValue = 0;
 		if (binaryRestriction.getLeftHandSide().getMetric()!=null){
 			String metric = binaryRestriction.getLeftHandSide().getMetric();
-			PlanningLogger.logger.info(monitoredEntity+" "+metric);
+			//PlanningLogger.logger.info(monitoredEntity+" "+metric);
 			currentLeftValue = monitoredEntity.getMonitoredValue(metric);
 			if (currentLeftValue<0){
 				if (monitoredEntity.getMonitoredVar(metric)!=null)

@@ -173,7 +173,7 @@ public class PlanningGreedyAlgorithm implements Runnable {
 					contextRepresentation.doAction(actionEffect);
 					
 					int fixedStr = contextRepresentation.countFixedStrategies(beforeActionContextRepresentation);
-					PlanningLogger.logger.info("Trying the action "+actionEffect.getActionName()+"constraints violated : "+ contextRepresentation.getViolatedConstraints()+" Strategies improved "+fixedStr);
+					PlanningLogger.logger.info("Trying the action "+actionEffect.getActionName()+"constraints violated : "+ contextRepresentation.getViolatedConstraints()+" Strategies improved "+contextRepresentation.getImprovedStrategies(beforeActionContextRepresentation));
 					
 					fixedConstraints
 								.put(new Pair<ActionEffect, Integer>(
@@ -336,7 +336,7 @@ public class PlanningGreedyAlgorithm implements Runnable {
 					+ date.getMinutes() 
 					+ ". The violated constraints are the following: "
 					+ contextRepresentation.getViolatedConstraints());
-			HashMap<Pair<ActionEffect, Integer>, Integer> fixedConstraints = new HashMap<Pair<ActionEffect, Integer>, Integer>();
+			HashMap<Pair<ActionEffect, Integer>, Integer> fixedDirectives = new HashMap<Pair<ActionEffect, Integer>, Integer>();
 			HashMap<Pair<ActionEffect, Integer>, Integer> fixedStrategies = new HashMap<Pair<ActionEffect, Integer>, Integer>();
 			
 			for (List<ActionEffect> list : actionEffects.values()) {
@@ -360,9 +360,9 @@ public class PlanningGreedyAlgorithm implements Runnable {
 						contextRepresentation.doAction(actionEffect);
 						
 						int fixedStr = contextRepresentation.countFixedStrategies(beforeActionContextRepresentation);
-						PlanningLogger.logger.info("Trying the action "+actionEffect.getActionName()+"constraints violated : "+ contextRepresentation.getViolatedConstraints()+" Strategies improved "+fixedStr);
+						PlanningLogger.logger.info("Trying the action "+actionEffect.getActionName()+"constraints violated : "+ contextRepresentation.getViolatedConstraints()+" Strategies improved "+contextRepresentation.getImprovedStrategies(beforeActionContextRepresentation));
 						
-						fixedConstraints
+						fixedDirectives
 									.put(new Pair<ActionEffect, Integer>(
 											actionEffect, 1),
 											initiallyBrokenConstraints
@@ -395,7 +395,7 @@ public class PlanningGreedyAlgorithm implements Runnable {
 			int maxAction = -20;
 			Pair action = null;
 			
-			for (Integer val : fixedConstraints.values()) {
+			for (Integer val : fixedDirectives.values()) {
 				if (val > maxAction) {
 					maxAction = val;
 				}
@@ -404,8 +404,8 @@ public class PlanningGreedyAlgorithm implements Runnable {
 			Pair actionTargetingComponent = null;
 			Pair actionTargetingComponentTopology = null;
 			int minStrat = 100;
-			for (Pair<ActionEffect, Integer> pair : fixedConstraints.keySet()) {
-				if (fixedConstraints.get(pair) == maxAction) {
+			for (Pair<ActionEffect, Integer> pair : fixedDirectives.keySet()) {
+				if (fixedDirectives.get(pair) == maxAction) {
 					
 					for(Pair<ActionEffect,Integer> p:fixedStrategies.keySet()){
 					//	PlanningLogger.logger.info("Action Effect "+p.getFirst().getActionName()+" strategies "+fixedStrategies.get(p));
@@ -435,11 +435,11 @@ public class PlanningGreedyAlgorithm implements Runnable {
 						+ " on "
 						+ ((ActionEffect) action.getFirst())
 								.getTargetedEntityID() + " Number of constraints fixed: "
-						+ fixedConstraints.get(action));
-				lastFixed = fixedConstraints.get(action);
+						+ fixedDirectives.get(action));
+				lastFixed = fixedDirectives.get(action);
 				Node entity = dependencyGraph.getNodeWithID(((ActionEffect) action.getFirst())
 						.getTargetedEntityID());
-				if (fixedConstraints.get(action) > 0) {
+				if (fixedDirectives.get(action) > 0) {
 					result.add(action);
 				}
 

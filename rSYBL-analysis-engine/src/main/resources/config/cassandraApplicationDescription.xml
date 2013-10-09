@@ -9,7 +9,10 @@
 		<ServiceUnit id="YCSBClient" >
 		<SYBLDirective Strategies="St2:STRATEGY CASE throughput &lt; 1000 AND latency &lt; 500 : scalein(CassandraNode);" Constraints="Co2:CONSTRAINT latency &lt; 1000 ms ;"/>
 		</ServiceUnit>
-		<ServiceUnit id="CassandraNode" />
+		<ServiceUnit id="CassandraNode" >
+		<SYBLDirective Constraints="Co3:CONSTRAINT cpuUsage &gt; 35 % AND cpuUsage &lt; 75 %" />
+		
+		</ServiceUnit>
 	</ServiceTopology>
 </CloudService>
 

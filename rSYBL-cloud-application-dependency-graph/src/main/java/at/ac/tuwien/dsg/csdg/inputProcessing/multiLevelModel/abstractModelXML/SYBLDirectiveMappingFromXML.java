@@ -369,6 +369,47 @@ public static Constraint mapSYBLAnnotationToXMLConstraint(String constraint ){
 	
 	ArrayList<BinaryRestriction> binaryRestrictions = new ArrayList<BinaryRestriction>();
 	binaryRestrictions.add(binaryRestr);
+	if(constraint.contains("AND") || constraint.contains("and")){
+	int i=0;
+	int index =0;
+		for (String x:s){
+			
+			if (x.equalsIgnoreCase("and")) index = i;
+					i++;
+		}
+		BinaryRestriction binaryRestriction = new BinaryRestriction();
+		 LeftHandSide leftHandSide2 = new LeftHandSide();
+		RightHandSide rightHandSide2 = new RightHandSide();
+		
+		if ((s[index+1].charAt(0)>='a' && s[index+1].charAt(0)<='z') ||(s[index+1].charAt(0)>='A' && s[index+1].charAt(0)<='Z')) leftHandSide2.setMetric(s[index+1]);
+		else
+		leftHandSide2.setNumber(s[3]);
+		if ((s[index+3].charAt(0)>='a' && s[index+3].charAt(0)<='z') ||(s[index+3].charAt(0)>='A' && s[index+3].charAt(0)<='Z')) rightHandSide2.setMetric(s[index+3]);
+		else
+			rightHandSide2.setNumber(s[index+3]);
+		switch(s[index+2]){
+		case "<":binaryRestriction.setType("lessThan");
+		break;
+		case ">":binaryRestriction.setType("greaterThan");
+		break;
+		case "<=":binaryRestriction.setType("lessThanOrEqual");
+		break;
+		case ">=":binaryRestriction.setType("greaterThanOrEqual");
+		break;
+		case "&gt;" :binaryRestriction.setType("greaterThan");break;
+
+		case "&lt;":binaryRestriction.setType("lessThan");
+		break;
+		default:binaryRestriction.setType("lessThan");
+			break;
+		}
+		binaryRestriction.setLeftHandSide(leftHandSide2);
+		binaryRestriction.setRightHandSide(rightHandSide2);
+	
+			binaryRestrictions.add(binaryRestriction);
+		
+}
+		
 	toEnforce.addBinaryRestrictionConjunction(binaryRestrictions);
 	c.setToEnforce(toEnforce);
 

@@ -28,7 +28,8 @@
         </CompositionRule>
         
           <CompositionRule TargetMonitoredElementLevel="SERVICE_UNIT">
-            <ResultingMetric type="RESOURCE" measurementUnit="ops" name="throughput"/>
+             <TargetMonitoredElementID>YCSBClient</TargetMonitoredElementID>
+             <ResultingMetric type="RESOURCE" measurementUnit="ops" name="throughput"/>
             <Operation MetricSourceMonitoredElementLevel="VM" type="SUM">
                   <ReferenceMetric type="RESOURCE" measurementUnit="ops"  name="ycsb_throughput"/>     
             </Operation>
@@ -50,6 +51,7 @@
             <ResultingMetric type="RESOURCE" measurementUnit="ms" name="latency"/>
                 <Operation MetricSourceMonitoredElementLevel="SERVICE_UNIT" type="KEEP">
                     <ReferenceMetric type="RESOURCE" name="latency"/>
+                       <SourceMonitoredElementID>YCSBClient</SourceMonitoredElementID>
                 </Operation>
         </CompositionRule>
         

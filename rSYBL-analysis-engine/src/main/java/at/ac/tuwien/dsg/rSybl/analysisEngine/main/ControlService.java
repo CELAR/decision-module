@@ -82,13 +82,13 @@ public class ControlService{
 			monitoringAPI = new MonitoringAPI();
 			monitoringAPI.setControlledService(node);
 			AnalysisLogger.logger.info("Have just set the cloud service ");
+			monitoringAPI.submitElasticityRequirements(dependencyGraph.getAllElasticityRequirements());
 
 			enforcementAPI = new EnforcementAPI();
     
 			enforcementAPI.setControlledService(node);
 
 			enforcementAPI.setMonitoringPlugin(monitoringAPI);
-			monitoringAPI.submitElasticityRequirements(dependencyGraph.getAllElasticityRequirements());
 	    	syblService=new SYBLService(dependencyGraph,monitoringAPI,enforcementAPI);
 	    	for (ElasticityRequirement syblSpecification:dependencyGraph.getAllElasticityRequirements()){
 			    SYBLAnnotation annotation = syblSpecification.getAnnotation();

@@ -661,7 +661,7 @@ public Comparable evaluateTerm(String term) throws NoSuchMethodException, Securi
 			result= Float.parseFloat(term);
 		}
 	}
-	SYBLDirectivesEnforcementLogger.logger.info("The value of "+term+" is "+result);
+	SYBLDirectivesEnforcementLogger.logger.info("The value of "+term+" is "+result+ " for node "+currentEntity.getId());
 	return result;
 }
 
