@@ -96,13 +96,14 @@ public class ControlService{
 		
 			
 
+    
+    	monitoringAPI.submitElasticityRequirements(dependencyGraph.getAllElasticityRequirements());
+    	syblService=new SYBLService(dependencyGraph,monitoringAPI,enforcementAPI);
     	for (ElasticityRequirement syblSpecification:dependencyGraph.getAllElasticityRequirements()){
 		    SYBLAnnotation annotation = syblSpecification.getAnnotation();
 		    syblService.processAnnotations(syblSpecification.getAnnotation().getEntityID(), annotation);
 
 		}
-    	monitoringAPI.submitElasticityRequirements(dependencyGraph.getAllElasticityRequirements());
-    	syblService=new SYBLService(dependencyGraph,monitoringAPI,enforcementAPI);
 	    //CloudService cloudService, ArrayList<SYBLSpecification> syblSpecifications
     disableConflictingConstraints();
     	planningGreedyAlgorithm = new PlanningGreedyAlgorithm(dependencyGraph,monitoringAPI,enforcementAPI);
