@@ -286,10 +286,11 @@ public class EnforcementPluginCELAR implements EnforcementInterface {
 		}
 		DependencyGraph d = new DependencyGraph();
 		d.setCloudService(cloudService);
-		RuntimeLogger.logger.info("Executing scaling action, number of VMs available for node "+ toBeScaled.getId()+" "+d.getNodeWithID(toBeScaled.getId()).getAllRelatedNodesOfType(RelationshipType.HOSTED_ON_RELATIONSHIP,NodeType.VIRTUAL_MACHINE).size());
-		if (d.getNodeWithID(toBeScaled.getId()).getAllRelatedNodesOfType(RelationshipType.HOSTED_ON_RELATIONSHIP,NodeType.VIRTUAL_MACHINE).size()>1){
-			
+		if (d.getNodeWithID(toBeScaled.getId()).getAllRelatedNodesOfType(RelationshipType.HOSTED_ON_RELATIONSHIP,NodeType.VIRTUAL_MACHINE).size()>2){
+	    RuntimeLogger.logger.info("Executing scaling action, number of VMs available for node "+ toBeScaled.getId()+" "+d.getNodeWithID(toBeScaled.getId()).getAllRelatedNodesOfType(RelationshipType.HOSTED_ON_RELATIONSHIP,NodeType.VIRTUAL_MACHINE).size());
+				
 		String ip = executeResizingCommand("removevm");
+		if(!ip.equalsIgnoreCase("")){
 		while (!checkStatus(ip,"removevm")){
 			try {
 				RuntimeLogger.logger.info("Waiting for scale in...");
@@ -299,10 +300,11 @@ public class EnforcementPluginCELAR implements EnforcementInterface {
 				e.printStackTrace();
 			}
 		}
-		if (!ip.equalsIgnoreCase("")){
+		
 			RuntimeLogger.logger.info("The IP of the Virtual Machine to be REMOVED is "+ip);	
 			DependencyGraph dep = new DependencyGraph();
 			dep.setCloudService(cloudService);
+			toBeScaled=dep.getNodeWithID(toBeScaled.getId());
 			Node toBeDel = dep.getNodeWithID(ip); 
 			toBeScaled.removeNode(toBeDel);
 			RuntimeLogger.logger.info("Cloud new service is "+dep.graphToString());
