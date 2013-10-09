@@ -81,7 +81,7 @@ public class ActionEffects {
 		{
 			scaleInEffectForCassandraDB.setTargetedEntityID("CassandraNode");
 			scaleInEffectForCassandraDB.setActionEffectForMetric("cpuUsage", 35.0f,"CassandraNode");
-			scaleInEffectForCassandraDB.setActionEffectForMetric("latency", -1000f,"YCSBClient");
+			scaleInEffectForCassandraDB.setActionEffectForMetric("latency", 1000f,"YCSBClient");
 			scaleInEffectForCassandraDB.setActionEffectForMetric("cost", -0.12f,"CassandraNode");
 			scaleInEffectForCassandraDB.setActionName("scaleInEffectForDataNode");
 			scaleInEffectForCassandraDB.setActionType("scalein");
