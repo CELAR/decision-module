@@ -328,8 +328,8 @@ public class PlanningGreedyAlgorithm implements Runnable {
 		ArrayList<Pair<ActionEffect, Integer>> result = new ArrayList<Pair<ActionEffect, Integer>>();
 	
 		int numberOfRemainingConstraints=numberOfBrokenConstraints;
-		while (contextRepresentation.countViolatedConstraints() > 0
-				&& numberOfRemainingConstraints > 0 && lastFixed>0) {
+//		while (contextRepresentation.countViolatedConstraints() > 0
+//				&& numberOfRemainingConstraints > 0 && lastFixed>0) {
 			Date date = new Date();
 			HashMap<Pair<ActionEffect, Integer>, Integer> fixedDirectives = new HashMap<Pair<ActionEffect, Integer>, Integer>();
 			HashMap<Pair<ActionEffect, Integer>, Integer> fixedStrategies = new HashMap<Pair<ActionEffect, Integer>, Integer>();
@@ -451,7 +451,7 @@ public class PlanningGreedyAlgorithm implements Runnable {
 			}
 			numberOfRemainingConstraints-=lastFixed;
 			
-		}
+	//	}
 
 		for (Pair<ActionEffect, Integer> actionEffect : result)
 			if (actionEffect.getFirst().getActionType()
