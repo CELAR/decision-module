@@ -331,11 +331,6 @@ public class PlanningGreedyAlgorithm implements Runnable {
 		while (contextRepresentation.countViolatedConstraints() > 0
 				&& numberOfRemainingConstraints > 0 && lastFixed>0) {
 			Date date = new Date();
-			PlanningLogger.logger.info("At " + date.getDay() + "_"
-					+ date.getMonth() + "_" + date.getHours() + "_"
-					+ date.getMinutes() 
-					+ ". The violated constraints are the following: "
-					+ contextRepresentation.getViolatedConstraints());
 			HashMap<Pair<ActionEffect, Integer>, Integer> fixedDirectives = new HashMap<Pair<ActionEffect, Integer>, Integer>();
 			HashMap<Pair<ActionEffect, Integer>, Integer> fixedStrategies = new HashMap<Pair<ActionEffect, Integer>, Integer>();
 			
@@ -346,6 +341,12 @@ public class PlanningGreedyAlgorithm implements Runnable {
 							for (int i = 0; i < a.getSecond(); i++) {
 								PlanningLogger.logger.info("Executing the already found action"+a.getFirst().getActionName());
 								contextRepresentation.doAction(a.getFirst());
+								PlanningLogger.logger.info("At " + date.getDay() + "_"
+										+ date.getMonth() + "_" + date.getHours() + "_"
+										+ date.getMinutes() 
+										+ ". The violated constraints are the following: "
+										+ contextRepresentation.getViolatedConstraints());
+							
 							}
 						}
 						int initiallyBrokenConstraints = contextRepresentation
