@@ -238,6 +238,7 @@ public class MELA_API implements MonitoringInterface{
         boolean notConnected = true;
         while (notConnected){
         try {
+        	RuntimeLogger.logger.info("Trying to connect to MELA ...");
             url = new URL(REST_API_URL + "/servicedescription");
             connection = (HttpURLConnection) url.openConnection();
             connection.setDoOutput(true);
@@ -274,7 +275,7 @@ public class MELA_API implements MonitoringInterface{
             serviceSet = true;
             notConnected=false;
         } catch (Exception e) {
-        	Logger.getLogger(MELA_API.class.getName()).log(Level.WARNING, "Trying to connect to MELA - failing ... . Retrying later");
+        	//Logger.getLogger(MELA_API.class.getName()).log(Level.WARNING, "Trying to connect to MELA - failing ... . Retrying later");
         	RuntimeLogger.logger.error("Failing to connect to MELA"+e.getMessage());
         	try {
 				Thread.sleep(MONITORING_DATA_REFRESH_INTERVAL * 1000);

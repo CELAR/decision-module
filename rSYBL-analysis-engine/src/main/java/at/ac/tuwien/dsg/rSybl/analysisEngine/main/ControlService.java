@@ -88,6 +88,17 @@ public class ControlService{
 			enforcementAPI.setControlledService(node);
 
 			enforcementAPI.setMonitoringPlugin(monitoringAPI);
+			monitoringAPI.submitElasticityRequirements(dependencyGraph.getAllElasticityRequirements());
+	    	syblService=new SYBLService(dependencyGraph,monitoringAPI,enforcementAPI);
+	    	for (ElasticityRequirement syblSpecification:dependencyGraph.getAllElasticityRequirements()){
+			    SYBLAnnotation annotation = syblSpecification.getAnnotation();
+			    syblService.processAnnotations(syblSpecification.getAnnotation().getEntityID(), annotation);
+
+			}
+		    //CloudService cloudService, ArrayList<SYBLSpecification> syblSpecifications
+	    	disableConflictingConstraints();
+	    	planningGreedyAlgorithm = new PlanningGreedyAlgorithm(dependencyGraph,monitoringAPI,enforcementAPI);
+	    	 planningGreedyAlgorithm.start();
 			
     	} catch (Exception e) {
     		AnalysisLogger.logger.error( "Control service Instantiation "+e.toString());
@@ -97,18 +108,7 @@ public class ControlService{
 			
 
     
-    	monitoringAPI.submitElasticityRequirements(dependencyGraph.getAllElasticityRequirements());
-    	syblService=new SYBLService(dependencyGraph,monitoringAPI,enforcementAPI);
-    	for (ElasticityRequirement syblSpecification:dependencyGraph.getAllElasticityRequirements()){
-		    SYBLAnnotation annotation = syblSpecification.getAnnotation();
-		    syblService.processAnnotations(syblSpecification.getAnnotation().getEntityID(), annotation);
-
-		}
-	    //CloudService cloudService, ArrayList<SYBLSpecification> syblSpecifications
-    disableConflictingConstraints();
-    	planningGreedyAlgorithm = new PlanningGreedyAlgorithm(dependencyGraph,monitoringAPI,enforcementAPI);
     	
-		    planningGreedyAlgorithm.start();
 	}
 	public void setApplicationDescriptionInfoInternalModel(String applicationDescriptionXML, String elasticityRequirementsXML, String deploymentInfoXML){
 		InputProcessing inputProcessing = new InputProcessing();
