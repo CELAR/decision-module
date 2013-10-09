@@ -436,7 +436,7 @@ public class PlanningGreedyAlgorithm implements Runnable {
 						+ ((ActionEffect) action.getFirst()).getActionType()
 						+ " on "
 						+ ((ActionEffect) action.getFirst())
-								.getTargetedEntityID() + " Number of constraints fixed: "
+								.getTargetedEntityID() + " Number of directives fixed: "
 						+ fixedDirectives.get(action));
 				lastFixed = fixedDirectives.get(action);
 				Node entity = dependencyGraph.getNodeWithID(((ActionEffect) action.getFirst())
