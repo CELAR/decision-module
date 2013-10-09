@@ -344,6 +344,7 @@ public class PlanningGreedyAlgorithm implements Runnable {
 					if (checkIfActionPossible(actionEffect)) {
 						for (Pair<ActionEffect, Integer> a : result) {
 							for (int i = 0; i < a.getSecond(); i++) {
+								PlanningLogger.logger.info("Executing the already found action"+a.getFirst().getActionName());
 								contextRepresentation.doAction(a.getFirst());
 							}
 						}
@@ -384,6 +385,7 @@ public class PlanningGreedyAlgorithm implements Runnable {
 							//System.out.println("Undoing action "
 									//+ actionEffect.getActionName());
 							for (int j = 0; j < result.get(i).getSecond(); j++) {
+								PlanningLogger.logger.info("Undo-ing the already found action"+result.get(i).getFirst().getActionName());
 								contextRepresentation.undoAction(result.get(i)
 										.getFirst());
 							}
