@@ -332,8 +332,7 @@ public void processStrategy(Rule r) {
 						Class partypes[] = new Class[1];
 
 						Object[] parameters = new Object[1];
-						Node entity = currentEntity;
-						entity.setId(parameter);
+						Node entity = dependencyGraph.getNodeWithID(parameter);
 						parameters[0]=entity;
 						partypes[0]=Node.class;
 						
