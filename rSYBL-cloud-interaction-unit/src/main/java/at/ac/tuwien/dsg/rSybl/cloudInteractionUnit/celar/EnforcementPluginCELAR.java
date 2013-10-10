@@ -26,6 +26,7 @@ public class EnforcementPluginCELAR implements EnforcementInterface {
 	private MonitoringAPIInterface monitoringAPI;
 	private Node cloudService;
 	boolean cleanupGoingOn =false;
+	boolean cleanupNecessary = true;
 	public static String API_URL="http://localhost:8080/celar-orchestrator/deployment/";
 	
 	public EnforcementPluginCELAR(Node cloudService){
@@ -269,6 +270,7 @@ public class EnforcementPluginCELAR implements EnforcementInterface {
 		toAdd.addNode(newVM,rel);
 		RuntimeLogger.logger.info("Cloud new service is "+dependencyGraph.graphToString());
 		monitoringAPI.refreshServiceStructure(cloudService);
+		cleanupNecessary=true;
 }else{
 	RuntimeLogger.logger.error("IP is empty "+ip);
 }
@@ -310,7 +312,11 @@ public class EnforcementPluginCELAR implements EnforcementInterface {
 			toBeScaled.removeNode(toBeDel);
 			RuntimeLogger.logger.info("Cloud new service is "+dep.graphToString());
 			monitoringAPI.refreshServiceStructure(cloudService);
+			cleanupNecessary=true;
 		}
+		}else{
+			if (cleanupNecessary)
+			cleanup();
 		}
 	}
 
