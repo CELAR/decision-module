@@ -316,7 +316,11 @@ public class EnforcementPluginCELAR implements EnforcementInterface {
 		}
 		}else{
 			if (cleanupNecessary)
-			cleanup();
+			{
+				cleanup();
+				cleanupNecessary=false;
+			}
+			
 		}
 	}
 
