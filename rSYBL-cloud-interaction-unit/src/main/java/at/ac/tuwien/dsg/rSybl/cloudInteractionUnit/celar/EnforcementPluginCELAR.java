@@ -286,6 +286,9 @@ public class EnforcementPluginCELAR implements EnforcementInterface {
 		}
 		DependencyGraph d = new DependencyGraph();
 		d.setCloudService(cloudService);
+		DependencyGraph dep = new DependencyGraph();
+		dep.setCloudService(cloudService);
+		toBeScaled=dep.getNodeWithID(toBeScaled.getId());
 		if (d.getNodeWithID(toBeScaled.getId()).getAllRelatedNodesOfType(RelationshipType.HOSTED_ON_RELATIONSHIP,NodeType.VIRTUAL_MACHINE).size()>2){
 	    RuntimeLogger.logger.info("Executing scaling action, number of VMs available for node "+ toBeScaled.getId()+" "+d.getNodeWithID(toBeScaled.getId()).getAllRelatedNodesOfType(RelationshipType.HOSTED_ON_RELATIONSHIP,NodeType.VIRTUAL_MACHINE).size());
 				
@@ -302,9 +305,7 @@ public class EnforcementPluginCELAR implements EnforcementInterface {
 		}
 		
 			RuntimeLogger.logger.info("The IP of the Virtual Machine to be REMOVED is "+ip);	
-			DependencyGraph dep = new DependencyGraph();
-			dep.setCloudService(cloudService);
-			toBeScaled=dep.getNodeWithID(toBeScaled.getId());
+		
 			Node toBeDel = dep.getNodeWithID(ip); 
 			toBeScaled.removeNode(toBeDel);
 			RuntimeLogger.logger.info("Cloud new service is "+dep.graphToString());
