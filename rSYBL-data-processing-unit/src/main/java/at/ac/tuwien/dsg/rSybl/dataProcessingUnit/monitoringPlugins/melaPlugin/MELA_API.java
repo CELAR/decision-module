@@ -638,7 +638,7 @@ public class MELA_API implements MonitoringInterface{
         }
 
         //if we have reached this point, either the monitored element was not found, either the metric
-        Logger.getLogger(this.getClass().getName()).log(Level.WARNING, "Metric ''{0}'' OR   Node {1} not found", new Object[]{metric.toString(), entity.getId()});
+        RuntimeLogger.logger.info( "Metric "+metric.toString()+" OR   Node "+entity.getId()+" not found");
         return -1;
     }
 //
