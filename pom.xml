@@ -7,9 +7,11 @@
   <version>0.1-SNAPSHOT</version>
   <name>CELAR Decision-Making Module (DMM) main POM</name>
 
-  <prerequisites>
-    <maven>2.0.6</maven>
-  </prerequisites>
+  <parent>
+    <groupId>eu.celar</groupId>
+    <artifactId>distribution</artifactId>
+    <version>0.0.1-SNAPSHOT</version>
+  </parent>
 
   <url>https://github.com/CELAR/decision-module</url>
 
@@ -29,21 +31,6 @@
     <module>rSYBL-sybl-processing-unit</module>
     <module>rSYBL-client</module>
   </modules>
-
-  <distributionManagement>
-      <repository>
-          <id>celar.releases</id>
-          <name>CELAR Releases</name>
-          <url>https://snf-153390.vm.okeanos.grnet.gr/nexus/content/repositories/releases</url>
-      </repository>
-      <snapshotRepository>
-          <id>celar.snapshots</id>
-          <name>CELAR Snapshots</name>
-          <url>https://snf-153390.vm.okeanos.grnet.gr/nexus/content/repositories/snapshots</url>
-      </snapshotRepository>
-  </distributionManagement>
-
-<!-- up to here into celar-discribution POM.  -->
 
 </project>
 
