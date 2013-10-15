@@ -77,6 +77,7 @@ public class SyblControlWS {
 	public void setApplicationDescriptionInfoInternalModel(String applicationDescriptionXML, String elasticityRequirementsXML, String deploymentInfoXML){
 		getControlService().setApplicationDescriptionInfoInternalModel(applicationDescriptionXML, elasticityRequirementsXML, deploymentInfoXML);
 	}
+	 
 	 @PUT
 	 @Path("/setApplicationDescriptionInfoTOSCABased")
 	 @Consumes("application/xml")
@@ -90,7 +91,12 @@ public class SyblControlWS {
 	public void setApplicationDescriptionInfoCELAR(String celar){
 		AnalysisLogger.logger.info("Received information from CELAR!!!!!: "+celar);
 	}
-	 
+	 @PUT
+	 @Path("/setApplicationDeploymentDescriptionCELAR")
+	 @Consumes("application/json")
+	public void setApplicationDeploymentInfoCELAR(String celar){
+		AnalysisLogger.logger.info("Received information from CELAR!!!!!: "+celar);
+	} 
 	public ControlService getControlService() {
 		return controlService;
 	}
