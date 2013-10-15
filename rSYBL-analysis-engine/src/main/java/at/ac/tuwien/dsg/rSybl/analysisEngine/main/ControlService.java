@@ -15,9 +15,9 @@
    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
    See the License for the specific language governing permissions and
    limitations under the License.
-*/
+ */
 
-package  at.ac.tuwien.dsg.rSybl.analysisEngine.main;
+package at.ac.tuwien.dsg.rSybl.analysisEngine.main;
 
 import java.io.BufferedWriter;
 import java.io.FileWriter;
@@ -46,130 +46,166 @@ import at.ac.tuwien.dsg.rSybl.cloudInteractionUnit.api.EnforcementAPIInterface;
 import at.ac.tuwien.dsg.rSybl.dataProcessingUnit.api.MonitoringAPI;
 import at.ac.tuwien.dsg.rSybl.dataProcessingUnit.api.MonitoringAPIInterface;
 import at.ac.tuwien.dsg.rSybl.planningEngine.PlanningGreedyAlgorithm;
+import at.ac.tuwien.dsg.sybl.syblProcessingUnit.processing.SYBLProcessingThread;
 import at.ac.tuwien.dsg.sybl.syblProcessingUnit.utils.SYBLDirectivesEnforcementLogger;
 
-
-
-
-
-
-
-
-public class ControlService{
+public class ControlService {
 	private SYBLService syblService;
-	private MonitoringAPIInterface monitoringAPI ;
+	private MonitoringAPIInterface monitoringAPI;
 	private EnforcementAPIInterface enforcementAPI;
 
-	private DependencyGraph dependencyGraph ;
+	private DependencyGraph dependencyGraph;
 	private PlanningGreedyAlgorithm planningGreedyAlgorithm;
-	private String applicationDescription="";
-	private String deploymentDescription="";
-	
-	public ControlService(){
+	private String applicationDescription = "";
+	private String deploymentDescription = "";
 
-		if (Configuration.getApplicationSpecificInformation().equalsIgnoreCase("files")){
+	public ControlService() {
+
+		if (Configuration.getApplicationSpecificInformation().equalsIgnoreCase(
+				"files")) {
 			loadEverythingFromConfigurationFiles();
 		}
-    		}
-	
-	public void startSYBLProcessingAndPlanning(){
-		try {
-			AnalysisLogger.logger.info("Current graph is "+dependencyGraph.graphToString());
+	}
 
-		//	at.ac.tuwien.dsg.sybl.monitorandenforcement.runtimeapi.Node clService = MappingToWS.mapNodeToNode(dependencyGraph.getCloudService());
+	public void startSYBLProcessingAndPlanning() {
+		try {
+			AnalysisLogger.logger.info("Current graph is "
+					+ dependencyGraph.graphToString());
+
+			// at.ac.tuwien.dsg.sybl.monitorandenforcement.runtimeapi.Node
+			// clService =
+			// MappingToWS.mapNodeToNode(dependencyGraph.getCloudService());
 			Node node = new Node();
 			node = dependencyGraph.getCloudService();
 			AnalysisLogger.logger.info(dependencyGraph.graphToString());
 			monitoringAPI = new MonitoringAPI();
 			monitoringAPI.setControlledService(node);
 			AnalysisLogger.logger.info("Have just set the cloud service ");
-			monitoringAPI.submitElasticityRequirements(dependencyGraph.getAllElasticityRequirements());
+			monitoringAPI.submitElasticityRequirements(dependencyGraph
+					.getAllElasticityRequirements());
 
 			enforcementAPI = new EnforcementAPI();
-    
+
 			enforcementAPI.setControlledService(node);
 
 			enforcementAPI.setMonitoringPlugin(monitoringAPI);
-	    	syblService=new SYBLService(dependencyGraph,monitoringAPI,enforcementAPI);
-	    	for (ElasticityRequirement syblSpecification:dependencyGraph.getAllElasticityRequirements()){
-			    SYBLAnnotation annotation = syblSpecification.getAnnotation();
-			    syblService.processAnnotations(syblSpecification.getAnnotation().getEntityID(), annotation);
+			syblService = new SYBLService(dependencyGraph, monitoringAPI,
+					enforcementAPI);
+			for (ElasticityRequirement syblSpecification : dependencyGraph
+					.getAllElasticityRequirements()) {
+				SYBLAnnotation annotation = syblSpecification.getAnnotation();
+				syblService.processAnnotations(syblSpecification
+						.getAnnotation().getEntityID(), annotation);
 
 			}
-		    //CloudService cloudService, ArrayList<SYBLSpecification> syblSpecifications
-	    	disableConflictingConstraints();
-	    	planningGreedyAlgorithm = new PlanningGreedyAlgorithm(dependencyGraph,monitoringAPI,enforcementAPI);
-	    	 planningGreedyAlgorithm.start();
-			
-    	} catch (Exception e) {
-    		AnalysisLogger.logger.error( "Control service Instantiation "+e.toString());
-    		e.printStackTrace();
-		}
-		
-			
+			// CloudService cloudService, ArrayList<SYBLSpecification>
+			// syblSpecifications
+			disableConflictingConstraints();
+			planningGreedyAlgorithm = new PlanningGreedyAlgorithm(
+					dependencyGraph, monitoringAPI, enforcementAPI);
+			planningGreedyAlgorithm.start();
 
-    
-    	
+		} catch (Exception e) {
+			AnalysisLogger.logger.error("Control service Instantiation "
+					+ e.toString());
+			e.printStackTrace();
+		}
+
 	}
-	public void setApplicationDescriptionInfoCELAR(String applicationDescriptionXML){
-		applicationDescription=applicationDescriptionXML;
-		if (!applicationDescription.equalsIgnoreCase("") && !deploymentDescription.equalsIgnoreCase("")){
-			dependencyGraph=inputProcessing.loadDependencyGraphFromStrings(applicationDescription, "", deploymentDescription);
+
+	public void setApplicationDescriptionInfoCELAR(
+			String applicationDescriptionXML) {
+		applicationDescription = applicationDescriptionXML;
+		if (planningGreedyAlgorithm != null)
+			planningGreedyAlgorithm.stop();
+		if (syblService != null)
+			syblService.stopProcessingThreads();
+		planningGreedyAlgorithm = null;
+		syblService = null;
+		monitoringAPI = null;
+		enforcementAPI = null;
+
+		if (!applicationDescription.equalsIgnoreCase("")
+				&& !deploymentDescription.equalsIgnoreCase("")) {
+			dependencyGraph = inputProcessing.loadDependencyGraphFromStrings(
+					applicationDescription, "", deploymentDescription);
 			startSYBLProcessingAndPlanning();
-			applicationDescription="";
-			deploymentDescription="";
+			applicationDescription = "";
+			deploymentDescription = "";
 		}
 	}
-	public void setApplicationDeploymentDescriptionInfoCELAR(String deploymentDescriptionXML){
-		deploymentDescription=deploymentDescriptionXML;
-		if (!applicationDescription.equalsIgnoreCase("") && !deploymentDescription.equalsIgnoreCase("")){
-			dependencyGraph=inputProcessing.loadDependencyGraphFromStrings(applicationDescription, "", deploymentDescription);
+
+	public void setApplicationDeploymentDescriptionInfoCELAR(
+			String deploymentDescriptionXML) {
+		deploymentDescription = deploymentDescriptionXML;
+		if (planningGreedyAlgorithm != null)
+			planningGreedyAlgorithm.stop();
+		if (syblService != null)
+			syblService.stopProcessingThreads();
+		planningGreedyAlgorithm = null;
+		syblService = null;
+		monitoringAPI = null;
+		enforcementAPI = null;
+		if (!applicationDescription.equalsIgnoreCase("")
+				&& !deploymentDescription.equalsIgnoreCase("")) {
+			dependencyGraph = inputProcessing.loadDependencyGraphFromStrings(
+					applicationDescription, "", deploymentDescription);
 			startSYBLProcessingAndPlanning();
-			applicationDescription="";
-			deploymentDescription="";
+			applicationDescription = "";
+			deploymentDescription = "";
 		}
 	}
-	public void setApplicationDescriptionInfoInternalModel(String applicationDescriptionXML, String elasticityRequirementsXML, String deploymentInfoXML){
+
+	public void setApplicationDescriptionInfoInternalModel(
+			String applicationDescriptionXML, String elasticityRequirementsXML,
+			String deploymentInfoXML) {
 		InputProcessing inputProcessing = new InputProcessing();
-		dependencyGraph=inputProcessing.loadDependencyGraphFromStrings(applicationDescriptionXML, elasticityRequirementsXML, deploymentInfoXML);
+		dependencyGraph = inputProcessing.loadDependencyGraphFromStrings(
+				applicationDescriptionXML, elasticityRequirementsXML,
+				deploymentInfoXML);
 		startSYBLProcessingAndPlanning();
 	}
-	public void setApplicationDescriptionInfoTOSCABased(String tosca){
-		//TODO : continue this, parse tosca and start planning and stuff
+
+	public void setApplicationDescriptionInfoTOSCABased(String tosca) {
+		// TODO : continue this, parse tosca and start planning and stuff
 		TOSCAProcessing toscaProcessing = new TOSCAProcessing();
-		dependencyGraph=toscaProcessing.toscaDescriptionToDependencyGraph();
+		dependencyGraph = toscaProcessing.toscaDescriptionToDependencyGraph();
 		startSYBLProcessingAndPlanning();
 	}
-	public void loadEverythingFromConfigurationFiles(){
+
+	public void loadEverythingFromConfigurationFiles() {
 		InputProcessing input = new InputProcessing();
-		dependencyGraph=input.loadDependencyGraphFromFile();
+		dependencyGraph = input.loadDependencyGraphFromFile();
 		AnalysisLogger.logger.info("Loaded graph from files ");
 		startSYBLProcessingAndPlanning();
 	}
-	public void writeCurrentDirectivesToFile(String file){
-    	BufferedWriter out = null;
-   	 try {
-		        out = new BufferedWriter(new FileWriter(file));
-		        
-		    } catch (IOException e) {
-		    	e.printStackTrace();
-		    }
-   	 
-   	for (ElasticityRequirement elReq:dependencyGraph.getAllElasticityRequirements()){
-			    SYBLAnnotation annotation = elReq.getAnnotation();
-		    try {
-		    	out.write(annotation.getEntityID()+"\n");
-				out.write(annotation.getConstraints()+"\n");
-				out.write(annotation.getStrategies()+"\n");
-				out.write(annotation.getMonitoring()+"\n");
+
+	public void writeCurrentDirectivesToFile(String file) {
+		BufferedWriter out = null;
+		try {
+			out = new BufferedWriter(new FileWriter(file));
+
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+
+		for (ElasticityRequirement elReq : dependencyGraph
+				.getAllElasticityRequirements()) {
+			SYBLAnnotation annotation = elReq.getAnnotation();
+			try {
+				out.write(annotation.getEntityID() + "\n");
+				out.write(annotation.getConstraints() + "\n");
+				out.write(annotation.getStrategies() + "\n");
+				out.write(annotation.getMonitoring() + "\n");
 			} catch (IOException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
-		    
-		  //  syblService.processAnnotations(syblSpecification.getComponentId(), annotation);
+
+			// syblService.processAnnotations(syblSpecification.getComponentId(),
+			// annotation);
 		}
-   	try {
+		try {
 			out.close();
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
@@ -177,207 +213,306 @@ public class ControlService{
 		}
 
 	}
-	
-	public boolean checkDistribution(Node arg1)
-			throws RemoteException {
+
+	public boolean checkDistribution(Node arg1) throws RemoteException {
 		// TODO Auto-generated method stub
-		return syblService.checkIfContained( arg1);
+		return syblService.checkIfContained(arg1);
 	}
-	
-	public void processAnnotation( String arg1, SYBLAnnotation arg2)
+
+	public void processAnnotation(String arg1, SYBLAnnotation arg2)
 			throws RemoteException {
 		syblService.processAnnotations(arg1, arg2);
 	}
-	
-	
-	//Conflict resolution for complex constraints
-	
-	public String checkIfConstraintsAreConflicting(BinaryRestriction binaryRestriction1,BinaryRestriction binaryRestriction2){
+
+	// Conflict resolution for complex constraints
+
+	public String checkIfConstraintsAreConflicting(
+			BinaryRestriction binaryRestriction1,
+			BinaryRestriction binaryRestriction2) {
 		boolean conflict = false;
-		String metricLeft1= "";
-		Float numberRight1=0.0f;
-		
-		if (binaryRestriction1.getLeftHandSide().getMetric()!=null){
-			 metricLeft1 = binaryRestriction1.getLeftHandSide().getMetric();
-			numberRight1 = Float.parseFloat(binaryRestriction1.getRightHandSide().getNumber());
-			
-			
-		}else{
+		String metricLeft1 = "";
+		Float numberRight1 = 0.0f;
+
+		if (binaryRestriction1.getLeftHandSide().getMetric() != null) {
+			metricLeft1 = binaryRestriction1.getLeftHandSide().getMetric();
+			numberRight1 = Float.parseFloat(binaryRestriction1
+					.getRightHandSide().getNumber());
+
+		} else {
 			metricLeft1 = binaryRestriction1.getRightHandSide().getMetric();
-			numberRight1 = Float.parseFloat(binaryRestriction1.getLeftHandSide().getNumber());
+			numberRight1 = Float.parseFloat(binaryRestriction1
+					.getLeftHandSide().getNumber());
 			if (binaryRestriction1.getType().contains("lessThan"))
-				binaryRestriction1.getType().replaceAll("lessThan", "greaterThan");
-			else binaryRestriction1.getType().replaceAll("greaterThan", "lessThan");
-			}
-		String metricLeft2= "";
-		Float numberRight2=0.0f;
-		
-		if (binaryRestriction2.getLeftHandSide().getMetric()!=null){
-			 metricLeft2 = binaryRestriction2.getLeftHandSide().getMetric();
-			numberRight2= Float.parseFloat(binaryRestriction2.getRightHandSide().getNumber());
-			
-			
-		}else{
-			metricLeft2 = binaryRestriction2.getRightHandSide().getMetric();
-			numberRight2 = Float.parseFloat(binaryRestriction2.getLeftHandSide().getNumber());
-			if (binaryRestriction2.getType().contains("lessThan"))
-			 binaryRestriction2.getType().replaceAll("lessThan", "greaterThan");
-			else binaryRestriction2.getType().replaceAll("greaterThan", "lessThan");
+				binaryRestriction1.getType().replaceAll("lessThan",
+						"greaterThan");
+			else
+				binaryRestriction1.getType().replaceAll("greaterThan",
+						"lessThan");
 		}
-		
+		String metricLeft2 = "";
+		Float numberRight2 = 0.0f;
+
+		if (binaryRestriction2.getLeftHandSide().getMetric() != null) {
+			metricLeft2 = binaryRestriction2.getLeftHandSide().getMetric();
+			numberRight2 = Float.parseFloat(binaryRestriction2
+					.getRightHandSide().getNumber());
+
+		} else {
+			metricLeft2 = binaryRestriction2.getRightHandSide().getMetric();
+			numberRight2 = Float.parseFloat(binaryRestriction2
+					.getLeftHandSide().getNumber());
+			if (binaryRestriction2.getType().contains("lessThan"))
+				binaryRestriction2.getType().replaceAll("lessThan",
+						"greaterThan");
+			else
+				binaryRestriction2.getType().replaceAll("greaterThan",
+						"lessThan");
+		}
+
 		if (metricLeft1.equalsIgnoreCase(metricLeft2))
-		if ( binaryRestriction1.getType().contains("lessThan")){
-			if (binaryRestriction2.getType().contains("greaterThan")){
-				if (numberRight1<=numberRight2) return metricLeft1;
-			}
-		}else{
-			if ( binaryRestriction1.getType().contains("greaterThan")){
-				if (binaryRestriction2.getType().contains("lessThan")){
-					if (numberRight1>=numberRight2) return metricLeft1;
+			if (binaryRestriction1.getType().contains("lessThan")) {
+				if (binaryRestriction2.getType().contains("greaterThan")) {
+					if (numberRight1 <= numberRight2)
+						return metricLeft1;
+				}
+			} else {
+				if (binaryRestriction1.getType().contains("greaterThan")) {
+					if (binaryRestriction2.getType().contains("lessThan")) {
+						if (numberRight1 >= numberRight2)
+							return metricLeft1;
+					}
 				}
 			}
-		}
 		return "";
 	}
-	
-	public void disableConflictingConstraints(){
-		HashMap<String,String> toRemove = new HashMap<String,String>();
-		for (ElasticityRequirement elReq:dependencyGraph.getAllElasticityRequirements()){
-			SYBLSpecification syblSpecification=SYBLDirectiveMappingFromXML.mapFromSYBLAnnotation(elReq.getAnnotation());
-		if (!syblSpecification.getType().equalsIgnoreCase("component")){
-			List<Constraint> constraints=syblSpecification.getConstraint();
-			//System.err.println("Searching for "+syblSpecification.getComponentId());
-			Node entity = dependencyGraph.getNodeWithID(syblSpecification.getComponentId());
-			if (entity.getNodeType()==NodeType.CLOUD_SERVICE){
-				entity=( entity).getAllRelatedNodesOfType(RelationshipType.COMPOSITION_RELATIONSHIP, NodeType.SERVICE_TOPOLOGY).get(0);
-			}
-			if (entity.getNodeType()==NodeType.SERVICE_TOPOLOGY){
-				//ComponentTopology componentTopology = (ComponentTopology) entity;
-				for (Node topology: entity.getAllRelatedNodesOfType(RelationshipType.COMPOSITION_RELATIONSHIP, NodeType.SERVICE_TOPOLOGY)){
-					for( ElasticityRequirement el: topology.getElasticityRequirements()){
-						SYBLSpecification specification=SYBLDirectiveMappingFromXML.mapFromSYBLAnnotation(el.getAnnotation());
-						if (specification.getComponentId().equalsIgnoreCase(topology.getId())){
-							for (Constraint c1:constraints){
-								for (Constraint c2:specification.getConstraint()){
-									for (ArrayList<BinaryRestriction> binaryRestrictionsC1:c1.getCondition().getBinaryRestriction()){
-										for (BinaryRestriction binaryRestrictionC1:binaryRestrictionsC1){
-											for (ArrayList<BinaryRestriction>binaryRestrictionsC2:c2.getCondition().getBinaryRestriction()){
-												for(BinaryRestriction binaryRestrictionC2:binaryRestrictionsC2){
-													if (!checkIfConstraintsAreConflicting(binaryRestrictionC1, binaryRestrictionC2).equalsIgnoreCase("")){
-														String metric = checkIfConstraintsAreConflicting(binaryRestrictionC1, binaryRestrictionC2);
-														toRemove.put(metric,c1.getId());
 
-													}
-												}
-											}
-										}
-									}
-									
-								}
-							}
-						}
-					}
-				
-			
-						
-					
-					if (topology.getAllRelatedNodesOfType(RelationshipType.COMPOSITION_RELATIONSHIP, NodeType.SERVICE_TOPOLOGY)!=null){
-						for (Node topology1:topology.getAllRelatedNodesOfType(RelationshipType.COMPOSITION_RELATIONSHIP, NodeType.SERVICE_TOPOLOGY)){
-							for( ElasticityRequirement el: topology.getElasticityRequirements()){
-								SYBLSpecification specification=SYBLDirectiveMappingFromXML.mapFromSYBLAnnotation(el.getAnnotation());
-									if (specification.getComponentId().equalsIgnoreCase(topology1.getId())){
-									for (Constraint c1:constraints){
-										for (Constraint c2:specification.getConstraint()){
-													for (ArrayList<BinaryRestriction> binaryRestrictionsC1:c1.getCondition().getBinaryRestriction()){
-														for (BinaryRestriction binaryRestrictionC1:binaryRestrictionsC1){
-															for (ArrayList<BinaryRestriction>binaryRestrictionsC2:c2.getCondition().getBinaryRestriction()){
-																for(BinaryRestriction binaryRestrictionC2:binaryRestrictionsC2){
-																	if (!checkIfConstraintsAreConflicting(binaryRestrictionC1, binaryRestrictionC2).equalsIgnoreCase("")){
-																		String metric = checkIfConstraintsAreConflicting(binaryRestrictionC1, binaryRestrictionC2);
-																		toRemove.put(metric,c1.getId());
-
-																	}
-																}
-															}
-													
-												}
-											}										}
-									}								}
-							}
-						}
-					
-					for (Node comp:topology.getAllRelatedNodesOfType(RelationshipType.COMPOSITION_RELATIONSHIP, NodeType.SERVICE_UNIT)){
-						for( ElasticityRequirement el: topology.getElasticityRequirements()){
-							SYBLSpecification specification=SYBLDirectiveMappingFromXML.mapFromSYBLAnnotation(el.getAnnotation());
-							if (specification.getComponentId().equalsIgnoreCase(comp.getId())){
-								for (Constraint c1:constraints){
-									for (Constraint c2:specification.getConstraint()){
-										for (ArrayList<BinaryRestriction> binaryRestrictionsC1:c1.getCondition().getBinaryRestriction()){
-											for (BinaryRestriction binaryRestrictionC1:binaryRestrictionsC1){
-												for (ArrayList<BinaryRestriction>binaryRestrictionsC2:c2.getCondition().getBinaryRestriction()){
-													for(BinaryRestriction binaryRestrictionC2:binaryRestrictionsC2){
-														if (!checkIfConstraintsAreConflicting(binaryRestrictionC1, binaryRestrictionC2).equalsIgnoreCase("")){
-															String metric = checkIfConstraintsAreConflicting(binaryRestrictionC1, binaryRestrictionC2);
-															toRemove.put(metric,c1.getId());
+	public void disableConflictingConstraints() {
+		HashMap<String, String> toRemove = new HashMap<String, String>();
+		for (ElasticityRequirement elReq : dependencyGraph
+				.getAllElasticityRequirements()) {
+			SYBLSpecification syblSpecification = SYBLDirectiveMappingFromXML
+					.mapFromSYBLAnnotation(elReq.getAnnotation());
+			if (!syblSpecification.getType().equalsIgnoreCase("component")) {
+				List<Constraint> constraints = syblSpecification
+						.getConstraint();
+				// System.err.println("Searching for "+syblSpecification.getComponentId());
+				Node entity = dependencyGraph.getNodeWithID(syblSpecification
+						.getComponentId());
+				if (entity.getNodeType() == NodeType.CLOUD_SERVICE) {
+					entity = (entity).getAllRelatedNodesOfType(
+							RelationshipType.COMPOSITION_RELATIONSHIP,
+							NodeType.SERVICE_TOPOLOGY).get(0);
+				}
+				if (entity.getNodeType() == NodeType.SERVICE_TOPOLOGY) {
+					// ComponentTopology componentTopology = (ComponentTopology)
+					// entity;
+					for (Node topology : entity.getAllRelatedNodesOfType(
+							RelationshipType.COMPOSITION_RELATIONSHIP,
+							NodeType.SERVICE_TOPOLOGY)) {
+						for (ElasticityRequirement el : topology
+								.getElasticityRequirements()) {
+							SYBLSpecification specification = SYBLDirectiveMappingFromXML
+									.mapFromSYBLAnnotation(el.getAnnotation());
+							if (specification.getComponentId()
+									.equalsIgnoreCase(topology.getId())) {
+								for (Constraint c1 : constraints) {
+									for (Constraint c2 : specification
+											.getConstraint()) {
+										for (ArrayList<BinaryRestriction> binaryRestrictionsC1 : c1
+												.getCondition()
+												.getBinaryRestriction()) {
+											for (BinaryRestriction binaryRestrictionC1 : binaryRestrictionsC1) {
+												for (ArrayList<BinaryRestriction> binaryRestrictionsC2 : c2
+														.getCondition()
+														.getBinaryRestriction()) {
+													for (BinaryRestriction binaryRestrictionC2 : binaryRestrictionsC2) {
+														if (!checkIfConstraintsAreConflicting(
+																binaryRestrictionC1,
+																binaryRestrictionC2)
+																.equalsIgnoreCase(
+																		"")) {
+															String metric = checkIfConstraintsAreConflicting(
+																	binaryRestrictionC1,
+																	binaryRestrictionC2);
+															toRemove.put(
+																	metric,
+																	c1.getId());
 
 														}
 													}
 												}
 											}
 										}
-										
-									}					}
-								}							}
+
+									}
+								}
+							}
 						}
-					
-				
-				if ((entity).getAllRelatedNodesOfType(RelationshipType.COMPOSITION_RELATIONSHIP, NodeType.SERVICE_UNIT)!=null)
-				for (Node comp:entity.getAllRelatedNodesOfType(RelationshipType.COMPOSITION_RELATIONSHIP, NodeType.SERVICE_UNIT)){
-					for( ElasticityRequirement el: comp.getElasticityRequirements()){
-						SYBLSpecification specification=SYBLDirectiveMappingFromXML.mapFromSYBLAnnotation(el.getAnnotation());
-						if (specification.getComponentId().equalsIgnoreCase(comp.getId())){
-							for (Constraint c1:constraints){
-								for (Constraint c2:specification.getConstraint()){
-									for (ArrayList<BinaryRestriction> binaryRestrictionsC1:c1.getCondition().getBinaryRestriction()){
-										for (BinaryRestriction binaryRestrictionC1:binaryRestrictionsC1){
-											for (ArrayList<BinaryRestriction>binaryRestrictionsC2:c2.getCondition().getBinaryRestriction()){
-												for(BinaryRestriction binaryRestrictionC2:binaryRestrictionsC2){
-													if (!checkIfConstraintsAreConflicting(binaryRestrictionC1, binaryRestrictionC2).equalsIgnoreCase("")){
-														String metric = checkIfConstraintsAreConflicting(binaryRestrictionC1, binaryRestrictionC2);
-														toRemove.put(metric,c1.getId());
+
+						if (topology.getAllRelatedNodesOfType(
+								RelationshipType.COMPOSITION_RELATIONSHIP,
+								NodeType.SERVICE_TOPOLOGY) != null) {
+							for (Node topology1 : topology
+									.getAllRelatedNodesOfType(
+											RelationshipType.COMPOSITION_RELATIONSHIP,
+											NodeType.SERVICE_TOPOLOGY)) {
+								for (ElasticityRequirement el : topology
+										.getElasticityRequirements()) {
+									SYBLSpecification specification = SYBLDirectiveMappingFromXML
+											.mapFromSYBLAnnotation(el
+													.getAnnotation());
+									if (specification
+											.getComponentId()
+											.equalsIgnoreCase(topology1.getId())) {
+										for (Constraint c1 : constraints) {
+											for (Constraint c2 : specification
+													.getConstraint()) {
+												for (ArrayList<BinaryRestriction> binaryRestrictionsC1 : c1
+														.getCondition()
+														.getBinaryRestriction()) {
+													for (BinaryRestriction binaryRestrictionC1 : binaryRestrictionsC1) {
+														for (ArrayList<BinaryRestriction> binaryRestrictionsC2 : c2
+																.getCondition()
+																.getBinaryRestriction()) {
+															for (BinaryRestriction binaryRestrictionC2 : binaryRestrictionsC2) {
+																if (!checkIfConstraintsAreConflicting(
+																		binaryRestrictionC1,
+																		binaryRestrictionC2)
+																		.equalsIgnoreCase(
+																				"")) {
+																	String metric = checkIfConstraintsAreConflicting(
+																			binaryRestrictionC1,
+																			binaryRestrictionC2);
+																	toRemove.put(
+																			metric,
+																			c1.getId());
+
+																}
+															}
+														}
 
 													}
 												}
 											}
 										}
 									}
-									
-								}				}
-					}
-				}
-				}
+								}
+							}
+
+							for (Node comp : topology.getAllRelatedNodesOfType(
+									RelationshipType.COMPOSITION_RELATIONSHIP,
+									NodeType.SERVICE_UNIT)) {
+								for (ElasticityRequirement el : topology
+										.getElasticityRequirements()) {
+									SYBLSpecification specification = SYBLDirectiveMappingFromXML
+											.mapFromSYBLAnnotation(el
+													.getAnnotation());
+									if (specification.getComponentId()
+											.equalsIgnoreCase(comp.getId())) {
+										for (Constraint c1 : constraints) {
+											for (Constraint c2 : specification
+													.getConstraint()) {
+												for (ArrayList<BinaryRestriction> binaryRestrictionsC1 : c1
+														.getCondition()
+														.getBinaryRestriction()) {
+													for (BinaryRestriction binaryRestrictionC1 : binaryRestrictionsC1) {
+														for (ArrayList<BinaryRestriction> binaryRestrictionsC2 : c2
+																.getCondition()
+																.getBinaryRestriction()) {
+															for (BinaryRestriction binaryRestrictionC2 : binaryRestrictionsC2) {
+																if (!checkIfConstraintsAreConflicting(
+																		binaryRestrictionC1,
+																		binaryRestrictionC2)
+																		.equalsIgnoreCase(
+																				"")) {
+																	String metric = checkIfConstraintsAreConflicting(
+																			binaryRestrictionC1,
+																			binaryRestrictionC2);
+																	toRemove.put(
+																			metric,
+																			c1.getId());
+
+																}
+															}
+														}
+													}
+												}
+
+											}
+										}
+									}
+								}
+							}
+
+							if ((entity).getAllRelatedNodesOfType(
+									RelationshipType.COMPOSITION_RELATIONSHIP,
+									NodeType.SERVICE_UNIT) != null)
+								for (Node comp : entity
+										.getAllRelatedNodesOfType(
+												RelationshipType.COMPOSITION_RELATIONSHIP,
+												NodeType.SERVICE_UNIT)) {
+									for (ElasticityRequirement el : comp
+											.getElasticityRequirements()) {
+										SYBLSpecification specification = SYBLDirectiveMappingFromXML
+												.mapFromSYBLAnnotation(el
+														.getAnnotation());
+										if (specification.getComponentId()
+												.equalsIgnoreCase(comp.getId())) {
+											for (Constraint c1 : constraints) {
+												for (Constraint c2 : specification
+														.getConstraint()) {
+													for (ArrayList<BinaryRestriction> binaryRestrictionsC1 : c1
+															.getCondition()
+															.getBinaryRestriction()) {
+														for (BinaryRestriction binaryRestrictionC1 : binaryRestrictionsC1) {
+															for (ArrayList<BinaryRestriction> binaryRestrictionsC2 : c2
+																	.getCondition()
+																	.getBinaryRestriction()) {
+																for (BinaryRestriction binaryRestrictionC2 : binaryRestrictionsC2) {
+																	if (!checkIfConstraintsAreConflicting(
+																			binaryRestrictionC1,
+																			binaryRestrictionC2)
+																			.equalsIgnoreCase(
+																					"")) {
+																		String metric = checkIfConstraintsAreConflicting(
+																				binaryRestrictionC1,
+																				binaryRestrictionC2);
+																		toRemove.put(
+																				metric,
+																				c1.getId());
+
+																	}
+																}
+															}
+														}
+													}
+
+												}
+											}
+										}
+									}
+								}
+						}
 					}
 				}
 			}
 		}
-		}
-		
-		
-		
-	for (ElasticityRequirement elasticityRequirement:dependencyGraph.getAllElasticityRequirements()){
-		SYBLSpecification specification=SYBLDirectiveMappingFromXML.mapFromSYBLAnnotation(elasticityRequirement.getAnnotation());
-		List<Constraint> constr = new ArrayList<Constraint>();
-		constr.addAll(specification.getConstraint());	
-		for (Constraint i : constr){
-			if (toRemove.containsValue(i.getId()))
-			{
-				SYBLDirectivesEnforcementLogger.logger.info("Removing the constraint "+i.getId());
-				specification.getConstraint().remove(constr.indexOf(i));
+
+		for (ElasticityRequirement elasticityRequirement : dependencyGraph
+				.getAllElasticityRequirements()) {
+			SYBLSpecification specification = SYBLDirectiveMappingFromXML
+					.mapFromSYBLAnnotation(elasticityRequirement
+							.getAnnotation());
+			List<Constraint> constr = new ArrayList<Constraint>();
+			constr.addAll(specification.getConstraint());
+			for (Constraint i : constr) {
+				if (toRemove.containsValue(i.getId())) {
+					SYBLDirectivesEnforcementLogger.logger
+							.info("Removing the constraint " + i.getId());
+					specification.getConstraint().remove(constr.indexOf(i));
+				}
 			}
 		}
 	}
-					}
-	
-	
 
 }

@@ -45,6 +45,7 @@ public class SYBLService {
 	private DependencyGraph dependencyGraph ;
 	private MonitoringAPIInterface monitoringAPI;
 	private EnforcementAPIInterface enforcementAPI;
+	private List<SYBLProcessingThread> processingThreads=new ArrayList<SYBLProcessingThread>();
 	public SYBLService(DependencyGraph dependencyGraph,MonitoringAPIInterface monitoringAPI,EnforcementAPIInterface enforcementAPI){
 		    this.dependencyGraph=dependencyGraph;
 		    this.monitoringAPI=monitoringAPI;
@@ -101,9 +102,15 @@ public class SYBLService {
 			Node e = nodes.get(componentID); 
 		
 		 SYBLProcessingThread p = new SYBLProcessingThread(syblAnnotation, e, dependencyGraph,monitoringAPI, enforcementAPI);
+		 processingThreads.add(p);
 		 p.start();
 		}
 	
+	}
+	public void stopProcessingThreads(){
+		for (SYBLProcessingThread processingThread:processingThreads){
+			processingThread.stop();
+		}
 	}
 	public boolean checkIfContained(Node componentId){
 		if (myProcessingThreads.containsKey(componentId))return true;
