@@ -90,12 +90,16 @@ public class SyblControlWS {
 	 @Consumes("application/json")
 	public void setApplicationDescriptionInfoCELAR(String celar){
 		AnalysisLogger.logger.info("Received information from CELAR!!!!!: "+celar);
+		controlService.setApplicationDescriptionInfoCELAR(celar);
 	}
+	 
 	 @PUT
 	 @Path("/setApplicationDeploymentDescriptionCELAR")
 	 @Consumes("application/json")
 	public void setApplicationDeploymentInfoCELAR(String celar){
 		AnalysisLogger.logger.info("Received information from CELAR!!!!!: "+celar);
+		controlService.setApplicationDeploymentDescriptionInfoCELAR(celar);
+
 	} 
 	public ControlService getControlService() {
 		return controlService;

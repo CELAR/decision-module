@@ -353,6 +353,7 @@ public class InputProcessing {
 		
 		return constructDependencyGraph();
 	}
+
 	public SYBLAnnotation mapFromXMLAnnotationToSYBLAnnotation(String entityID,SYBLAnnotationXML syblAnnotationXML,SYBLAnnotation.AnnotationType annotationType){
 		SYBLAnnotation syblannotation = new SYBLAnnotation();
 

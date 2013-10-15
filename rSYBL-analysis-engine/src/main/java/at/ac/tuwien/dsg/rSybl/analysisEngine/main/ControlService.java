@@ -62,7 +62,8 @@ public class ControlService{
 
 	private DependencyGraph dependencyGraph ;
 	private PlanningGreedyAlgorithm planningGreedyAlgorithm;
-	
+	private String applicationDescription="";
+	private String deploymentDescription="";
 	
 	public ControlService(){
 
@@ -109,6 +110,24 @@ public class ControlService{
 
     
     	
+	}
+	public void setApplicationDescriptionInfoCELAR(String applicationDescriptionXML){
+		applicationDescription=applicationDescriptionXML;
+		if (!applicationDescription.equalsIgnoreCase("") && !deploymentDescription.equalsIgnoreCase("")){
+			dependencyGraph=inputProcessing.loadDependencyGraphFromStrings(applicationDescription, "", deploymentDescription);
+			startSYBLProcessingAndPlanning();
+			applicationDescription="";
+			deploymentDescription="";
+		}
+	}
+	public void setApplicationDeploymentDescriptionInfoCELAR(String deploymentDescriptionXML){
+		deploymentDescription=deploymentDescriptionXML;
+		if (!applicationDescription.equalsIgnoreCase("") && !deploymentDescription.equalsIgnoreCase("")){
+			dependencyGraph=inputProcessing.loadDependencyGraphFromStrings(applicationDescription, "", deploymentDescription);
+			startSYBLProcessingAndPlanning();
+			applicationDescription="";
+			deploymentDescription="";
+		}
 	}
 	public void setApplicationDescriptionInfoInternalModel(String applicationDescriptionXML, String elasticityRequirementsXML, String deploymentInfoXML){
 		InputProcessing inputProcessing = new InputProcessing();
