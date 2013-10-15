@@ -40,6 +40,7 @@ import com.sun.jersey.spi.resource.Singleton;
 import at.ac.tuwien.dsg.csdg.elasticityInformation.elasticityRequirements.SYBLAnnotation;
 import at.ac.tuwien.dsg.rSybl.analysisEngine.main.ControlService;
 import at.ac.tuwien.dsg.rSybl.analysisEngine.main.ControlServiceFactory;
+import at.ac.tuwien.dsg.rSybl.analysisEngine.utils.AnalysisLogger;
 
 
 @Singleton
@@ -83,6 +84,13 @@ public class SyblControlWS {
 		getControlService().setApplicationDescriptionInfoTOSCABased(tosca);
 	}
 
+	 @PUT
+	 @Path("/setApplicationDescriptionCELAR")
+	 @Consumes("application/json")
+	public void setApplicationDescriptionInfoCELAR(String celar){
+		AnalysisLogger.logger.info("Received information from CELAR!!!!!: "+celar);
+	}
+	 
 	public ControlService getControlService() {
 		return controlService;
 	}
