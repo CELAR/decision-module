@@ -7,7 +7,7 @@
 			<Slave>CassandraNode</Slave>
 		</Relationship>
 		<ServiceUnit id="YCSBClient" >
-		<SYBLDirective Constraints="Co1:CONSTRAINT latency &lt; 10 ms;"/>
+		<SYBLDirective Constraints="Co1:CONSTRAINT latency &lt; 12 ms;"/>
 		</ServiceUnit>
 		<ServiceUnit id="CassandraNode" />	
 		

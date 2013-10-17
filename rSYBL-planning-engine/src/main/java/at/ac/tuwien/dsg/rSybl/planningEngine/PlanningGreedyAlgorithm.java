@@ -191,7 +191,7 @@ public class PlanningGreedyAlgorithm implements Runnable {
 			findStrategies();
 			lastContextRepresentation=new ContextRepresentation(dependencyGraph, monitoringAPI);
 			lastContextRepresentation.initializeContext();
-
+			PlanningLogger.logger.info("Strategies that could be enforced. ... "+strategiesThatNeedToBeImproved);
 		HashMap<String, List<ActionEffect>> actionEffects = ActionEffects
 				.getActionEffects(dependencyGraph,monitoringAPI,contextRepresentation);
 
