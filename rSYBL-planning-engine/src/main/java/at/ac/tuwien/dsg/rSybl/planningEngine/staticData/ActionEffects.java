@@ -113,7 +113,7 @@ public class ActionEffects {
                             scaleInEffectForCassandraDB.setActionEffectForMetric("latency", 0f,"YCSBClient");
                         
 			}else{
-				scaleInEffectForCassandraDB.setActionEffectForMetric("latency", 2f,"YCSBClient");
+				scaleInEffectForCassandraDB.setActionEffectForMetric("latency", 1f,"YCSBClient");
 			}
 			scaleInEffectForCassandraDB.setActionEffectForMetric("cost", -0.12f,"CassandraNode");
 		//	scaleInEffectForCassandraDB.setActionEffectForMetric("cost", -0.12f,"CloudService");
