@@ -244,6 +244,7 @@ public class EnforcementPluginCELAR implements EnforcementInterface {
 			}
 		}
 		String ip = executeResizingCommand("addvm");
+		if (!ip.equalsIgnoreCase(""))
 		while (!checkStatus(ip,"addvm")){
 			try {
 				RuntimeLogger.logger.info("Waiting for scale out...");
