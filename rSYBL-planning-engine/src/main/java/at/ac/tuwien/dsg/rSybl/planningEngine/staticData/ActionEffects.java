@@ -63,7 +63,7 @@ public class ActionEffects {
                             }else{
                                 val=ycsbClient.getMonitoredValue("throughput");
                             }
-			if (val>8000){
+			if (val>9000){
 				scaleOutEffectForCassandraDB.setActionEffectForMetric("latency", -1000.0f,"YCSBClient");
 				}
 			else{
@@ -109,13 +109,15 @@ public class ActionEffects {
                             }else{
                                 val=ycsbClient.getMonitoredValue("throughput");
                             }
-			if (val<8000){		
+			if (val<9000){		
                             scaleInEffectForCassandraDB.setActionEffectForMetric("latency", -1000f,"YCSBClient");
                         
 			}else{
-				scaleInEffectForCassandraDB.setActionEffectForMetric("latency", 1000f,"YCSBClient");
+				scaleInEffectForCassandraDB.setActionEffectForMetric("latency", 2f,"YCSBClient");
 			}
 			scaleInEffectForCassandraDB.setActionEffectForMetric("cost", -0.12f,"CassandraNode");
+			scaleInEffectForCassandraDB.setActionEffectForMetric("cost", -0.12f,"CloudService");
+			
 			scaleInEffectForCassandraDB.setActionName("scaleInEffectForDataNode");
 			scaleInEffectForCassandraDB.setActionType("scalein");
 
