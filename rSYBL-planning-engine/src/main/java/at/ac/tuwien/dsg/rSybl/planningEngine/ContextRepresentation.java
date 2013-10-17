@@ -24,6 +24,7 @@ package at.ac.tuwien.dsg.rSybl.planningEngine;
 
 import java.lang.reflect.Method;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 import at.ac.tuwien.dsg.csdg.DependencyGraph;
@@ -422,7 +423,7 @@ public class ContextRepresentation {
 		}
 		return constr;
 	}
-	public String getImprovedStrategies(ContextRepresentation previousContextRepresentation){
+	public String getImprovedStrategies(ContextRepresentation previousContextRepresentation,String strategiesNeedingToBe){
 		String str = "";
 		for (ElasticityRequirement elReq:dependencyGraph.getAllElasticityRequirements()){
 			SYBLSpecification syblSpecification = SYBLDirectiveMappingFromXML.mapFromSYBLAnnotation(elReq.getAnnotation());
@@ -431,7 +432,7 @@ public class ContextRepresentation {
 				if (monitoredEntity==null) PlanningLogger.logger.info("Not finding monitored entity "+monitoredEntity+ " "+syblSpecification.getComponentId());
 			for (Strategy strategy:syblSpecification.getStrategy()){
 				Condition condition = strategy.getCondition();		
-				
+				if (strategiesNeedingToBe.contains(strategy.getId())){
 				if (evaluateCondition(condition, monitoredEntity)){
 				if (strategy.getToEnforce().getActionName().toLowerCase().contains("maximize")||strategy.getToEnforce().getActionName().toLowerCase().contains("minimize")){
 					if (strategy.getToEnforce().getActionName().toLowerCase().contains("maximize")){
@@ -449,10 +450,11 @@ public class ContextRepresentation {
 						}
 					}
 				}
-			}
+			}}
 			}
 		}
 		return str;	}
+	
 	public boolean evaluateBinaryRestriction(BinaryRestriction binaryRestriction,MonitoredEntity monitoredEntity){
 		boolean fulfilled=true;
 		float currentLeftValue=0;
@@ -522,7 +524,7 @@ public class ContextRepresentation {
 		}
 		return fulfilled;
 	}
-	public int countFixedStrategies(ContextRepresentation previousContextRepresentation){
+	public int countFixedStrategies(ContextRepresentation previousContextRepresentation,String strategiesThatNeedToBeImproved){
 		int nbFixedStrategies = 0;
 		for (ElasticityRequirement elReq:dependencyGraph.getAllElasticityRequirements()){
 			SYBLSpecification syblSpecification = SYBLDirectiveMappingFromXML.mapFromSYBLAnnotation(elReq.getAnnotation());
@@ -532,7 +534,7 @@ public class ContextRepresentation {
 			for (Strategy strategy:syblSpecification.getStrategy()){
 				Condition condition = strategy.getCondition();		
 				
-				if (evaluateCondition(condition, monitoredEntity)){
+				if (strategiesThatNeedToBeImproved.contains(strategy.getId()) && evaluateCondition(condition, monitoredEntity)){
 				if (strategy.getToEnforce().getActionName().toLowerCase().contains("maximize")||strategy.getToEnforce().getActionName().toLowerCase().contains("minimize")){
 					if (strategy.getToEnforce().getActionName().toLowerCase().contains("maximize")){
 						//PlanningLogger.logger.info("Current value for "+ strategy.getToEnforce().getParameter()+" is "+ monitoredEntity.getMonitoredValue(strategy.getToEnforce().getParameter())+" .Previous value was "+previousContextRepresentation.getValueForMetric(monitoredEntity,strategy.getToEnforce().getParameter()));

@@ -58,15 +58,22 @@ public class ControlService {
 	private PlanningGreedyAlgorithm planningGreedyAlgorithm;
 	private String applicationDescription = "";
 	private String deploymentDescription = "";
-
+	
+	
 	public ControlService() {
-
-		if (Configuration.getApplicationSpecificInformation().equalsIgnoreCase(
-				"files")) {
-			loadEverythingFromConfigurationFiles();
-		}
+		new StartThread().start();
+		
 	}
+	public class StartThread extends Thread {
 
+	    public void run() {
+	    	if (Configuration.getApplicationSpecificInformation().equalsIgnoreCase(
+					"files")) {
+				loadEverythingFromConfigurationFiles();
+			}	    }
+
+	  
+	}
 	public void startSYBLProcessingAndPlanning() {
 		try {
 			AnalysisLogger.logger.info("Current graph is "
@@ -116,6 +123,8 @@ public class ControlService {
 	public void setApplicationDescriptionInfoCELAR(
 			String applicationDescriptionXML) {
 		applicationDescription = applicationDescriptionXML;
+		InputProcessing inputProcessing = new InputProcessing();
+
 		if (planningGreedyAlgorithm != null)
 			planningGreedyAlgorithm.stop();
 		if (syblService != null)
@@ -138,6 +147,8 @@ public class ControlService {
 	public void setApplicationDeploymentDescriptionInfoCELAR(
 			String deploymentDescriptionXML) {
 		deploymentDescription = deploymentDescriptionXML;
+		InputProcessing inputProcessing = new InputProcessing();
+
 		if (planningGreedyAlgorithm != null)
 			planningGreedyAlgorithm.stop();
 		if (syblService != null)
@@ -148,8 +159,7 @@ public class ControlService {
 		enforcementAPI = null;
 		if (!applicationDescription.equalsIgnoreCase("")
 				&& !deploymentDescription.equalsIgnoreCase("")) {
-			dependencyGraph = inputProcessing.loadDependencyGraphFromStrings(
-					applicationDescription, "", deploymentDescription);
+			dependencyGraph = inputProcessing.loadDependencyGraphFromStrings(applicationDescription, "", deploymentDescription);
 			startSYBLProcessingAndPlanning();
 			applicationDescription = "";
 			deploymentDescription = "";

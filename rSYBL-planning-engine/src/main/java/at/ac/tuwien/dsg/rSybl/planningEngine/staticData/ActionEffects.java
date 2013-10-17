@@ -29,6 +29,9 @@ import java.util.Map.Entry;
 
 import at.ac.tuwien.dsg.csdg.DependencyGraph;
 import at.ac.tuwien.dsg.rSybl.dataProcessingUnit.api.MonitoringAPIInterface;
+import at.ac.tuwien.dsg.rSybl.planningEngine.ContextRepresentation;
+import at.ac.tuwien.dsg.rSybl.planningEngine.MonitoredEntity;
+import at.ac.tuwien.dsg.rSybl.planningEngine.utils.PlanningLogger;
 
 
 
@@ -42,14 +45,33 @@ public class ActionEffects {
 //	public static ActionEffect scaleInEffectForWebServer= new ActionEffect();
 
 
-	public static HashMap<String,List<ActionEffect>> getActionEffects(DependencyGraph dependencyGraph,MonitoringAPIInterface syblAPI){
-		HashMap<String,List<ActionEffect>> actionEffects = new HashMap<String,List<ActionEffect>>();
+	public static HashMap<String,List<ActionEffect>> getActionEffects(DependencyGraph dependencyGraph,MonitoringAPIInterface syblAPI,ContextRepresentation currentContextRepr){
 		
+		HashMap<String,List<ActionEffect>> actionEffects = new HashMap<String,List<ActionEffect>>();
+		MonitoredEntity cassandraNode = currentContextRepr.findMonitoredEntity("CassandraNode");
+		MonitoredEntity ycsbClient = currentContextRepr.findMonitoredEntity("YCSBClient");
+		
+
 		{
 			scaleOutEffectForCassandraDB.setTargetedEntityID("CassandraNode");
 			scaleOutEffectForCassandraDB.setActionEffectForMetric("cpuUsage", -30.0f,"CassandraNode");
 //			scaleOutEffectForCassandraDB.setActionEffectForMetric("cpuUsage", -40.0f,"DataControllerServiceUnit");
-			scaleOutEffectForCassandraDB.setActionEffectForMetric("latency", -1000.0f,"YCSBClient");
+			if (ycsbClient!=null){
+                            float val = 0;
+                            if (ycsbClient.getMonitoredValue("throughput")==null){
+                               val= syblAPI.getMetricValue("throughput", dependencyGraph.getNodeWithID("YCSBClient"));
+                            }else{
+                                val=ycsbClient.getMonitoredValue("throughput");
+                            }
+			if (val>8000){
+				scaleOutEffectForCassandraDB.setActionEffectForMetric("latency", -1000.0f,"YCSBClient");
+				}
+			else{
+				scaleOutEffectForCassandraDB.setActionEffectForMetric("latency", 0.0f,"YCSBClient");
+				}
+			}else{
+				PlanningLogger.logger.info("YCSB Client is null as shown by the context representation ");
+			}
 			scaleOutEffectForCassandraDB.setActionEffectForMetric("cost", 0.12f,"CassandraNode");
 			scaleOutEffectForCassandraDB.setActionName("scaleOutEffectForDataNode");
 			scaleOutEffectForCassandraDB.setActionType("scaleout");
@@ -81,7 +103,18 @@ public class ActionEffects {
 		{
 			scaleInEffectForCassandraDB.setTargetedEntityID("CassandraNode");
 			scaleInEffectForCassandraDB.setActionEffectForMetric("cpuUsage", 35.0f,"CassandraNode");
-			scaleInEffectForCassandraDB.setActionEffectForMetric("latency", 1000f,"YCSBClient");
+                        float val = 0;
+                        if (ycsbClient.getMonitoredValue("throughput")==null){
+                               val= syblAPI.getMetricValue("throughput", dependencyGraph.getNodeWithID("YCSBClient"));
+                            }else{
+                                val=ycsbClient.getMonitoredValue("throughput");
+                            }
+			if (val<8000){		
+                            scaleInEffectForCassandraDB.setActionEffectForMetric("latency", -1000f,"YCSBClient");
+                        
+			}else{
+				scaleInEffectForCassandraDB.setActionEffectForMetric("latency", 1000f,"YCSBClient");
+			}
 			scaleInEffectForCassandraDB.setActionEffectForMetric("cost", -0.12f,"CassandraNode");
 			scaleInEffectForCassandraDB.setActionName("scaleInEffectForDataNode");
 			scaleInEffectForCassandraDB.setActionType("scalein");
