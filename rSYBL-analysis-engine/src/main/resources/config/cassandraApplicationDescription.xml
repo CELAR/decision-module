@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <CloudService id="CloudService">
-	<SYBLDirective Strategies="St1:STRATEGY CASE fulfilled(Co1): minimize(cost);"/>
+	<SYBLDirective Strategies="St1:STRATEGY CASE latency &lt; 10 ms: minimize(cost);"/>
 	<ServiceTopology id="MainTopology">
 		<Relationship>
 			<Master>YCSBClient</Master>

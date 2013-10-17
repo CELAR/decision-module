@@ -165,9 +165,7 @@ public class PlanningGreedyAlgorithm implements Runnable {
 							}
 						}
 						if (strategy.getToEnforce().getActionName().toLowerCase().contains("minimize")){
-							PlanningLogger.logger.info("Current value for "+ strategy.getToEnforce().getParameter());
-							PlanningLogger.logger.info("Current value for "+ strategy.getToEnforce().getParameter()+" is "+ monitoredEntity.getMonitoredValue(strategy.getToEnforce().getParameter()));
-
+						
 							PlanningLogger.logger.info("Current value for "+ strategy.getToEnforce().getParameter()+" is "+ monitoredEntity.getMonitoredValue(strategy.getToEnforce().getParameter())+" .Previous value was "+lastContextRepresentation.getValueForMetric(monitoredEntity,strategy.getToEnforce().getParameter()));
 							
 							if (monitoredEntity.getMonitoredValue(strategy.getToEnforce().getParameter())>=lastContextRepresentation.getValueForMetric(monitoredEntity,strategy.getToEnforce().getParameter())){
