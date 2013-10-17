@@ -10,14 +10,16 @@
 	</DeploymentUnit>
 	<DeploymentUnit serviceUnitID="CassandraNode">
 		<AssociatedVM IP="83.212.116.239"/>
-	 <!--	<AssociatedVM IP="83.212.117.123"/> 
-	 	<AssociatedVM IP="83.212.117.11"/> 
+		<AssociatedVM IP="83.212.117.123"/> 
+		<AssociatedVM IP="83.212.117.11"/> 
 		<AssociatedVM IP="83.212.117.124"/>
 		<AssociatedVM IP="83.212.117.108"/>
-		<AssociatedVM IP="83.212.117.125"/> -->
+			 	
+		<AssociatedVM IP="83.212.117.125"/>
+
 		<AssociatedVM IP="83.212.117.126"/>
-	<!--     <AssociatedVM IP="83.212.117.31"/> 
-		<AssociatedVM IP="83.212.106.9"/> 
+	     <AssociatedVM IP="83.212.117.31"/> 
+	<!--	<AssociatedVM IP="83.212.106.9"/> 
 		<AssociatedVM IP="83.212.122.156"/>
 		<AssociatedVM IP="83.212.111.233"/> 
 		<AssociatedVM IP="83.212.125.226"/>  -->
