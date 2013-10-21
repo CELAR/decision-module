@@ -87,7 +87,7 @@ public class SyblControlWS {
 
 	 @PUT
 	 @Path("/setApplicationDescriptionCELAR")
-	 @Consumes("application/json")
+	 @Consumes("application/xml")
 	public void setApplicationDescriptionInfoCELAR(String celar){
 		AnalysisLogger.logger.info("Received information from CELAR!!!!!: "+celar);
 		controlService.setApplicationDescriptionInfoCELAR(celar);
@@ -95,7 +95,7 @@ public class SyblControlWS {
 	 
 	 @PUT
 	 @Path("/setApplicationDeploymentDescriptionCELAR")
-	 @Consumes("application/json")
+	 @Consumes("application/xml")
 	public void setApplicationDeploymentInfoCELAR(String celar){
 		AnalysisLogger.logger.info("Received information from CELAR!!!!!: "+celar);
 		controlService.setApplicationDeploymentDescriptionInfoCELAR(celar);
