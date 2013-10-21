@@ -82,39 +82,14 @@ public class EnforcementPluginCELAR implements EnforcementInterface {
 	              }else
 	              {
 	            	  RuntimeLogger.logger.error(array.getJSONObject("1").getString("stderr"));
-	    	        try{
-	    		              if ((array.getJSONObject("1").getString("stdout")).contains("Removing:"))
-	    		              {
-	    		            	  String strs[]=(array.getJSONObject("1").getString("stdout")).split("Removing: ");
-	    		            	
-
-	    		            	  return strs[strs.length-1];
-	    		              }
-	    		            	  else{
-	    		            		  if((array.getJSONObject("1").getString("stdout")).contains("Adding: ")){
-	    		            			  String strs[]=(array.getJSONObject("1").getString("stdout")).split("Adding: ");
-	    		            			//  System.out.println(strs[strs.length-1].split("xss")[0]);
-	    		    	            	 // System.out.println(strs[strs.length-1].split("xss")[1]);
-	    		    	            	  return strs[strs.length-1].split("xss")[0];  
-	    		            		  }
-	    		            	  }
-	    		    	        RuntimeLogger.logger.error("Error when calling orchestrator API for "+actionType+" error is "+array.getJSONObject("1").getString("stderr"));
-
-	    		              if (array.getJSONObject("1").getString("stdout").charAt(0)>='0'&&array.getJSONObject("1").getString("stdout").charAt(0)<='9' && !array.getJSONObject("1").getString("stdout").contains(" "))
-	    		            		  return array.getJSONObject("1").getString("stdout");
-	    		              else
-	    		            	  return "";
-	    		              
-	    	        }catch(Exception e){
-		    	        RuntimeLogger.logger.error("Error when calling orchestrator API for "+actionType+" error is "+array.getJSONObject("1").getString("stderr"));
-	    	        	return "";
-	    	        }
-
+	    	       return "";
 	              }
-	            } finally {
-	              is.close();
+	            }catch(Exception e){
+	            	
+		        	//Logger.getLogger(EnforcementPluginCELAR.class.getName()).log(Level.WARNING, "Failing the action "+actionType);
+		        	RuntimeLogger.logger.error("Failing the action "+actionType+" with error "+e.getMessage());
+		        
 	            }
-	            
 	        } catch (Exception e) {
 	           // Logger.getLogger(MELA_API.class.getName()).log(Level.SEVERE, e.getMessage(), e);
 	        	e.printStackTrace();
@@ -222,7 +197,7 @@ public class EnforcementPluginCELAR implements EnforcementInterface {
 	                  sb.append(cp);
 	                  s+=cp;
 	              }
-	              RuntimeLogger.logger.info("This is what we get from the status" +sb);
+	              RuntimeLogger.logger.info("STATUS:" +sb);
 	          
 	             if (s.contains("true"))return true;
 	             else return false;
@@ -244,8 +219,10 @@ public class EnforcementPluginCELAR implements EnforcementInterface {
 			}
 		}
 		String ip = executeResizingCommand("addvm");
-		if (!ip.equalsIgnoreCase(""))
-		while (!checkStatus(ip,"addvm")){
+		if (!ip.equalsIgnoreCase("")){
+			RuntimeLogger.logger.info("The IP of the Virtual Machine to be ADDED is "+ip);	
+
+			while (!checkStatus(ip,"addvm")){
 			try {
 				RuntimeLogger.logger.info("Waiting for scale out...");
 				Thread.sleep(10000);
@@ -255,7 +232,7 @@ public class EnforcementPluginCELAR implements EnforcementInterface {
 				e.printStackTrace();
 			}
 		}
-
+		}
 		if (!ip.equalsIgnoreCase("")){
 			RuntimeLogger.logger.info("The IP of the Virtual Machine to be ADDED is "+ip);	
 		DependencyGraph dependencyGraph=new DependencyGraph();
