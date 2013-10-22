@@ -125,7 +125,7 @@ public class PlanningGreedyAlgorithm implements Runnable {
 			if (entity.getNodeType()==NodeType.CLOUD_SERVICE) {
 				List<String> ips = entity.getAssociatedIps();
 				PlanningLogger.logger.info("For action "+actionEffect.getActionName()+entity.getAllRelatedNodesOfType(RelationshipType.HOSTED_ON_RELATIONSHIP, NodeType.VIRTUAL_MACHINE).size()+" hosts");
-				if (entity.getAllRelatedNodesOfType(RelationshipType.HOSTED_ON_RELATIONSHIP, NodeType.VIRTUAL_MACHINE).size() > 2)
+				if (entity.getAllRelatedNodesOfType(RelationshipType.HOSTED_ON_RELATIONSHIP, NodeType.VIRTUAL_MACHINE).size() > 4)
 					return true;
 			}
 			if (entity.getNodeType()==NodeType.SERVICE_TOPOLOGY) {
@@ -138,7 +138,7 @@ public class PlanningGreedyAlgorithm implements Runnable {
 						numberPrivateIps++;
 					}
 				}
-				if (entity.getAllRelatedNodesOfType(RelationshipType.HOSTED_ON_RELATIONSHIP, NodeType.VIRTUAL_MACHINE).size() >2)
+				if (entity.getAllRelatedNodesOfType(RelationshipType.HOSTED_ON_RELATIONSHIP, NodeType.VIRTUAL_MACHINE).size() > 4)
 					return true;
 			}
 		}
