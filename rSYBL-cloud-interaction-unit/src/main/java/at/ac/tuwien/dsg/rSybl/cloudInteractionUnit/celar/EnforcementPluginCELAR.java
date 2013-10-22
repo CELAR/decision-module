@@ -292,13 +292,13 @@ public class EnforcementPluginCELAR implements EnforcementInterface {
 			monitoringAPI.refreshServiceStructure(cloudService);
 			cleanupNecessary=true;
 		}
-		}else{
-			if (cleanupNecessary)
-			{
-				cleanup();
-				cleanupNecessary=false;
-			}
-			
+//		}else{
+//			if (cleanupNecessary)
+//			{
+//				cleanup();
+//				cleanupNecessary=false;
+//			}
+//			
 		}
 	}
 
