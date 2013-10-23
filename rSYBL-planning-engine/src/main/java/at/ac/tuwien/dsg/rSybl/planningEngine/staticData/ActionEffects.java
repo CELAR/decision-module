@@ -63,11 +63,11 @@ public class ActionEffects {
                             }else{
                                 val=ycsbClient.getMonitoredValue("throughput");
                             }
-			if (val>800){
+			if (val>200){
 				scaleOutEffectForCassandraDB.setActionEffectForMetric("latency", -1000.0f,"YCSBClient");
 				}
 			else{
-				scaleOutEffectForCassandraDB.setActionEffectForMetric("latency", 0.0f,"YCSBClient");
+				scaleOutEffectForCassandraDB.setActionEffectForMetric("latency", -2.0f,"YCSBClient");
 				}
 			}else{
 				PlanningLogger.logger.info("YCSB Client is null as shown by the context representation ");
