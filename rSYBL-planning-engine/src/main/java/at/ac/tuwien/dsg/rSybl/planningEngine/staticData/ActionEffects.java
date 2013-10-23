@@ -63,7 +63,7 @@ public class ActionEffects {
                             }else{
                                 val=ycsbClient.getMonitoredValue("throughput");
                             }
-			if (val>200){
+			if (val>100){
 				scaleOutEffectForCassandraDB.setActionEffectForMetric("latency", -1000.0f,"YCSBClient");
 				}
 			else{
