@@ -31,9 +31,9 @@
         
         <CompositionRule TargetMonitoredElementLevel="SERVICE_UNIT">
             <TargetMonitoredElementID>YCSBClient</TargetMonitoredElementID>
-            <ResultingMetric type="RESOURCE" measurementUnit="ops" name="throughput"/>
+            <ResultingMetric type="RESOURCE" measurementUnit="ops/s" name="throughput"/>
             <Operation MetricSourceMonitoredElementLevel="VM" type="SUM">
-                <ReferenceMetric type="RESOURCE" measurementUnit="ops"  name="ycsb_throughput"/>     
+                <ReferenceMetric type="RESOURCE" measurementUnit="ops/s"  name="ycsb_throughput"/>     
             </Operation>
         </CompositionRule>
         
@@ -82,7 +82,7 @@
         
     <CompositionRule TargetMonitoredElementLevel="SERVICE">
         
-            <ResultingMetric type="RESOURCE" measurementUnit="$" name="QualityIndicator"/>
+            <ResultingMetric type="RESOURCE" measurementUnit="val" name="QualityIndicator"/>
             <Operation  type="SUM">
                 <Operation value="-0.0833" type="MUL">
                     <Operation MetricSourceMonitoredElementLevel="SERVICE_TOPOLOGY" type="KEEP"> 
