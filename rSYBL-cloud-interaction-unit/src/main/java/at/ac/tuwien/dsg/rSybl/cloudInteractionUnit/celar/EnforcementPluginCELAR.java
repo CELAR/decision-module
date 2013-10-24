@@ -220,6 +220,7 @@ public class EnforcementPluginCELAR implements EnforcementInterface {
 		}
 		String ip = executeResizingCommand("addvm");
 		if (!ip.equalsIgnoreCase("")){
+			monitoringAPI.scaleoutstarted(toBeScaled);
 			RuntimeLogger.logger.info("The IP of the Virtual Machine to be ADDED is "+ip);	
 
 			while (!checkStatus(ip,"addvm")){
@@ -247,6 +248,8 @@ public class EnforcementPluginCELAR implements EnforcementInterface {
 		newVM.setId(ip);
 		toAdd.addNode(newVM,rel);
 		RuntimeLogger.logger.info("Cloud new service is "+dependencyGraph.graphToString());
+		monitoringAPI.scaleoutended(arg0)
+
 		monitoringAPI.refreshServiceStructure(cloudService);
 		cleanupNecessary=true;
 }else{
@@ -274,6 +277,7 @@ public class EnforcementPluginCELAR implements EnforcementInterface {
 				
 		String ip = executeResizingCommand("removevm");
 		if(!ip.equalsIgnoreCase("")){
+			monitoringAPI.scaleinstarted(toBeScaled);
 		while (!checkStatus(ip,"removevm")){
 			try {
 				RuntimeLogger.logger.info("Waiting for scale in...");
@@ -289,6 +293,7 @@ public class EnforcementPluginCELAR implements EnforcementInterface {
 			Node toBeDel = dep.getNodeWithID(ip); 
 			toBeScaled.removeNode(toBeDel);
 			RuntimeLogger.logger.info("Cloud new service is "+dep.graphToString());
+			monitoringAPI.scaleinended(toBeScaled);
 			monitoringAPI.refreshServiceStructure(cloudService);
 			cleanupNecessary=true;
 		}

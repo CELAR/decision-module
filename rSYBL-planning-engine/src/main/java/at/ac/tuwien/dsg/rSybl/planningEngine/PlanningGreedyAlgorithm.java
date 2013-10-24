@@ -330,8 +330,7 @@ public class PlanningGreedyAlgorithm implements Runnable {
 			if (actionEffect.getFirst().getActionType()
 					.equalsIgnoreCase("scaleout")) {
 			//	for (int i = 0; i < actionEffect.getSecond(); i++) {
-				monitoringAPI.scaleoutstarted(actionEffect.getFirst()
-						.getTargetedEntity());
+				
 				enforcementAPI.scaleout(actionEffect.getFirst()
 						.getTargetedEntity());
 				
@@ -342,8 +341,7 @@ public class PlanningGreedyAlgorithm implements Runnable {
 						// TODO Auto-generated catch block
 						PlanningLogger.logger.error(e.toString());
 					}
-					monitoringAPI.scaleoutended(actionEffect.getFirst()
-							.getTargetedEntity());
+				
 		//		}
 				//PlanningLogger.logger.info("Scale out for "+ actionEffect.getFirst().getTargetedEntity() + "  ");
 
@@ -351,8 +349,7 @@ public class PlanningGreedyAlgorithm implements Runnable {
 				if (actionEffect.getFirst().getActionType()
 						.equalsIgnoreCase("scalein")) {
 //					for (int i = 0; i < actionEffect.getSecond(); i++) {
-					monitoringAPI.scaleinstarted(actionEffect.getFirst()
-							.getTargetedEntity());
+					
 					enforcementAPI.scalein(actionEffect.getFirst()
 							.getTargetedEntity());
 					
@@ -363,8 +360,7 @@ public class PlanningGreedyAlgorithm implements Runnable {
 							// TODO Auto-generated catch block
 							PlanningLogger.logger.error(e.toString());
 						}
-						monitoringAPI.scaleinended(actionEffect.getFirst()
-								.getTargetedEntity());
+					
 //					}
 				//	PlanningLogger.logger.info("Scale in for "+ actionEffect.getFirst().getTargetedEntity());
 
