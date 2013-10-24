@@ -16,7 +16,7 @@
   <url>https://github.com/CELAR/decision-module</url>
 
   <description>
-    CELAR c-Eclipse.
+    CELAR Decision-Making Module
   </description>
 
   <packaging>pom</packaging>
@@ -24,6 +24,7 @@
   <modules>
     <module>rSYBL-data-processing-unit</module>
     <module>rSYBL-analysis-engine</module>
+    <module>rSYBL-analysis-engine-tar</module>
     <module>rSYBL-planning-engine</module>
     <module>rSYBL-learning-engine</module>
     <module>rSYBL-cloud-interaction-unit</module>
