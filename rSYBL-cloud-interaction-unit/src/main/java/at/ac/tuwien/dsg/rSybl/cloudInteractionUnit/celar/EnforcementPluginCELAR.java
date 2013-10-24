@@ -248,7 +248,7 @@ public class EnforcementPluginCELAR implements EnforcementInterface {
 		newVM.setId(ip);
 		toAdd.addNode(newVM,rel);
 		RuntimeLogger.logger.info("Cloud new service is "+dependencyGraph.graphToString());
-		monitoringAPI.scaleoutended(arg0)
+		monitoringAPI.scaleoutended(arg0);
 
 		monitoringAPI.refreshServiceStructure(cloudService);
 		cleanupNecessary=true;
