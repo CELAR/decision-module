@@ -64,7 +64,12 @@
                 <SourceMonitoredElementID>YCSBClient</SourceMonitoredElementID>
             </Operation>
         </CompositionRule>
-        
+               <CompositionRule TargetMonitoredElementLevel="SERVICE_TOPOLOGY">
+            <ResultingMetric type="RESOURCE" measurementUnit="no" name="numberOfVMs"/>
+            <Operation MetricSourceMonitoredElementLevel="SERVICE_UNIT" type="SUM">
+                <ReferenceMetric type="RESOURCE" name="numberOfVMs"/>
+            </Operation>
+        </CompositionRule>
         <CompositionRule TargetMonitoredElementLevel="SERVICE_TOPOLOGY">
             <ResultingMetric type="RESOURCE" measurementUnit="$" name="cost"/>
             <Operation MetricSourceMonitoredElementLevel="SERVICE_UNIT" type="SUM">
