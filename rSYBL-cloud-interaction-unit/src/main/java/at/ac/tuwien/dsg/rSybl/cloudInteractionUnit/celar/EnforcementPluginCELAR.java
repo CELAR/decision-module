@@ -289,13 +289,16 @@ public class EnforcementPluginCELAR implements EnforcementInterface {
 		}
 		
 			RuntimeLogger.logger.info("The IP of the Virtual Machine to be REMOVED is "+ip);	
-		
+			try{
 			Node toBeDel = dep.getNodeWithID(ip); 
 			toBeScaled.removeNode(toBeDel);
 			RuntimeLogger.logger.info("Cloud new service is "+dep.graphToString());
 			monitoringAPI.scaleinended(toBeScaled);
 			monitoringAPI.refreshServiceStructure(cloudService);
 			cleanupNecessary=true;
+			}catch(Exception e){
+				RuntimeLogger.logger.info("Failed to remove node "+ip);
+			}
 		}
 //		}else{
 //			if (cleanupNecessary)
