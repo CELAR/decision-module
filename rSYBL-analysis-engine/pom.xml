@@ -181,7 +181,7 @@
 	
 	</dependencies>
 	<build>
-	        <finalName>rSYBL-${project.version}</finalName>
+	     <!--     <finalName>rSYBL-${project.version}</finalName>-->
     <plugins>
 			 <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
