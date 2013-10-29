@@ -37,14 +37,14 @@ import javax.xml.bind.JAXBContext;
 
 
 public class SYBLControlClient {
-	protected String REST_API_URL="http://83.212.112.35/rSYBL-analysis-engine-0.1-SNAPSHOT/restWS";
-    public void sendTOSCADescription() {
-	    String toscaDescription="";
+	protected String REST_API_URL="http://localhost/rSYBL-analysis-engine-0.1-SNAPSHOT/restWS";
+    public void setApplicationDescription(String appDescription) {
+	   
 
         URL url = null;
         HttpURLConnection connection = null;
         try {
-            url = new URL(REST_API_URL + "/setApplicationDescriptionInfoTOSCABased");
+            url = new URL(REST_API_URL + "/setApplicationDescriptionCELAR");
             connection = (HttpURLConnection) url.openConnection();
             connection.setDoOutput(true);
             connection.setInstanceFollowRedirects(false);
@@ -54,7 +54,54 @@ public class SYBLControlClient {
 
             //write message body
             OutputStream os = connection.getOutputStream();
-            os.write(toscaDescription.getBytes(Charset.forName("UTF-8")));
+            os.write(appDescription.getBytes(Charset.forName("UTF-8")));
+            os.flush();
+            os.close();
+
+            InputStream errorStream = connection.getErrorStream();
+            if (errorStream != null) {
+                BufferedReader reader = new BufferedReader(new InputStreamReader(errorStream));
+                String line;
+                while ((line = reader.readLine()) != null) {
+                    Logger.getLogger(SYBLControlClient.class.getName()).log(Level.SEVERE, line);
+                }
+            }
+
+            InputStream inputStream = connection.getInputStream();
+            if (inputStream != null) {
+                BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream));
+                String line;
+                while ((line = reader.readLine()) != null) {
+                    Logger.getLogger(SYBLControlClient.class.getName()).log(Level.SEVERE, line);
+                }
+            }
+
+        } catch (Exception e) {
+            Logger.getLogger(SYBLControlClient.class.getName()).log(Level.SEVERE, e.getMessage(), e);
+        } finally {
+            if (connection != null) {
+                connection.disconnect();
+            }
+        }
+        
+    }
+    public void setApplicationDeployment(String appDescription) {
+ 	   
+
+        URL url = null;
+        HttpURLConnection connection = null;
+        try {
+            url = new URL(REST_API_URL + "/setApplicationDeploymentDescriptionCELAR");
+            connection = (HttpURLConnection) url.openConnection();
+            connection.setDoOutput(true);
+            connection.setInstanceFollowRedirects(false);
+            connection.setRequestMethod("PUT");
+            connection.setRequestProperty("Content-Type", "application/xml");
+            connection.setRequestProperty("Accept", "application/json");
+
+            //write message body
+            OutputStream os = connection.getOutputStream();
+            os.write(appDescription.getBytes(Charset.forName("UTF-8")));
             os.flush();
             os.close();
 
