@@ -39,7 +39,7 @@
         
         <CompositionRule TargetMonitoredElementLevel="SERVICE_UNIT">
             <TargetMonitoredElementID>YCSBClient</TargetMonitoredElementID>
-            <ResultingMetric type="RESOURCE" measurementUnit="ops/s" name="expectedThroughput"/>
+            <ResultingMetric type="RESOURCE" measurementUnit="ops/s" name="throughputExpected"/>
             <Operation MetricSourceMonitoredElementLevel="VM" type="SUM">
                 <ReferenceMetric type="RESOURCE" measurementUnit="ops/s"  name="ycsb_target"/>     
             </Operation>
