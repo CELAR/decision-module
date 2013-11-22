@@ -48,7 +48,7 @@ public class ActionEffects {
 	public static HashMap<String,List<ActionEffect>> getActionEffects(DependencyGraph dependencyGraph,MonitoringAPIInterface syblAPI,ContextRepresentation currentContextRepr){
 		
 		HashMap<String,List<ActionEffect>> actionEffects = new HashMap<String,List<ActionEffect>>();
-		MonitoredEntity cassandraNode = currentContextRepr.findMonitoredEntity("CassandraNode");
+		//MonitoredEntity cassandraNode = currentContextRepr.findMonitoredEntity("CassandraNode");
 //		MonitoredEntity ycsbClient = currentContextRepr.findMonitoredEntity("YCSBClient");
 		
 
@@ -118,14 +118,14 @@ public class ActionEffects {
 		
 
 		{
-			scaleInEffectForCassandraDB.setTargetedEntityID("CassandraNode");
+			scaleInEffectForCassandraDB.setTargetedEntityID("DataNodeServiceUnit");
 			scaleInEffectForCassandraDB.setActionEffectForMetric("cpuUsage", 35.0f,"DataNodeServiceUnit");
 			scaleInEffectForCassandraDB.setActionEffectForMetric("cpuUsage", 20.0f,"DataNodeServiceUnit");
 
                    scaleInEffectForCassandraDB.setActionEffectForMetric("latency", 1f,"DataNodeServiceUnit");
                    scaleInEffectForCassandraDB.setActionEffectForMetric("latency", 1f,"DataNodeServiceUnit");
 
-			scaleInEffectForCassandraDB.setActionEffectForMetric("cost", -0.12f,"CassandraNode");
+			scaleInEffectForCassandraDB.setActionEffectForMetric("cost", -0.12f,"DataNodeServiceUnit");
 		//	scaleInEffectForCassandraDB.setActionEffectForMetric("cost", -0.12f,"CloudService");
 			
 			scaleInEffectForCassandraDB.setActionName("scaleInEffectForDataNode");
