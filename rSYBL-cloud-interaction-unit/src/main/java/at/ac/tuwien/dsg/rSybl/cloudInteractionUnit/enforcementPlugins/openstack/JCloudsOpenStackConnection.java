@@ -140,7 +140,7 @@ public class JCloudsOpenStackConnection {
         String metadata ="";
         if (entity.getId().equalsIgnoreCase("DataNodeServiceUnit"))metadata= "CASSANDRA_SEED_NODE_IP=10.99.0.147";
         else 
-        	metadata="LOAD_BALANCER_IP=10.99.0.151";
+        	metadata="LOAD_BALANCER_IP=10.99.0.151 \n CASSANDRA_SEED_NODE_IP=10.99.0.147";
         nodeMetaData.put(metadata, "");
         createNodeOptions.metadata(nodeMetaData);
         createNodeOptions.userData(metadata.getBytes());
