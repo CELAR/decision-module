@@ -98,15 +98,11 @@ public class InputProcessing {
 			
 			JAXBContext a = JAXBContext.newInstance( DeploymentDescription.class );
 			Unmarshaller u  = a.createUnmarshaller();
-			String deploymentDescriptionPath = Configuration.getDeploymentDescriptionPath();
-		//	RuntimeLogger.logger.info("Got here "+deploymentDescriptionPath);
-		//	RuntimeLogger.logger.info("Got here "+this.getClass().getClassLoader().getResourceAsStream(deploymentDescriptionPath));
+			//String deploymentDescriptionPath = Configuration.getDeploymentDescriptionPath();
+			//DependencyGraphLogger.logger.info("Got here "+this.getClass().getClassLoader().getResourceAsStream(deploymentDescriptionPath));
 			
-			if (deploymentDescriptionPath!=null){
-				//deploymentDescription = (DeploymentDescription) u.unmarshal(new File(deploymentDescriptionPath));
 				deploymentDescription = (DeploymentDescription) u.unmarshal( new StringReader(deploymentDescr)) ;
-			}
-			//RuntimeLogger.logger.info("Read deployment Descrption"+deploymentDescription.toString());
+			DependencyGraphLogger.logger.info("Read deployment Descrption"+deploymentDescription.toString());
 
 		} catch (Exception e) {
 			DependencyGraphLogger.logger.error("Error in reading deployment description"+e.toString());
@@ -291,6 +287,9 @@ public class InputProcessing {
 		cloudService.addNode(entry.getKey(), entry.getValue());
 		}
 		graph.setCloudService(cloudService);
+		DependencyGraphLogger.logger.info("Deployment Description "+deploymentDescription);
+		DependencyGraphLogger.logger.info("Deployment Description "+deploymentDescription.getAccessIP());
+		DependencyGraphLogger.logger.info("Static info cloud service "+cloudService.getStaticInformation());
 		cloudService.getStaticInformation().put("AccessIP",deploymentDescription.getAccessIP());
 		//
 		
