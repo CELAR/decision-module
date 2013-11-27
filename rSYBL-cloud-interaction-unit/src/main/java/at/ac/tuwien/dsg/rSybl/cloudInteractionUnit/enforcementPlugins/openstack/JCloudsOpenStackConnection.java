@@ -138,9 +138,9 @@ public class JCloudsOpenStackConnection {
         Map<String, String> nodeMetaData = new HashMap<String, String>();
         
         String metadata ="";
-        if (entity.getId().equalsIgnoreCase("DataNodeServiceUnit"))metadata= "CASSANDRA_SEED_NODE_IP=10.99.0.147";
+        if (entity.getId().equalsIgnoreCase("DataNodeServiceUnit"))metadata= "CASSANDRA_SEED_NODE_IP=10.99.0.30";
         else 
-        	metadata="LOAD_BALANCER_IP=10.99.0.151 \n CASSANDRA_SEED_NODE_IP=10.99.0.147";
+        	metadata="LOAD_BALANCER_IP=10.99.0.23 \n CASSANDRA_SEED_NODE_IP=10.99.0.30";
         nodeMetaData.put(metadata, "");
         createNodeOptions.metadata(nodeMetaData);
         createNodeOptions.userData(metadata.getBytes());
