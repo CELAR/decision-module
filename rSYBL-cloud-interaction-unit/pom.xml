@@ -16,11 +16,11 @@
   
   
   <dependencies>
-	 <dependency>
-	    <groupId>org.apache.jclouds</groupId>
-	    <artifactId>jclouds-all</artifactId>
-	    <version>1.6.1-incubating</version>
-	  </dependency>
+<dependency>
+            <groupId>org.apache.jclouds</groupId>
+            <artifactId>jclouds-all</artifactId>
+            <version>1.6.1-incubating</version>
+        </dependency>
             
 		        <dependency>
             <groupId>org.json</groupId>
