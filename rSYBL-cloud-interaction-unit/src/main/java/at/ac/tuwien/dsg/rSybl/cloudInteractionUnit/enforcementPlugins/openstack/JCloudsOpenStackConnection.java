@@ -147,13 +147,13 @@ public class JCloudsOpenStackConnection {
         
         createNodeOptions.keyPairName(Configuration.getCertificateName());
         String vmName = entity.getId();
-       // RuntimeLogger.logger.info("FLAVOR ID "+(String)entity.getStaticInformation("DefaultImage")+" "+(String)entity.getStaticInformation("DefaultFlavor"));
+        RuntimeLogger.logger.info("FLAVOR ID "+(String)entity.getStaticInformation("DefaultImage")+" "+(String)entity.getStaticInformation("DefaultFlavor"));
         String flavorID = "";
         for (Resource flavor:client.getFlavorApiForZone("myregion").list().concat()){
-    	//	RuntimeLogger.logger.error("Enumerating possible flavors Flavor "+flavor.getName()+" "+ flavor.getId());
+    		RuntimeLogger.logger.error("Enumerating possible flavors Flavor "+flavor.getName()+" "+ flavor.getId());
 
         	if (((String)entity.getStaticInformation("DefaultFlavor")).equalsIgnoreCase(flavor.getName())){
-       // 		RuntimeLogger.logger.info("Flavor found "+flavor.getId());
+        		RuntimeLogger.logger.info("Flavor found "+flavor.getId());
         		flavorID=flavor.getId();
         	}
         }
