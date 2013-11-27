@@ -83,6 +83,8 @@ public class JCloudsOpenStackConnection {
 
 //		Iterable<Module> modules = ImmutableSet.<Module>of(
 //                new SLF4JLoggingModule());
+		
+		RuntimeLogger.logger.info(Configuration.getCloudAPIType()+" "+Configuration.getCloudUser()+" "+Configuration.getCloudPassword()+" "+Configuration.getCloudAPIEndpoint());
 		ComputeServiceContext context = ContextBuilder.newBuilder(Configuration.getCloudAPIType())
                 .credentials(Configuration.getCloudUser(), Configuration.getCloudPassword())
                 .endpoint(Configuration.getCloudAPIEndpoint())
