@@ -147,22 +147,22 @@ public class JCloudsOpenStackConnection {
         
         createNodeOptions.keyPairName(Configuration.getCertificateName());
         String vmName = entity.getId();
-        RuntimeLogger.logger.info("FLAVOR ID "+(String)entity.getStaticInformation("DefaultImage")+" "+(String)entity.getStaticInformation("DefaultFlavor"));
+       // RuntimeLogger.logger.info("FLAVOR ID "+(String)entity.getStaticInformation("DefaultImage")+" "+(String)entity.getStaticInformation("DefaultFlavor"));
         String flavorID = "";
-    //    for (Resource flavor:client.getFlavorApiForZone("myregion").list().concat()){
+        for (Resource flavor:client.getFlavorApiForZone("myregion").list().concat()){
     	//	RuntimeLogger.logger.error("Enumerating possible flavors Flavor "+flavor.getName()+" "+ flavor.getId());
 
-      //  	if (((String)entity.getStaticInformation("DefaultFlavor")).equalsIgnoreCase(flavor.getName())){
+        	if (((String)entity.getStaticInformation("DefaultFlavor")).equalsIgnoreCase(flavor.getName())){
        // 		RuntimeLogger.logger.info("Flavor found "+flavor.getId());
-    //    		flavorID=flavor.getId();
-     //   	}
-      //  }
+        		flavorID=flavor.getId();
+        	}
+        }
     //    RuntimeLogger.logger.info("Scaling out "+entity.getId()+" which has controller "+controller);
         
         boolean serverCorrectlyCreated = false;
         ServerCreated serverCreated = null;
         while (!serverCorrectlyCreated){
-         serverCreated = serverApi.create(vmName,((String)entity.getStaticInformation("DefaultImage")), (String)entity.getStaticInformation("DefaultFlavor"),createNodeOptions);
+         serverCreated = serverApi.create(vmName,((String)entity.getStaticInformation("DefaultImage")), flavorID,createNodeOptions);
          
         //wait for all to become ACTIVE
 
