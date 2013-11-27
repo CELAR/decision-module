@@ -99,6 +99,9 @@ public class JCloudsOpenStackConnection {
         final String region = "myregion";
 
         serverApi = client.getServerApiForZone(region);
+        for (Resource flavor : client.getFlavorApiForZone(region).list().concat()) {
+            RuntimeLogger.logger.error( flavor.getId()+" "+flavor.getName());
+          }
 	}
 	/**
 	 * 
