@@ -92,6 +92,7 @@ public class JCloudsOpenStackConnection {
                 .buildView(ComputeServiceContext.class);
 
 
+		
         ComputeService computeService = context.getComputeService();
 
 

@@ -127,18 +127,19 @@ public class Main {
 	}
 	
 	public static void main(String[] args) {
-		Main m = new Main();
-		Node cloudService = m.constructExampleDependencyGraph();
+		//Main m = new Main();
+		//Node cloudService = m.constructExampleDependencyGraph();
 		
-		DependencyGraph dependencyGraph = new DependencyGraph();
-		dependencyGraph.setCloudService(cloudService);
+//		DependencyGraph dependencyGraph = new DependencyGraph();
+//		dependencyGraph.setCloudService(cloudService);
+//		
+//		System.out.println(dependencyGraph.graphToString());
 		
-		//System.out.println(dependencyGraph.graphToString());
-		//DependencyGraph fromTosca = new TOSCAProcessing().toscaDescriptionToDependencyGraph();
-		//System.out.println(fromTosca.graphToString());
+		DependencyGraph fromTosca = new TOSCAProcessing().toscaDescriptionToDependencyGraph();
+		System.out.println(fromTosca.graphToString());
 		
-		InputProcessing inputProcessing=new InputProcessing();
-		System.out.println(inputProcessing.loadDependencyGraphFromFile().graphToString());
+		//InputProcessing inputProcessing=new InputProcessing();
+	//	System.out.println(inputProcessing.loadDependencyGraphFromFile().graphToString());
 	}
 	
 	}
