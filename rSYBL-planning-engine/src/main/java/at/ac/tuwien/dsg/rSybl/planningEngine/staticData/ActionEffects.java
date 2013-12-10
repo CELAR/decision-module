@@ -218,7 +218,7 @@ public class ActionEffects {
 		}
 		return actionEffects;
 	}
-	 public HashMap<String,List<ActionEffect>> getActionEffects () {
+	 public static HashMap<String,List<ActionEffect>> getActionEffects () {
 			HashMap<String,List<ActionEffect>> actionEffects = new HashMap<String,List<ActionEffect>>();
 
 			JSONParser parser = new JSONParser();
