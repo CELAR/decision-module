@@ -37,8 +37,13 @@
 			<version>0.1-SNAPSHOT</version>
 		</dependency>
 		<dependency>
-			<groupId>eu.celar.decision-making</groupId>
-			<artifactId>rSYBL-cloud-interaction-unit</artifactId>
+		<groupId>at.ac.tuwien.rSYBL.control-service</groupId>
+		<artifactId>rSYBL-planning-engine</artifactId>
+	  <version>0.1-SNAPSHOT</version>
+		</dependency>
+		<dependency>
+			<groupId>at.ac.tuwien.rSYBL.control-service</groupId>
+			<artifactId>rSYBL-sybl-processing-unit</artifactId>
 			<version>0.1-SNAPSHOT</version>
 		</dependency>
 	</dependencies>

@@ -6,6 +6,7 @@
   <artifactId>rSYBL-decision-making-pom</artifactId>
   <version>0.1-SNAPSHOT</version>
   <name>CELAR Decision-Making Module (DMM) main POM</name>
+ <!-- Standalone MELA and core sources located for conveninence at https://github.com/tuwiendsg/MELA  -->
 
   <parent>
     <groupId>eu.celar</groupId>
@@ -32,6 +33,13 @@
     <module>rSYBL-sybl-processing-unit</module>
     <module>rSYBL-client</module>
   </modules>
+       <repositories>
+                <repository>
+                        <id>infosys-repo</id>
+                        <url>http://www.infosys.tuwien.ac.at/mvn</url>
+                </repository>
+        </repositories>
+
 
 </project>
 

@@ -46,7 +46,11 @@
 			<groupId>eu.celar.decision-making</groupId>
 			<artifactId>rSYBL-sybl-processing-unit</artifactId>
 			<version>0.1-SNAPSHOT</version>
-
+		</dependency>
+		<dependency>
+		<groupId>at.ac.tuwien.rSYBL.control-service</groupId>
+		<artifactId>rSYBL-planning-engine</artifactId>
+	  <version>0.1-SNAPSHOT</version>
 		</dependency>
 		<dependency>
 			<groupId>org.json</groupId>
