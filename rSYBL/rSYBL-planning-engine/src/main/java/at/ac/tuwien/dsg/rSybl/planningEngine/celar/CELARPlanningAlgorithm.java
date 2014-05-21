@@ -21,6 +21,10 @@ package at.ac.tuwien.dsg.rSybl.planningEngine.celar;
 /**
  *  Author : Georgiana Copil - e.copil@dsg.tuwien.ac.at
  */
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
 
 import at.ac.tuwien.dsg.csdg.DependencyGraph;
 import at.ac.tuwien.dsg.csdg.Node;
@@ -33,12 +37,15 @@ import at.ac.tuwien.dsg.csdg.elasticityInformation.elasticityRequirements.Strate
 import at.ac.tuwien.dsg.csdg.inputProcessing.multiLevelModel.abstractModelXML.SYBLDirectiveMappingFromXML;
 import at.ac.tuwien.dsg.rSybl.cloudInteractionUnit.api.EnforcementAPIInterface;
 import at.ac.tuwien.dsg.rSybl.dataProcessingUnit.api.MonitoringAPIInterface;
+import at.ac.tuwien.dsg.rSybl.planningEngine.ContextRepresentation;
+import at.ac.tuwien.dsg.rSybl.planningEngine.MonitoredCloudService;
+import at.ac.tuwien.dsg.rSybl.planningEngine.MonitoredEntity;
 import at.ac.tuwien.dsg.rSybl.planningEngine.utils.Configuration;
 import at.ac.tuwien.dsg.rSybl.planningEngine.staticData.ActionEffect;
 import at.ac.tuwien.dsg.rSybl.planningEngine.celar.staticData.ActionEffectsCELAR;
 import at.ac.tuwien.dsg.rSybl.planningEngine.utils.PlanningLogger;
 
-public class CELARPlanningAlgorithm  {
+public class CELARPlanningAlgorithm  implements Runnable{
 
 	
 	private Thread t;
