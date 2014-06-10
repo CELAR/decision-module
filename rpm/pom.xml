@@ -3,7 +3,7 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>eu.celar.decision-making</groupId>
   <artifactId>decision-making-rpm</artifactId>
-  <version>0.1</version>
+  <version>0.0.1-SNAPSHOT</version>
   <name>CELAR Decision-Making Module RPM</name>
 
   <parent>
