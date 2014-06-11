@@ -3,8 +3,8 @@
 
   <artifactId>decision-making-module</artifactId>
   <version>1.0.0-SNAPSHOT</version>
+  <name>Decision-Making Module</name>
   <packaging>pom</packaging>
-  <name>decision-making-module</name>
   <url>http://infosys.tuwien.ac.at/</url>
 
   <parent>
