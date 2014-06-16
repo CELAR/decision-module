@@ -76,7 +76,7 @@
           <needarch>noarch</needarch>
           <description>Decision making module, include rSYBL, MELA and SALSA</description>
           <requires>
-            <require>apache-tomcat &gt;= 6.0.20-2</require>
+            <require>tomcat6</require>
           </requires>
           <mappings>
             <mapping>
