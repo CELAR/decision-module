@@ -15,6 +15,13 @@
   </parent>
 
   <url>https://github.com/CELAR/decision-module</url>
+       <repositories>
+                <repository>
+                        <id>infosys-repo</id>
+                        <url>http://www.infosys.tuwien.ac.at/mvn</url>
+                </repository>
+        </repositories>
+
 
   <description>
     CELAR Decision-Making Module
@@ -33,13 +40,15 @@
     <module>rSYBL-sybl-processing-unit</module>
     <module>rSYBL-client</module>
   </modules>
-       <repositories>
-                <repository>
-                        <id>infosys-repo</id>
-                        <url>http://www.infosys.tuwien.ac.at/mvn</url>
-                </repository>
-        </repositories>
 
+  <issueManagement>
+    <system>GitHub Issues</system>
+    <url>https://github.com/CELAR/decision-module/issues</url>
+  </issueManagement>
 
+  <scm>
+    <connection>scm:git:ssh://git@github.com:CELAR/decision-module.git</connection>
+    <developerConnection>scm:git:ssh://git@github.com:CELAR/decision-module.git</developerConnection>
+  </scm>
 </project>
 

@@ -14,7 +14,12 @@
 		<version>0.1-SNAPSHOT</version>
 	</parent>
 	<artifactId>rSYBL-planning-engine</artifactId>
-
+   <repositories>
+                <repository>
+                        <id>infosys-repo</id>
+                        <url>http://www.infosys.tuwien.ac.at/mvn</url>
+                </repository>
+        </repositories>
 	<dependencies>
 		<dependency>
 			<groupId>junit</groupId>
@@ -52,6 +57,7 @@
 		<artifactId>rSYBL-planning-engine</artifactId>
 	  <version>0.1-SNAPSHOT</version>
 		</dependency>
+		
 		<dependency>
 			<groupId>org.json</groupId>
 			<artifactId>json</artifactId>
@@ -77,4 +83,5 @@
 			</plugin>
 		</plugins>
 	</build>
+	 
 </project>
