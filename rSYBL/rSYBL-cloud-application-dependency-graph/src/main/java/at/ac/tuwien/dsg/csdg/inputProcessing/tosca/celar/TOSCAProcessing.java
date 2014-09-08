@@ -23,7 +23,6 @@
 package at.ac.tuwien.dsg.csdg.inputProcessing.tosca.celar;
 
 import java.io.File;
-import java.io.FileReader;
 import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -31,18 +30,13 @@ import java.util.List;
 
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
-import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
-import javax.xml.namespace.QName;
 
 import org.oasis_open.docs.tosca.ns._2011._12.Definitions;
 import org.oasis_open.docs.tosca.ns._2011._12.TBoundaryDefinitions;
 import org.oasis_open.docs.tosca.ns._2011._12.TEntityTemplate;
 import org.oasis_open.docs.tosca.ns._2011._12.TExtensibleElements;
-import org.oasis_open.docs.tosca.ns._2011._12.TDefinitions.Extensions;
-import org.oasis_open.docs.tosca.ns._2011._12.TDefinitions.Types;
 import org.oasis_open.docs.tosca.ns._2011._12.TNodeTemplate;
-import org.oasis_open.docs.tosca.ns._2011._12.TNodeTemplate.Policies;
 import org.oasis_open.docs.tosca.ns._2011._12.TPolicy;
 import org.oasis_open.docs.tosca.ns._2011._12.TRelationshipTemplate;
 import org.oasis_open.docs.tosca.ns._2011._12.TServiceTemplate;
@@ -53,12 +47,10 @@ import at.ac.tuwien.dsg.csdg.Node;
 import at.ac.tuwien.dsg.csdg.Relationship;
 import at.ac.tuwien.dsg.csdg.Node.NodeType;
 import at.ac.tuwien.dsg.csdg.Relationship.RelationshipType;
+import at.ac.tuwien.dsg.csdg.SimpleRelationship;
 import at.ac.tuwien.dsg.csdg.elasticityInformation.ElasticityRequirement;
 import at.ac.tuwien.dsg.csdg.elasticityInformation.elasticityRequirements.SYBLAnnotation;
 import at.ac.tuwien.dsg.csdg.elasticityInformation.elasticityRequirements.SYBLAnnotation.AnnotationType;
-import at.ac.tuwien.dsg.csdg.inputProcessing.multiLevelModel.InputProcessing;
-import at.ac.tuwien.dsg.csdg.inputProcessing.multiLevelModel.deploymentDescription.DeploymentDescription;
-import at.ac.tuwien.dsg.csdg.utils.Configuration;
 
 
 
@@ -178,7 +170,7 @@ public class TOSCAProcessing {
 					n.setId(serviceTemplate.getSubstitutableNodeType().getLocalPart());
 					
 					n.setNodeType(NodeType.SERVICE_TOPOLOGY);
-					Relationship rel  = new Relationship();
+					SimpleRelationship rel  = new SimpleRelationship();
 					rel.setType(RelationshipType.COMPOSITION_RELATIONSHIP);
 					rel.setSourceElement(cloudServiceName);
 					rel.setTargetElement(n.getId());
@@ -204,7 +196,7 @@ public class TOSCAProcessing {
 								//System.out.println(n+" "+nodeTemplate.getId());
 								//serviceUnit.setId(nodeTemplate.getId());
 							//	serviceUnit.setNodeType(NodeType.SERVICE_UNIT);
-								rel  = new Relationship();
+								rel  = new SimpleRelationship();
 								rel.setType(RelationshipType.COMPOSITION_RELATIONSHIP);
 								n.addNode(serviceUnit,rel );
 								nodes.put(serviceUnit.getId(), serviceUnit);
@@ -256,7 +248,7 @@ public class TOSCAProcessing {
 								}
 								//serviceUnit.setId(nodeTemplate.getId());
 								//serviceUnit.setNodeType(NodeType.SERVICE_UNIT);
-								Relationship rel  = new Relationship();
+								SimpleRelationship rel  = new SimpleRelationship();
 								rel.setType(RelationshipType.COMPOSITION_RELATIONSHIP);
 								n.addNode(serviceUnit,rel );
 								nodes.put(serviceUnit.getId(), serviceUnit);
@@ -285,7 +277,7 @@ public class TOSCAProcessing {
 	public DependencyGraph toscaDescriptionToDependencyGraph(){
 		DependencyGraph dependencyGraph = new DependencyGraph();
 		HashMap<String,Node> nodes = new HashMap<String,Node>();//String - id of the node, for easier access and modification of its relationships
-		Relationship rel = new Relationship();
+		Relationship rel = new SimpleRelationship();
 		//TODO: take each construct present in TOSCA and transform it to our model
 		Definitions definitions = readTOSCADescriptionsFile();
 		parseTOSCAGraph(nodes, definitions.getServiceTemplateOrNodeTypeOrNodeTypeImplementation());
@@ -298,7 +290,7 @@ public class TOSCAProcessing {
 	public DependencyGraph toscaDescriptionToDependencyGraph(String tosca){
 		DependencyGraph dependencyGraph = new DependencyGraph();
 		HashMap<String,Node> nodes = new HashMap<String,Node>();//String - id of the node, for easier access and modification of its relationships
-		Relationship rel = new Relationship();
+		Relationship rel = new SimpleRelationship();
 		//TODO: take each construct present in TOSCA and transform it to our model
 		Definitions definitions = readTOSCADescriptionsString(tosca);
 		TPolicy policy=new TPolicy();

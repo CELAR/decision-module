@@ -41,6 +41,8 @@ import at.ac.tuwien.dsg.rSybl.planningEngine.MonitoredEntity;
 import at.ac.tuwien.dsg.rSybl.planningEngine.staticData.ActionEffect;
 import at.ac.tuwien.dsg.rSybl.planningEngine.utils.Configuration;
 import at.ac.tuwien.dsg.rSybl.planningEngine.utils.PlanningLogger;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 
 
@@ -67,7 +69,11 @@ public class ActionEffectsCELAR {
 			if (ycsbClient!=null){
                             Double val = 0.0;
                             if (ycsbClient.getMonitoredValue("throughput")==null){
-                               val= syblAPI.getMetricValue("throughput", dependencyGraph.getNodeWithID("YCSBClient"));
+                                try {
+                                    val= syblAPI.getMetricValue("throughput", dependencyGraph.getNodeWithID("YCSBClient"));
+                                } catch (Exception ex) {
+                                    Logger.getLogger(ActionEffectsCELAR.class.getName()).log(Level.SEVERE, null, ex);
+                                }
                             }else{
                                 val=ycsbClient.getMonitoredValue("throughput");
                             }

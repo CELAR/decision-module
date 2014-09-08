@@ -23,11 +23,10 @@
 
 package at.ac.tuwien.dsg.rSybl.analysisEngine.celar.api;
 
-import java.rmi.RemoteException;
-import java.util.logging.Logger;
 
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
+import javax.ws.rs.POST;
 import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
@@ -39,10 +38,7 @@ import com.sun.jersey.spi.resource.Singleton;
 
 
 import at.ac.tuwien.dsg.csdg.elasticityInformation.elasticityRequirements.SYBLAnnotation;
-import at.ac.tuwien.dsg.rSybl.analysisEngine.main.ControlCoordination;
-import at.ac.tuwien.dsg.rSybl.analysisEngine.main.ControlService;
-import at.ac.tuwien.dsg.rSybl.analysisEngine.main.ControlServiceFactory;
-import at.ac.tuwien.dsg.rSybl.analysisEngine.utils.AnalysisLogger;
+import at.ac.tuwien.dsg.rSybl.analysisEngine.celar.main.ControlCoordination;
 
 
 @Singleton
@@ -111,6 +107,16 @@ public class SyblControlWS {
 		 controlCoordination.setApplicationDeploymentDescription(celar);
 
 	} 
+	 
+	 
+	 @PUT
+	 @Path("/serviceDeploymentRefresh")
+	 @Consumes("application/xml")
+	public void setApplicationRefreshDeploymentInfo(String celar){
+		 controlCoordination.refreshApplicationDeploymentDescription(celar);
+
+	} 
+	 
 	 @PUT
 	 @Path("/prepareControl")
 	 @Consumes("application/xml")
@@ -131,8 +137,42 @@ public class SyblControlWS {
 		 controlCoordination.stopControl(cloudServiceId);
 	}
 	 
-	
-
+	 @POST
+	 @Path("/replaceCloudService")
+	 @Consumes("application/xml")
+	public void replaceCloudService(String cloudServiceId, String cloudService){
+		 controlCoordination.replaceCloudServiceWithRequirements(cloudServiceId, cloudService);
+	}
+	 @POST
+	 @Path("/replaceRequirements")
+	 @Consumes("application/xml")
+	public void replaceRequirements(String cloudServiceId, String requirements){
+		 controlCoordination.replaceRequirements(cloudServiceId, requirements);
+	}
+	 @POST
+	 @Path("/replaceCloudServiceRequirementsFromCurrentCloudService")
+	 @Consumes("application/xml")
+	public void replaceCloudService(String cloudService){
+		 controlCoordination.replaceCloudServiceWithRequirements(cloudService);
+	}
+	 @POST
+	 @Path("/replaceCompositionRulesFromCurrentCloudService")
+	 @Consumes("application/xml")
+	public void replaceCompositionRules(String composition){
+		 controlCoordination.replaceCompositionRules(composition);
+	}
+	 @POST
+	 @Path("/replaceRequirementsFromCurrentCloudService")
+	 @Consumes("application/xml")
+	public void replaceRequirements(String requirements){
+		 controlCoordination.replaceRequirements(requirements);
+	}
+	 @POST
+	 @Path("/replaceEffectsForCurrentCloudService")
+	 @Consumes("application/json")
+	public void replaceEffects(String effects){
+		 controlCoordination.replaceEffects(effects);
+	}
 	public UriInfo getContext() {
 		return context;
 	}

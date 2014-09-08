@@ -17,6 +17,7 @@ import at.ac.tuwien.dsg.csdg.Node;
 import at.ac.tuwien.dsg.csdg.Node.NodeType;
 import at.ac.tuwien.dsg.csdg.Relationship;
 import at.ac.tuwien.dsg.csdg.Relationship.RelationshipType;
+import at.ac.tuwien.dsg.csdg.relationships.ElasticityRelationship;
 import at.ac.tuwien.dsg.rSybl.cloudInteractionUnit.enforcementPlugins.interfaces.EnforcementInterface;
 import at.ac.tuwien.dsg.rSybl.cloudInteractionUnit.utils.Configuration;
 import at.ac.tuwien.dsg.rSybl.cloudInteractionUnit.utils.RuntimeLogger;
@@ -208,8 +209,8 @@ public class EnforcementPluginCELAR implements EnforcementInterface {
 	              
 	              
 	}
-	@Override
-	public void scaleOut(Node toBeScaled) {
+	public boolean scaleOut(Node toBeScaled) {
+            
 		while (cleanupGoingOn){
 			try {
 				Thread.sleep(10000);
@@ -241,24 +242,26 @@ public class EnforcementPluginCELAR implements EnforcementInterface {
 			Node toAdd = dependencyGraph.getNodeWithID(toBeScaled.getId());
 		Node newVM = new Node();
 		newVM.setNodeType(NodeType.VIRTUAL_MACHINE);
-		Relationship rel = new Relationship();
+		ElasticityRelationship rel = new ElasticityRelationship();
 		rel.setSourceElement(toBeScaled.getId());
 		rel.setTargetElement(ip);
 		rel.setType(RelationshipType.HOSTED_ON_RELATIONSHIP);
 		newVM.setId(ip);
 		toAdd.addNode(newVM,rel);
+                
 		RuntimeLogger.logger.info("Cloud new service is "+dependencyGraph.graphToString());
 		monitoringAPI.scaleoutended(toBeScaled);
 
 		monitoringAPI.refreshServiceStructure(cloudService);
 		cleanupNecessary=true;
-}else{
+                return true;
+                }else{
 	RuntimeLogger.logger.error("IP is empty "+ip);
-}
+        return false;
+                }
 	}
 
-	@Override
-	public void scaleIn(Node toBeScaled) {
+	public boolean scaleIn(Node toBeScaled) {
 		while (cleanupGoingOn){
 			try {
 				Thread.sleep(10000);
@@ -298,8 +301,10 @@ public class EnforcementPluginCELAR implements EnforcementInterface {
 			cleanupNecessary=true;
 			}catch(Exception e){
 				RuntimeLogger.logger.info("Failed to remove node "+ip);
-			}
-		}
+			return false;
+                        }
+		return true;
+                }
 //		}else{
 //			if (cleanupNecessary)
 //			{
@@ -308,6 +313,7 @@ public class EnforcementPluginCELAR implements EnforcementInterface {
 //			}
 //			
 		}
+                return false;
 	}
 
 	@Override
@@ -316,14 +322,16 @@ public class EnforcementPluginCELAR implements EnforcementInterface {
 		return null;
 	}
 
-	@Override
-	public void enforceAction(String actionName, Node entity) {
+
+	public boolean enforceAction(String actionName, Node entity) {
 	if (actionName.equalsIgnoreCase("cleanup")){
 		cleanupGoingOn=true;
 		cleanup();
+                
 		cleanupGoingOn=false;
+                return true;
 	}
-		
+	return false;	
 	}
 
 	@Override
@@ -341,5 +349,14 @@ public class EnforcementPluginCELAR implements EnforcementInterface {
 	public void setMonitoringPlugin(MonitoringAPIInterface monitoring) {
 		monitoringAPI=monitoring;
 	}
+
+    @Override
+    public boolean containsElasticityCapability(Node entity, String capability) {
+      switch (capability.toLowerCase()){
+          case "scalein":return true;
+          case "scaleout": return true;
+          default: return false;
+      }
+    }
 
 }
