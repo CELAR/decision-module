@@ -45,6 +45,8 @@ import at.ac.tuwien.dsg.rSybl.planningEngine.staticData.ActionEffect;
 import at.ac.tuwien.dsg.rSybl.planningEngine.celar.staticData.ActionEffectsCELAR;
 import at.ac.tuwien.dsg.rSybl.planningEngine.utils.PlanningLogger;
 
+
+//Not using CELAR specific planning algorithm
 public class CELARPlanningAlgorithm  implements Runnable{
 
 	

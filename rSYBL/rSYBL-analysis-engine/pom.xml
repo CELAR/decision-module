@@ -13,6 +13,7 @@
     <groupId>eu.celar.decision-making</groupId>
     <artifactId>rSYBL-decision-making-pom</artifactId>
     <version>0.1-SNAPSHOT</version>
+      
   </parent>
 	
    <dependencies>
@@ -152,17 +153,15 @@
             <version>2.11.0</version>
         </dependency>
 
-
-
 		<dependency>
 			<groupId>at.ac.tuwien.rSYBL.control-service</groupId>
 			<artifactId>rSYBL-analysis-engine</artifactId>
 	  		<version>0.1-SNAPSHOT</version>
-	  		  <type>jar</type>
-            <classifier>sources</classifier>
+                         <type>jar</type>
+                          <classifier>sources</classifier>
 		</dependency>
 		
-				<dependency>
+		<dependency>
 			<groupId>eu.celar.decision-making</groupId>
 			<artifactId>rSYBL-cloud-application-dependency-graph</artifactId>
 			<version>0.1-SNAPSHOT</version>

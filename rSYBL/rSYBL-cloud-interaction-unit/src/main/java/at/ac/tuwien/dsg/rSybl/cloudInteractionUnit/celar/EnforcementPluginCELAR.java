@@ -18,6 +18,7 @@ import at.ac.tuwien.dsg.csdg.Node.NodeType;
 import at.ac.tuwien.dsg.csdg.Relationship;
 import at.ac.tuwien.dsg.csdg.Relationship.RelationshipType;
 import at.ac.tuwien.dsg.csdg.relationships.ElasticityRelationship;
+import at.ac.tuwien.dsg.rSybl.cloudInteractionUnit.celar.dbalancer.ElasticityAction;
 import at.ac.tuwien.dsg.rSybl.cloudInteractionUnit.enforcementPlugins.interfaces.EnforcementInterface;
 import at.ac.tuwien.dsg.rSybl.cloudInteractionUnit.utils.Configuration;
 import at.ac.tuwien.dsg.rSybl.cloudInteractionUnit.utils.RuntimeLogger;
@@ -28,13 +29,19 @@ public class EnforcementPluginCELAR implements EnforcementInterface {
 	private Node cloudService;
 	boolean cleanupGoingOn =false;
 	boolean cleanupNecessary = true;
-	public static String API_URL="http://localhost:8080/celar-orchestrator/deployment/";
+	public static String API_URL="https://83.212.107.38:8443/deployment/";
 	
 	public EnforcementPluginCELAR(Node cloudService){
 		this.cloudService=cloudService;
 		API_URL=Configuration.getEnforcementServiceURL();
 		
 	}
+        public static void executeElasticityAction(int actionID, String actionName){
+            ElasticityAction action = new ElasticityAction();
+            action.setId(actionID);
+            action.setName(actionName);
+        }
+        
 	public static String executeResizingCommand(String actionType){
 		String ip = "";
 		 URL url = null;

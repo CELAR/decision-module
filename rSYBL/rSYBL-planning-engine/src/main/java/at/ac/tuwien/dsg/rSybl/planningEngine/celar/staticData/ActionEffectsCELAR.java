@@ -46,7 +46,7 @@ import java.util.logging.Logger;
 
 
 
-
+//Not using CELAR specific planning algorithm
 public class ActionEffectsCELAR {
 	public static ActionEffect scaleOutEffectForCassandraDB = new ActionEffect();
 	public static ActionEffect scaleOutEffectForWebServer=new ActionEffect();
