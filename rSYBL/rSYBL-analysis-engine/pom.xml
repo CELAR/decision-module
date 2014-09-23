@@ -228,6 +228,25 @@
                 </executions>
             </plugin>
             
+             <plugin>
+                <artifactId>maven-antrun-plugin</artifactId>
+                <version>1.7</version>
+                <executions>
+                    <execution>
+                        <phase>process-resources</phase>
+                        <configuration>
+                            <target>
+                                <copy todir="${basedir}/target/config">
+                                    <fileset dir="${basedir}/src/main/resources" includes="**/*" />
+                                </copy>
+                            </target>
+                        </configuration>
+                        <goals>
+                            <goal>run</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
             
 		</plugins>
 		
