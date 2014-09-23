@@ -236,7 +236,7 @@
                         <phase>process-resources</phase>
                         <configuration>
                             <target>
-                                <copy todir="${basedir}/target/config">
+                                <copy todir="${basedir}/target">
                                     <fileset dir="${basedir}/src/main/resources" includes="**/*" />
                                 </copy>
                             </target>
