@@ -65,7 +65,8 @@
         <extensions>true</extensions>
         <configuration>
           <classifier>${package.os}</classifier>
-          <release>${BUILD_NUMBER}.${package.os}</release>
+          <!-- <release>${BUILD_NUMBER}.${package.os}</release> -->
+	  <version>1.0.0</version>
           <summary>Decision making module</summary>
           <name>celar-decision-making</name>
           <group>Applications/Engineering</group>
