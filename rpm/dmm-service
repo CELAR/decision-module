@@ -1,0 +1,69 @@
+### BEGIN INIT INFO
+# Provides:          mela-analysis-service
+# Required-Start:
+# Required-Stop:
+# Default-Start:     2 3 4 5
+# Default-Stop:      0 1 6
+# Short-Description: Start MELA Data Service daemon
+# Description:       To start-stop MELA-DS
+### END INIT INFO
+
+RUN_MODE="daemons"
+. /etc/profile
+JAVA=$(which java)
+NAME=dmm-service
+DAEMONDIR=/opt/dmm-service
+DAEMON=rSYBL-analysis-engine-0.1-SNAPSHOT-exec-war.jar
+PIDDIR=/tmp
+PIDFILE=$PIDDIR/dmm-service.pid
+MELA_HTTP_PORT=8182
+LOG_DIR=/tmp/dmm-service
+
+test -x $JAVA -a -f $DAEMONDIR/$DAEMON || echo "test -x $JAVA -a -f $DAEMONDIR/$DAEMON failed"  
+test -x $JAVA -a -f $DAEMONDIR/$DAEMON || exit 0
+
+. /lib/lsb/init-functions
+. /etc/init.d/functions
+
+case "$1" in
+	start)
+		mkdir -p $LOG_DIR
+		cd $DAEMONDIR
+                daemon --pidfile=$PIDFILE $JAVA -DLOG_DIR=$LOG_DIR -jar $DAEMON -httpPort $MELA_HTTP_PORT > $LOG_DIR/mela.log  2>&1 &
+		RETVAL=$?
+                echo
+		[ $RETVAL = 0 ] && touch /var/lock/mela-data-service-daemon
+		;;
+	stop)
+		echo "Stopping Mela-DataService daemon"
+		#killproc --pidfile $PIDFILE
+		pid=`ps -ef | grep $DAEMON | tr -s ' '  | cut -f2 -d ' ' | head -n 2`
+		echo $pid
+		sudo kill -9 $pid
+		RETVAL=$?
+   		echo
+                [ $RETVAL = 0 ] && rm -f /var/lock/mela-data-service-daemon
+ 		;;
+	restart)
+		$0 stop
+		sleep 1
+		$0 start
+		;;
+	status)
+		pidofproc -p $PIDFILE $JAVA >/dev/null
+		status=$?
+		if [ $status -eq 0 ]; then
+			echo "Mela-DataService is running"
+		else
+			echo "Mela-DataService is not running"
+		fi
+		exit $status
+		;;
+	*)
+		echo "Usage: $0 {start|stop|restart|status}"
+		exit 1
+		;;
+esac
+ 
+exit 0
+

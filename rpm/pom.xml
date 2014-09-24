@@ -1,123 +1,182 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-  <modelVersion>4.0.0</modelVersion>
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
 
-  <artifactId>decision-making-rpm</artifactId>
-  <name>CELAR DMM (RPM)</name>
+    <artifactId>decision-making-rpm</artifactId>
+    <name>CELAR DMM (rpm)</name>
 
-  <parent>
-    <groupId>eu.celar</groupId>
-    <artifactId>decision-making-module</artifactId>
-    <version>1.0.0-SNAPSHOT</version>
-  </parent>
+    <parent>
+        <groupId>eu.celar</groupId>
+        <artifactId>decision-making-module</artifactId>
+        <version>1.0.0-SNAPSHOT</version>
+    </parent>
 
-  <url>https://github.com/CELAR/decision-module</url>
+    <url>https://github.com/CELAR/multilevel-metrics-evaluation</url>
 
-  <description>
-    CELAR Decision-Making Module
-  </description>
+    <description>
+        CELAR Decision-Making Module
+    </description>
 
-  <packaging>pom</packaging>
+    <packaging>pom</packaging>
 
-  <dependencies>
-    <dependency>
-      <groupId>eu.celar.decision-making</groupId>
-      <artifactId>rSYBL-analysis-engine</artifactId>
-      <version>0.1-SNAPSHOT</version>
-      <type>war</type>
-    </dependency>
-  </dependencies>
+    <dependencies>
+        <dependency>
+	    <groupId>eu.celar.decision-making</groupId>
+	    <artifactId>rSYBL-analysis-engine</artifactId>
+      	    <version>0.1-SNAPSHOT</version>
+            <type>jar</type>
+            <classifier>exec-war</classifier>
+        </dependency>
+    </dependencies>
 
-  <properties>
-    <rpm.install.basedir>/usr/share/tomcat6</rpm.install.basedir>
-    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-  </properties>
+    <properties>
+        <rpm.install.basedir>/usr/share/dmm</rpm.install.basedir>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <package.os>CentOS</package.os>
+        <BUILD_NUMBER>1</BUILD_NUMBER>
+    </properties>
+    
+    <profiles>
+        <profile>
+            <id>Release</id>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.codehaus.mojo</groupId>
+                        <artifactId>rpm-maven-plugin</artifactId>
+                        <version>2.1-alpha-4</version>
+                        <extensions>true</extensions>
+                        <configuration>
+                            <classifier>${package.os}</classifier>
+                            <!-- <release>${BUILD_NUMBER}.${package.os}</release> -->
+                            <summary>Decision Making Module</summary>
+                            <version>1.0.0</version>
+                            <name>celar-decision-making</name>
+                            <group>Applications/Engineering</group>
+                            <vendor>TUWien</vendor>
+                            <packager>TUWien</packager>
+                            <copyright>Apache License, Version 2.0</copyright>
+                            <url>http://infosys.tuwien.ac.at</url>
+                            <needarch>noarch</needarch>
+                            <description>Decision making module, include rSYBL, MELA and SALSA</description>
+                            <mappings>
+                                <mapping>
+                                    <directory>/opt/dmm-service</directory>
+                                    <!--              <directory>${rpm.install.basedir}</directory> -->
+                                    <filemode>664</filemode>
+                                    <username>root</username>
+                                    <groupname>root</groupname>
+                                    <directoryIncluded>false</directoryIncluded>
+                                    <sources>
+                                        <source>
+                                            <location>${project.build.directory}/decision-making-rpm-1.0.0-SNAPSHOT/decision-making-rpm-1.0.0-SNAPSHOT/</location>
+                                        </source>
+                                    </sources>
+                                </mapping>
 
-  <build>
-    <plugins>
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-dependency-plugin</artifactId>
-        <executions>
-          <execution>
-            <id>copy-war</id>
-            <goals>
-              <goal>copy</goal>
-            </goals>
-            <configuration>
-              <outputDirectory>${project.build.directory}/dependency/webapps</outputDirectory>
-              <artifactItems>
-                <artifactItem>
-                  <groupId>eu.celar.decision-making</groupId>
-                  <artifactId>rSYBL-analysis-engine</artifactId>
-                  <version>0.1-SNAPSHOT</version>
-                  <type>war</type>
-                </artifactItem>
-              </artifactItems>
-            </configuration>
-          </execution>
-        </executions>
-      </plugin>
+                                <mapping>
+                                    <directory>/etc/init.d</directory>
+                                    <filemode>774</filemode>
+                                    <username>root</username>
+                                    <groupname>root</groupname>
+                                    <directoryIncluded>false</directoryIncluded>
+                                    <sources>
+                                        <source>
+                                            <location>${project.build.directory}/decision-making-rpm-1.0.0-SNAPSHOT/decision-making-rpm-1.0.0-SNAPSHOT/dmm-service</location>
+                                        </source>
+                                    </sources>
+                                </mapping>
+                            </mappings>
 
-      <plugin>
-        <groupId>org.codehaus.mojo</groupId>
-        <artifactId>rpm-maven-plugin</artifactId>
-        <extensions>true</extensions>
-        <configuration>
-          <classifier>${package.os}</classifier>
-          <!-- <release>${BUILD_NUMBER}.${package.os}</release> -->
-	  <version>1.0.0</version>
-          <summary>Decision making module</summary>
-          <name>celar-decision-making</name>
-          <group>Applications/Engineering</group>
-          <vendor>TUWien</vendor>
-          <packager>TUWien</packager>
-          <copyright>Apache License, Version 2.0</copyright>
-          <url>http://infosys.tuwien.ac.at</url>
-          <needarch>noarch</needarch>
-          <description>Decision making module, include rSYBL, MELA and SALSA</description>
-          <requires>
-            <require>tomcat6</require>
-          </requires>
-          <mappings>
-            <mapping>
-              <directory>${rpm.install.basedir}/webapps</directory>
-              <filemode>664</filemode>
-              <username>tomcat6</username>
-              <groupname>tomcat6</groupname>
-              <directoryIncluded>false</directoryIncluded>
-              <sources>
-                <source>
-                  <location>target/dependency/webapps</location>
-                </source>
-              </sources>
-            </mapping>
-          </mappings>
+                            <!--                      <preinstallScriptlet>
+                             <script>
+                                     install debian init script: start-stop-deamon 
+                                    yum -y install gcc
+                                    cd /usr/local/src/
+                                    wget -N http://za.archive.ubuntu.com/ubuntu/pool/main/d/dpkg/dpkg_1.15.5.6ubuntu4.tar.bz2
+                                    tar jfxvh dpkg_1.15.5.6ubuntu4.tar.bz2
+                                    rm dpkg_1.15.5.6ubuntu4.tar.bz2
+                                    cd dpkg-1.15.5.6ubuntu4/
+                                    make
+                                    make install
+                                </script>
+                            </preinstallScriptlet>-->
 
-          <preinstallScriptlet>
-            <script>
-echo "Installing decision module webapp..."
-            </script>
-          </preinstallScriptlet>
+                            <postinstallScriptlet>
+                                <script>
+                                    chkconfig dmm-service on
+                                    service dmm-service start
+                                </script>
+                            </postinstallScriptlet>
+                        </configuration>
+                        <executions>
+                            <execution>
+                                <id>attach-rpm-on-package</id>
+                                <phase>package</phase>
+                                <goals>
+                                    <goal>attached-rpm</goal>
+                                </goals>
+                            </execution>
+                    
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+    </profiles>
 
-          <postinstallScriptlet>
-            <script>
-echo "WARNING: Restart tomcat to ensure changes take effect."
-            </script>
-          </postinstallScriptlet>
-        </configuration>
-        <executions>
-          <execution>
-            <id>attach-rpm</id>
-            <phase>package</phase>
-            <goals>
-              <goal>attached-rpm</goal>
-            </goals>
-          </execution>
-        </executions>
-      </plugin>
-    </plugins>
-  </build>
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-dependency-plugin</artifactId>
+                
+                <executions>
+                    <execution>
+                        <id>copy-jar</id>
+                        <goals>
+                            <goal>copy</goal>
+                        </goals>
+                        <configuration>
+                            <outputDirectory>${project.build.directory}</outputDirectory>
+                            <artifactItems>
+                                <artifactItem>
+				    <groupId>eu.celar.decision-making</groupId>
+		                    <artifactId>rSYBL-analysis-engine</artifactId>
+                                    <type>jar</type>
+                                    <version>0.1-SNAPSHOT</version>
+                                    <classifier>exec-war</classifier>
+                                </artifactItem>
+                            </artifactItems>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-assembly-plugin</artifactId>
+                <configuration>
+                    <descriptors>
+                        <descriptor>bundle.xml</descriptor>
+                    </descriptors>
+                    <appendAssemblyId>false</appendAssemblyId>
+                </configuration>
+                <executions>
+                    <execution>
+                        <id>make-assembly</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>single</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+
+
+            
+        </plugins>
+    </build>
 
 </project>
 
