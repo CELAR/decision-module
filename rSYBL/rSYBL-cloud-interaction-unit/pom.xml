@@ -51,7 +51,14 @@
 			<type>jar</type>
 			<scope>compile</scope>
 		</dependency>
-		<dependency>
+                <dependency>
+			<groupId>gr.ntua.cslab</groupId>
+			<artifactId>orchestrator-client</artifactId>
+			<version>0.1</version>
+			<type>jar</type>
+			<scope>compile</scope>
+		</dependency>
+           	<dependency>
 			<groupId>eu.celar.decision-making</groupId>
 			<artifactId>rSYBL-data-processing-unit</artifactId>
 			<version>0.1-SNAPSHOT</version>
