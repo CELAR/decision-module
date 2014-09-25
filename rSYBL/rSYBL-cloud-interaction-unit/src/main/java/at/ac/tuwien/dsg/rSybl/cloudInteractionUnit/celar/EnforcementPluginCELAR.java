@@ -29,6 +29,7 @@ import gr.ntua.cslab.orchestrator.beans.ExecutedResizingAction;
 import gr.ntua.cslab.orchestrator.beans.Parameter;
 import gr.ntua.cslab.orchestrator.beans.Parameters;
 import gr.ntua.cslab.orchestrator.beans.ResizingAction;
+import gr.ntua.cslab.orchestrator.beans.ResizingActionList;
 import gr.ntua.cslab.orchestrator.beans.ResizingActionType;
 import gr.ntua.cslab.orchestrator.beans.ResizingExecutionStatus;
 import java.util.ArrayList;
@@ -50,12 +51,6 @@ public class EnforcementPluginCELAR implements EnforcementInterface {
         this.cloudService = cloudService;
         API_URL = Configuration.getEnforcementServiceURL();
 
-    }
-
-    private void findAvailableActions() {
-    }
-
-    private void checkElasticityActionStatus(int actionID) {
     }
 
     public void refreshElasticityActionsList(String actionName) {
@@ -81,14 +76,11 @@ public class EnforcementPluginCELAR implements EnforcementInterface {
             }
 
             InputStream inputStream = connection.getInputStream();
-            JAXBContext jAXBContext = JAXBContext.newInstance(List.class);
-            List<ResizingAction> retrievedData = (List<ResizingAction>) jAXBContext.createUnmarshaller().unmarshal(inputStream);
-            for (ResizingAction action : retrievedData) {
+            JAXBContext jAXBContext = JAXBContext.newInstance(ResizingActionList.class);
+            ResizingActionList retrievedData = (ResizingActionList) jAXBContext.createUnmarshaller().unmarshal(inputStream);
+            for (ResizingAction action : retrievedData.getResizingActions()) {
                 this.actionsAvailable.put(action.getId(), action);
             }
-            ObjectMapper mapper = new ObjectMapper(); // can reuse, share globally
-
-            //  List<ResizeAction> actions= mapper.readValue(inputStream, List<ResizingAction>.class);
 
         } catch (Exception e) {
             // Logger.getLogger(MELA_API.class.getName()).log(Level.SEVERE, e.getMessage(), e);
@@ -141,6 +133,48 @@ public class EnforcementPluginCELAR implements EnforcementInterface {
         }
         return ok;
     }
+    
+    public boolean scaleIn(Node node,String ip) {
+        boolean ok = true;
+        DependencyGraph dependencyGraph = new DependencyGraph();
+        dependencyGraph.setCloudService(cloudService);
+        Node toBeScaled = dependencyGraph.getNodeWithID(node.getId());
+        for (Entry<Integer, ResizingAction> actionE : actionsAvailable.entrySet()) {
+            ResizingAction action = actionE.getValue();
+            if (action.getType() == ResizingActionType.SCALE_IN && toBeScaled.getId() == action.getModuleId() + "") {
+                Parameters pars = new Parameters();
+                Parameter par = new Parameter();
+                par.setKey("IP");
+                par.setValue(ip);
+                pars.addParameter(par);
+                ExecutedResizingAction executedResizingAction = executeResizingCommand(action.getId(),pars);
+                ResizingExecutionStatus status = checkForAction(executedResizingAction.getUniqueId());
+                while (status == ResizingExecutionStatus.ONGOING) {
+                    try {
+                        Thread.sleep(10000);
+                    } catch (InterruptedException ex) {
+                        Logger.getLogger(EnforcementPluginCELAR.class.getName()).log(Level.SEVERE, null, ex);
+                    }
+                    status = checkForAction(executedResizingAction.getUniqueId());
+                }
+                if (status == ResizingExecutionStatus.SUCCESS) {
+                    //TODO : Assume we have value IP returned
+                    //Parameters par = executedResizingAction.getParameters();
+                    //Parameter p = (Parameter) par.getParameters().get(0);
+                      //  String ip = p.getValue();
+                        toBeScaled.removeNode(ip);
+                        monitoringAPI.refreshServiceStructure(cloudService);
+
+                    
+                }
+
+                if (status == ResizingExecutionStatus.FAILED) {
+                }
+                break;
+            }
+        }
+        return ok;
+    }
 
     public static ResizingExecutionStatus checkForAction(String uniqueID) {
         URL url = null;
@@ -148,18 +182,25 @@ public class EnforcementPluginCELAR implements EnforcementInterface {
         try {
             url = new URL(API_URL + "/status");
 
+            connection = (HttpURLConnection) url.openConnection();
+            connection.setRequestMethod("GET");
+            connection.setRequestProperty("Content-Type", "application/xml");
+            connection.setRequestProperty("Accept", "application/xml");
 
-            InputStream is = url.openStream();
-            try {
-                BufferedReader rd = new BufferedReader(new InputStreamReader(is, Charset.forName("UTF-8")));
-                ResizingExecutionStatus action = null;
-                return action;
-            } catch (Exception e) {
-
-                //Logger.getLogger(EnforcementPluginCELAR.class.getName()).log(Level.WARNING, "Failing the action "+actionType);
-                RuntimeLogger.logger.error("Failing the action " + uniqueID + " with error " + e.getMessage());
-
+            InputStream errorStream = connection.getErrorStream();
+            if (errorStream != null) {
+                BufferedReader reader = new BufferedReader(new InputStreamReader(errorStream));
+                String line;
+                while ((line = reader.readLine()) != null) {
+                    Logger.getLogger(EnforcementPluginCELAR.class.getName()).log(Level.SEVERE, line);
+                }
             }
+
+            InputStream inputStream = connection.getInputStream();
+            JAXBContext jAXBContext = JAXBContext.newInstance(ResizingExecutionStatus.class);
+            ResizingExecutionStatus retrievedData = (ResizingExecutionStatus) jAXBContext.createUnmarshaller().unmarshal(inputStream);
+            return retrievedData;
+
         } catch (Exception e) {
             // Logger.getLogger(MELA_API.class.getName()).log(Level.SEVERE, e.getMessage(), e);
             e.printStackTrace();
@@ -255,25 +296,74 @@ public class EnforcementPluginCELAR implements EnforcementInterface {
         return ok;
     }
 
-    
+    public static ExecutedResizingAction executeResizingCommand(Integer actionID, Parameters pars) {
+        URL url = null;
+        HttpURLConnection connection = null;
+        try {
+            url = new URL(API_URL+"/?query="+actionID+"/"+pars);
+
+
+
+            connection = (HttpURLConnection) url.openConnection();
+            connection.setRequestMethod("POST");
+            connection.setRequestProperty("Content-Type", "application/xml");
+            connection.setRequestProperty("Accept", "application/xml");
+
+            InputStream errorStream = connection.getErrorStream();
+            if (errorStream != null) {
+                BufferedReader reader = new BufferedReader(new InputStreamReader(errorStream));
+                String line;
+                while ((line = reader.readLine()) != null) {
+                    Logger.getLogger(EnforcementPluginCELAR.class.getName()).log(Level.SEVERE, line);
+                }
+            }
+
+            InputStream inputStream = connection.getInputStream();
+            JAXBContext jAXBContext = JAXBContext.newInstance(ExecutedResizingAction.class);
+            ExecutedResizingAction retrievedData = (ExecutedResizingAction) jAXBContext.createUnmarshaller().unmarshal(inputStream);
+            return retrievedData;
+
+        } catch (Exception e) {
+            // Logger.getLogger(MELA_API.class.getName()).log(Level.SEVERE, e.getMessage(), e);
+            e.printStackTrace();
+            Logger.getLogger(EnforcementPluginCELAR.class.getName()).log(Level.WARNING, "Trying to connect to the Orchestrator - failing ... . Retrying later");
+            RuntimeLogger.logger.error("Failing to connect to Orchestrator");
+
+        } finally {
+            if (connection != null) {
+                connection.disconnect();
+            }
+        }
+        return null;
+    }
+
     public static ExecutedResizingAction executeResizingCommand(Integer actionID) {
         URL url = null;
         HttpURLConnection connection = null;
         try {
-            url = new URL(API_URL + actionID);
+            url = new URL(API_URL+"/?query="+actionID+"/");
 
 
-            InputStream is = url.openStream();
-            try {
-                BufferedReader rd = new BufferedReader(new InputStreamReader(is, Charset.forName("UTF-8")));
-                ExecutedResizingAction action=null;
-                return action;
-            } catch (Exception e) {
 
-                //Logger.getLogger(EnforcementPluginCELAR.class.getName()).log(Level.WARNING, "Failing the action "+actionType);
-                RuntimeLogger.logger.error("Failing the action " + actionID + " with error " + e.getMessage());
+            connection = (HttpURLConnection) url.openConnection();
+            connection.setRequestMethod("POST");
+            connection.setRequestProperty("Content-Type", "application/xml");
+            connection.setRequestProperty("Accept", "application/xml");
 
+            InputStream errorStream = connection.getErrorStream();
+            if (errorStream != null) {
+                BufferedReader reader = new BufferedReader(new InputStreamReader(errorStream));
+                String line;
+                while ((line = reader.readLine()) != null) {
+                    Logger.getLogger(EnforcementPluginCELAR.class.getName()).log(Level.SEVERE, line);
+                }
             }
+
+            InputStream inputStream = connection.getInputStream();
+            JAXBContext jAXBContext = JAXBContext.newInstance(ExecutedResizingAction.class);
+            ExecutedResizingAction retrievedData = (ExecutedResizingAction) jAXBContext.createUnmarshaller().unmarshal(inputStream);
+            return retrievedData;
+
         } catch (Exception e) {
             // Logger.getLogger(MELA_API.class.getName()).log(Level.SEVERE, e.getMessage(), e);
             e.printStackTrace();
@@ -393,8 +483,8 @@ public class EnforcementPluginCELAR implements EnforcementInterface {
     @Override
     public List<String> getElasticityCapabilities() {
         // TODO Auto-generated method stub
-        List<String> avActions=new ArrayList<String>();
-        for (ResizingAction action:this.actionsAvailable.values()){
+        List<String> avActions = new ArrayList<String>();
+        for (ResizingAction action : this.actionsAvailable.values()) {
             avActions.add(action.getName());
         }
         return avActions;
