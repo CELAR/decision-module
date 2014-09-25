@@ -5,27 +5,19 @@
 package at.ac.tuwien.dsg.rSybl.cloudInteractionUnit.celar;
 
 import at.ac.tuwien.dsg.csdg.Node;
-import at.ac.tuwien.dsg.mela.common.jaxbEntities.monitoringConcepts.MonitoredElementMonitoringSnapshot;
 import at.ac.tuwien.dsg.rSybl.cloudInteractionUnit.celar.dbalancer.BalancerInfo;
-import at.ac.tuwien.dsg.rSybl.cloudInteractionUnit.celar.dbalancer.BalancerType;
 import at.ac.tuwien.dsg.rSybl.cloudInteractionUnit.celar.dbalancer.BalancingStatus;
 import at.ac.tuwien.dsg.rSybl.cloudInteractionUnit.celar.dbalancer.StartBalancer;
 import at.ac.tuwien.dsg.rSybl.cloudInteractionUnit.utils.Configuration;
 import at.ac.tuwien.dsg.rSybl.cloudInteractionUnit.utils.RuntimeLogger;
-import at.ac.tuwien.dsg.rSybl.dataProcessingUnit.monitoringPlugins.melaPlugin.MELA_API;
 import java.io.BufferedReader;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
-import java.io.StringReader;
 import java.io.StringWriter;
 import java.net.HttpURLConnection;
 import java.net.URL;
-import java.nio.charset.Charset;
-import java.util.logging.Level;
 import javax.xml.bind.JAXBContext;
-import javax.xml.bind.Unmarshaller;
-import org.apache.log4j.Logger;
 
 /**
  *
