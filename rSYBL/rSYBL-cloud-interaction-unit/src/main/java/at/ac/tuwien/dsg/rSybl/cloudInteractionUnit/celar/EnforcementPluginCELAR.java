@@ -37,8 +37,10 @@ public class EnforcementPluginCELAR implements EnforcementInterface {
         API_URL = Configuration.getEnforcementServiceURL();
 
     }
-
-    public static void executeElasticityAction(int actionID, String actionName) {
+    private void checkElasticityActionStatus(int actionID){
+        
+    }
+    public  void executeElasticityAction(int actionID, String actionName) {
         ElasticityAction action = new ElasticityAction();
         action.setId(actionID);
         action.setName(actionName);
