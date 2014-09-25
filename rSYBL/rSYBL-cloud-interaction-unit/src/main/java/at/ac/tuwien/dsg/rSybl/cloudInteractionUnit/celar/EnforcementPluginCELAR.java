@@ -32,6 +32,8 @@ import gr.ntua.cslab.orchestrator.beans.ResizingAction;
 import gr.ntua.cslab.orchestrator.beans.ResizingActionList;
 import gr.ntua.cslab.orchestrator.beans.ResizingActionType;
 import gr.ntua.cslab.orchestrator.beans.ResizingExecutionStatus;
+import java.io.OutputStream;
+import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map.Entry;
@@ -133,8 +135,8 @@ public class EnforcementPluginCELAR implements EnforcementInterface {
         }
         return ok;
     }
-    
-    public boolean scaleIn(Node node,String ip) {
+
+    public boolean scaleIn(Node node, String ip) {
         boolean ok = true;
         DependencyGraph dependencyGraph = new DependencyGraph();
         dependencyGraph.setCloudService(cloudService);
@@ -147,7 +149,7 @@ public class EnforcementPluginCELAR implements EnforcementInterface {
                 par.setKey("IP");
                 par.setValue(ip);
                 pars.addParameter(par);
-                ExecutedResizingAction executedResizingAction = executeResizingCommand(action.getId(),pars);
+                ExecutedResizingAction executedResizingAction = executeResizingCommand(action.getId(), pars);
                 ResizingExecutionStatus status = checkForAction(executedResizingAction.getUniqueId());
                 while (status == ResizingExecutionStatus.ONGOING) {
                     try {
@@ -161,11 +163,11 @@ public class EnforcementPluginCELAR implements EnforcementInterface {
                     //TODO : Assume we have value IP returned
                     //Parameters par = executedResizingAction.getParameters();
                     //Parameter p = (Parameter) par.getParameters().get(0);
-                      //  String ip = p.getValue();
-                        toBeScaled.removeNode(ip);
-                        monitoringAPI.refreshServiceStructure(cloudService);
+                    //  String ip = p.getValue();
+                    toBeScaled.removeNode(ip);
+                    monitoringAPI.refreshServiceStructure(cloudService);
 
-                    
+
                 }
 
                 if (status == ResizingExecutionStatus.FAILED) {
@@ -300,7 +302,7 @@ public class EnforcementPluginCELAR implements EnforcementInterface {
         URL url = null;
         HttpURLConnection connection = null;
         try {
-            url = new URL(API_URL+"/?query="+actionID+"/"+pars);
+            url = new URL(API_URL + "/?query=" + actionID + "/");
 
 
 
@@ -308,7 +310,15 @@ public class EnforcementPluginCELAR implements EnforcementInterface {
             connection.setRequestMethod("POST");
             connection.setRequestProperty("Content-Type", "application/xml");
             connection.setRequestProperty("Accept", "application/xml");
+            OutputStream os = connection.getOutputStream();
+            JAXBContext jaxbContext = JAXBContext.newInstance(Parameters.class);
+            jaxbContext.createMarshaller().marshal(pars, os);
+            StringWriter stringWriter = new StringWriter();
+            jaxbContext.createMarshaller().marshal(pars, stringWriter);
 
+            RuntimeLogger.logger.info(stringWriter.toString());
+            os.flush();
+            os.close();
             InputStream errorStream = connection.getErrorStream();
             if (errorStream != null) {
                 BufferedReader reader = new BufferedReader(new InputStreamReader(errorStream));
@@ -341,7 +351,7 @@ public class EnforcementPluginCELAR implements EnforcementInterface {
         URL url = null;
         HttpURLConnection connection = null;
         try {
-            url = new URL(API_URL+"/?query="+actionID+"/");
+            url = new URL(API_URL + "/?query=" + actionID + "/");
 
 
 
