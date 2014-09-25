@@ -1,11 +1,11 @@
 ### BEGIN INIT INFO
-# Provides:          mela-analysis-service
+# Provides:         rSybl service
 # Required-Start:
 # Required-Stop:
 # Default-Start:     2 3 4 5
 # Default-Stop:      0 1 6
-# Short-Description: Start MELA Data Service daemon
-# Description:       To start-stop MELA-DS
+# Short-Description: Start rsybl Data Service daemon
+# Description:       To start-stop rsybl-DS
 ### END INIT INFO
 
 RUN_MODE="daemons"
@@ -13,10 +13,10 @@ RUN_MODE="daemons"
 JAVA=$(which java)
 NAME=dmm-service
 DAEMONDIR=/opt/dmm-service
-DAEMON=rSYBL-analysis-engine-0.1-SNAPSHOT-exec-war.jar
+DAEMON=rSYBL-analysis-engine-0.1-SNAPSHOT-war-exec.jar
 PIDDIR=/tmp
 PIDFILE=$PIDDIR/dmm-service.pid
-MELA_HTTP_PORT=8182
+rsybl_HTTP_PORT=8182
 LOG_DIR=/tmp/dmm-service
 
 test -x $JAVA -a -f $DAEMONDIR/$DAEMON || echo "test -x $JAVA -a -f $DAEMONDIR/$DAEMON failed"  
@@ -29,20 +29,20 @@ case "$1" in
 	start)
 		mkdir -p $LOG_DIR
 		cd $DAEMONDIR
-                daemon --pidfile=$PIDFILE $JAVA -DLOG_DIR=$LOG_DIR -jar $DAEMON -httpPort $MELA_HTTP_PORT > $LOG_DIR/mela.log  2>&1 &
+                daemon --pidfile=$PIDFILE $JAVA -DLOG_DIR=$LOG_DIR -jar $DAEMON -httpPort $rsybl_HTTP_PORT > $LOG_DIR/rsybl.log  2>&1 &
 		RETVAL=$?
                 echo
-		[ $RETVAL = 0 ] && touch /var/lock/mela-data-service-daemon
+		[ $RETVAL = 0 ] && touch /var/lock/rsybl-data-service-daemon
 		;;
 	stop)
-		echo "Stopping Mela-DataService daemon"
+		echo "Stopping rsybl-service daemon"
 		#killproc --pidfile $PIDFILE
 		pid=`ps -ef | grep $DAEMON | tr -s ' '  | cut -f2 -d ' ' | head -n 2`
 		echo $pid
 		sudo kill -9 $pid
 		RETVAL=$?
    		echo
-                [ $RETVAL = 0 ] && rm -f /var/lock/mela-data-service-daemon
+                [ $RETVAL = 0 ] && rm -f /var/lock/rsybl-data-service-daemon
  		;;
 	restart)
 		$0 stop
@@ -53,9 +53,9 @@ case "$1" in
 		pidofproc -p $PIDFILE $JAVA >/dev/null
 		status=$?
 		if [ $status -eq 0 ]; then
-			echo "Mela-DataService is running"
+			echo "rsybl-service is running"
 		else
-			echo "Mela-DataService is not running"
+			echo "rsybl-service is not running"
 		fi
 		exit $status
 		;;
