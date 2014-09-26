@@ -8,7 +8,6 @@ import at.ac.tuwien.dsg.csdg.elasticityInformation.elasticityRequirements.SYBLAn
 import at.ac.tuwien.dsg.csdg.inputProcessing.multiLevelModel.InputProcessing;
 import at.ac.tuwien.dsg.csdg.inputProcessing.tosca.TOSCAProcessing;
 
-package at.ac.tuwien.dsg.rSybl.analysisEngine.main;
 
 import java.rmi.RemoteException;
 import java.util.HashMap;
@@ -18,7 +17,6 @@ import at.ac.tuwien.dsg.csdg.DependencyGraph;
 import at.ac.tuwien.dsg.csdg.elasticityInformation.elasticityRequirements.SYBLAnnotation;
 import at.ac.tuwien.dsg.csdg.inputProcessing.multiLevelModel.InputProcessing;
 import at.ac.tuwien.dsg.csdg.inputProcessing.tosca.TOSCAProcessing;
-import at.ac.tuwien.dsg.rSybl.analysisEngine.utils.AnalysisLogger;
 
 public class ControlCoordination {
 	private String currentControls="";

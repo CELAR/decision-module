@@ -50,6 +50,7 @@ import at.ac.tuwien.dsg.rSybl.cloudInteractionUnit.api.MultipleEnforcementAPIs;
 import at.ac.tuwien.dsg.rSybl.cloudInteractionUnit.utils.RuntimeLogger;
 import at.ac.tuwien.dsg.rSybl.dataProcessingUnit.api.MonitoringAPI;
 import at.ac.tuwien.dsg.rSybl.dataProcessingUnit.api.MonitoringAPIInterface;
+import at.ac.tuwien.dsg.rSybl.planningEngine.HealthWatch;
 import at.ac.tuwien.dsg.rSybl.planningEngine.PlanningAlgorithmInterface;
 import at.ac.tuwien.dsg.rSybl.planningEngine.PlanningGreedyAlgorithm;
 import at.ac.tuwien.dsg.rSybl.planningEngine.PlanningGreedyAlgorithmWithPolynomialElasticityRelationships;
@@ -69,11 +70,14 @@ public class ControlService {
 	private String deploymentDescription = "";
 	private String metricCompositionRules ="";
 	private String effects ="";
-	
+	private HealthWatch healthWatch;
 	public ControlService() {
 		new StartThread().start();
 		
 	}
+        public void triggerHealthFix(String servicePartID){
+            healthWatch.triggerHealthFix(servicePartID);
+        }
 	public class StartThread extends Thread {
 
 	    public void run() {
@@ -91,6 +95,7 @@ public class ControlService {
 	public void start(){
                 
 		startSYBLProcessingAndPlanning();
+                healthWatch = new  HealthWatch(monitoringAPI, enforcementAPI, dependencyGraph);
                 dependencyGraph.setControlState();
 	}
 	
