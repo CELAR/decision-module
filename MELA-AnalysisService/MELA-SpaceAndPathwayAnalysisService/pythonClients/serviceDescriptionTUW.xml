@@ -1,0 +1,17 @@
+<MonitoredElement level="SERVICE" id="CloudService">
+<MonitoredElement level="SERVICE_TOPOLOGY" id="MainTopology">
+<MonitoredElement level="SERVICE_UNIT" id="YCSBClient">
+<MonitoredElement level="VM" id="83.212.112.210"/>
+<MonitoredElement level="VM" id="83.212.112.179"/>
+<MonitoredElement level="VM" id="83.212.112.164"/>
+<MonitoredElement level="VM" id="83.212.112.195"/>
+<MonitoredElement level="VM" id="83.212.112.193"/>
+</MonitoredElement>
+<MonitoredElement level="SERVICE_UNIT" id="CassandraNode">
+<MonitoredElement level="VM" id="83.212.112.207"/>
+<MonitoredElement level="VM" id="83.212.112.170"/>
+<MonitoredElement level="VM" id="83.212.112.181"/>
+<MonitoredElement level="VM" id="83.212.112.197"/>
+</MonitoredElement>
+</MonitoredElement>
+</MonitoredElement>

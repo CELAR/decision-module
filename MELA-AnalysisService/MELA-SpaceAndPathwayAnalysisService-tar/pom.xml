@@ -1,0 +1,79 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+
+    <artifactId>MELA-SpaceAndPathwayAnalysisService-tar</artifactId>
+    <packaging>pom</packaging>
+    <version>2.0-SNAPSHOT</version>
+
+    <name>MELA-SpaceAndPathwayAnalysisService (TAR)</name>
+    <url>http://maven.apache.org</url>
+
+    <parent>
+      <groupId>eu.celar.multilevel-metrics-evaluation</groupId>
+      <artifactId>MELA-Pom</artifactId>
+      <version>2.0-SNAPSHOT</version>
+        <relativePath>../../pom.xml</relativePath>
+    </parent>
+
+  <dependencies>
+    <dependency>
+      <groupId>eu.celar.multilevel-metrics-evaluation</groupId>
+      <artifactId>MELA-SpaceAndPathwayAnalysisService</artifactId>
+      <type>jar</type>
+      <classifier>exec-war</classifier>
+      <version>2.0-SNAPSHOT</version>
+    </dependency>
+  </dependencies>
+
+  <build>
+    <plugins>
+
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-dependency-plugin</artifactId>
+
+        <executions>
+          <execution>
+            <id>copy-jar</id>
+            <goals>
+              <goal>copy</goal>
+            </goals>
+            <configuration>
+              <outputDirectory>${project.build.directory}</outputDirectory>
+              <artifactItems>
+                <artifactItem>
+                  <groupId>eu.celar.multilevel-metrics-evaluation</groupId>
+                  <artifactId>MELA-SpaceAndPathwayAnalysisService</artifactId>
+                  <type>jar</type>
+                  <classifier>exec-war</classifier>
+                </artifactItem>
+              </artifactItems>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+      
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-assembly-plugin</artifactId>
+        <configuration>
+          <descriptors>
+            <descriptor>bundle.xml</descriptor>
+          </descriptors>
+          <appendAssemblyId>false</appendAssemblyId>
+        </configuration>
+        <executions>
+          <execution>
+            <id>make-assembly</id>
+            <phase>package</phase>
+            <goals>
+              <goal>single</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+      
+     </plugins>
+   </build>
+</project>
