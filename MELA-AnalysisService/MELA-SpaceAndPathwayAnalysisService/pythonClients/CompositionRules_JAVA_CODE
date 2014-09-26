@@ -1,0 +1,505 @@
+private CompositionRulesConfiguration compositionRulesConfiguration;
+
+    // creating aggregation rules
+    {
+        compositionRulesConfiguration = new CompositionRulesConfiguration();
+
+        //a CompositionRulesBlock block has all rules for a particular service level and elements
+        Collection<CompositionRulesBlock> compositionRulesBlockList = new ArrayList<CompositionRulesBlock>();
+
+        compositionRulesConfiguration.setMetricCompositionRuleBlocks(compositionRulesBlockList);
+
+        //rules for VM level
+        {
+            CompositionRulesBlock compositionRulesBlock = new CompositionRulesBlock();
+            compositionRulesBlockList.add(compositionRulesBlock);
+
+            compositionRulesBlock.setTargetServiceElementLevel(ServiceElement.ServiceElementLevel.VM);
+            Collection<CompositionRule> compositionRules  = new ArrayList<CompositionRule>();
+
+            compositionRulesBlock.setCompositionRules(compositionRules);
+
+            //memory_free convert to GB from bytes
+            {
+                CompositionRule compositionRule = new CompositionRule();
+                compositionRule.setMetricSourceServiceElementLevel(ServiceElement.ServiceElementLevel.VM);
+                Metric targetMetric =  new Metric("mem_free");
+                Metric resultingMetric =  new Metric("mem_free_in_GB");
+                resultingMetric.setMeasurementUnit("GB");
+                compositionRule.setTargetMetric(targetMetric);
+                compositionRule.setResultingMetric(resultingMetric);
+
+                compositionRules.add(compositionRule);
+
+                //creating the list of operations to be applied on the target metric
+                Collection<CompositionOperation> compositionOperations  = new ArrayList<CompositionOperation>();
+                compositionRule.setOperations(compositionOperations);
+
+                //divide by 1024^3
+                {
+                    CompositionOperation compositionOperation = new CompositionOperation();
+                    compositionOperation.setOperation(CompositionOperationType.DIV);
+                    compositionOperation.setValue("1073741824");
+                    compositionOperations.add(compositionOperation);
+                }
+
+            }
+
+            //mem_total convert to GB from bytes
+            {
+                CompositionRule compositionRule = new CompositionRule();
+                compositionRule.setMetricSourceServiceElementLevel(ServiceElement.ServiceElementLevel.VM);
+                Metric targetMetric =  new Metric("mem_total");
+                Metric resultingMetric =  new Metric("mem_total_in_GB");
+                compositionRule.setTargetMetric(targetMetric);
+                resultingMetric.setMeasurementUnit("GB");
+                compositionRule.setResultingMetric(resultingMetric);
+
+                compositionRules.add(compositionRule);
+
+                //creating the list of operations to be applied on the target metric
+                Collection<CompositionOperation> compositionOperations  = new ArrayList<CompositionOperation>();
+                compositionRule.setOperations(compositionOperations);
+
+                //divide by 1024^3
+                {
+                    CompositionOperation compositionOperation = new CompositionOperation();
+                    compositionOperation.setOperation(CompositionOperationType.DIV);
+                    compositionOperation.setValue("1073741824");
+                    compositionOperations.add(compositionOperation);
+                }
+
+            }
+
+
+
+            //sum up pkts_in and pkts_out at VM level
+            //done by setting TargetMetric as "pkyts_in" and operation referenceMetricName as "pkts_out"
+            {
+                CompositionRule compositionRule = new CompositionRule();
+                compositionRule.setMetricSourceServiceElementLevel(ServiceElement.ServiceElementLevel.VM);
+                Metric targetMetric =  new Metric("pkts_in");
+                Metric resultingMetric =  new Metric("pkts_total");
+                resultingMetric.setMeasurementUnit("no");
+                compositionRule.setTargetMetric(targetMetric);
+                compositionRule.setResultingMetric(resultingMetric);
+
+                compositionRules.add(compositionRule);
+
+                //creating the list of operations to be applied on the target metric
+                Collection<CompositionOperation> compositionOperations  = new ArrayList<CompositionOperation>();
+                compositionRule.setOperations(compositionOperations);
+
+                //add the value of pkts_out metric
+                {
+                    CompositionOperation compositionOperation = new CompositionOperation();
+                    compositionOperation.setOperation(CompositionOperationType.ADD);
+                    compositionOperation.setValue("0");
+                    compositionOperation.setReferenceMetricName("pkts_out");
+                    compositionOperations.add(compositionOperation);
+                }
+
+            }
+
+            //CPU usage from cpu_idle
+            {
+                CompositionRule compositionRule = new CompositionRule();
+                compositionRule.setMetricSourceServiceElementLevel(ServiceElement.ServiceElementLevel.VM);
+                Metric targetMetric =  new Metric("cpu_idle");
+                Metric resultingMetric =  new Metric("cpu_usage");
+                resultingMetric.setMeasurementUnit("%");
+                compositionRule.setTargetMetric(targetMetric);
+                compositionRule.setResultingMetric(resultingMetric);
+
+                compositionRules.add(compositionRule);
+
+                //creating the list of operations to be applied on the target metric
+                Collection<CompositionOperation> compositionOperations  = new ArrayList<CompositionOperation>();
+                compositionRule.setOperations(compositionOperations);
+
+                //like subtracting from 100 just that it is inverse
+
+                //multiply by -1
+                {
+                    CompositionOperation compositionOperation = new CompositionOperation();
+                    compositionOperation.setOperation(CompositionOperationType.MUL);
+                    compositionOperation.setValue("-1");
+                    compositionOperations.add(compositionOperation);
+                }
+
+                //add 100
+                {
+                    CompositionOperation compositionOperation = new CompositionOperation();
+                    compositionOperation.setOperation(CompositionOperationType.ADD);
+                    compositionOperation.setValue("100");
+                    compositionOperations.add(compositionOperation);
+                }
+
+            }
+
+        }
+
+//
+        //rules for SERVICE_UNIT level
+        {
+            CompositionRulesBlock compositionRulesBlock = new CompositionRulesBlock();
+            compositionRulesBlockList.add(compositionRulesBlock);
+
+            compositionRulesBlock.setTargetServiceElementLevel(ServiceElement.ServiceElementLevel.SERVICE_UNIT);
+            Collection<CompositionRule> compositionRules  = new ArrayList<CompositionRule>();
+
+            compositionRulesBlock.setCompositionRules(compositionRules);
+
+            //memory_free convert to GB from bytes
+            {
+                CompositionRule compositionRule = new CompositionRule();
+                compositionRule.setMetricSourceServiceElementLevel(ServiceElement.ServiceElementLevel.VM);
+                Metric targetMetric =  new Metric("mem_free_in_GB");
+                Metric resultingMetric =  new Metric("mem_free");
+                resultingMetric.setMeasurementUnit("GB");
+                compositionRule.setTargetMetric(targetMetric);
+                compositionRule.setResultingMetric(resultingMetric);
+
+                compositionRules.add(compositionRule);
+
+                //creating the list of operations to be applied on the target metric
+                Collection<CompositionOperation> compositionOperations  = new ArrayList<CompositionOperation>();
+                compositionRule.setOperations(compositionOperations);
+
+                //average
+                {
+                    CompositionOperation compositionOperation = new CompositionOperation();
+                    compositionOperation.setOperation(CompositionOperationType.AVG);
+                    compositionOperations.add(compositionOperation);
+                }
+
+            }
+
+            //mem_total convert to GB from bytes
+            {
+                CompositionRule compositionRule = new CompositionRule();
+                compositionRule.setMetricSourceServiceElementLevel(ServiceElement.ServiceElementLevel.VM);
+                Metric targetMetric =  new Metric("mem_total_in_GB");
+                Metric resultingMetric =  new Metric("mem_total");
+                resultingMetric.setMeasurementUnit("GB");
+                compositionRule.setTargetMetric(targetMetric);
+                compositionRule.setResultingMetric(resultingMetric);
+
+                compositionRules.add(compositionRule);
+
+                //creating the list of operations to be applied on the target metric
+                Collection<CompositionOperation> compositionOperations  = new ArrayList<CompositionOperation>();
+                compositionRule.setOperations(compositionOperations);
+
+                //average
+                {
+                    CompositionOperation compositionOperation = new CompositionOperation();
+                    compositionOperation.setOperation(CompositionOperationType.AVG);
+                    compositionOperations.add(compositionOperation);
+                }
+
+            }
+
+            //mem_total convert to GB from bytes
+            {
+                CompositionRule compositionRule = new CompositionRule();
+                compositionRule.setMetricSourceServiceElementLevel(ServiceElement.ServiceElementLevel.VM);
+                Metric targetMetric =  new Metric("mem_total_in_GB");
+                Metric resultingMetric =  new Metric("mem_tota");
+                resultingMetric.setMeasurementUnit("GB");
+                compositionRule.setTargetMetric(targetMetric);
+                compositionRule.setResultingMetric(resultingMetric);
+
+                compositionRules.add(compositionRule);
+
+                //creating the list of operations to be applied on the target metric
+                Collection<CompositionOperation> compositionOperations  = new ArrayList<CompositionOperation>();
+                compositionRule.setOperations(compositionOperations);
+
+                //average
+                {
+                    CompositionOperation compositionOperation = new CompositionOperation();
+                    compositionOperation.setOperation(CompositionOperationType.AVG);
+                    compositionOperations.add(compositionOperation);
+                }
+
+            }
+
+
+
+            {
+                CompositionRule compositionRule = new CompositionRule();
+                compositionRule.setMetricSourceServiceElementLevel(ServiceElement.ServiceElementLevel.VM);
+                Metric targetMetric =  new Metric("pkts_total");
+                Metric resultingMetric =  new Metric("pkts_total");
+                resultingMetric.setMeasurementUnit("no");
+                compositionRule.setTargetMetric(targetMetric);
+                compositionRule.setResultingMetric(resultingMetric);
+
+                compositionRules.add(compositionRule);
+
+                //creating the list of operations to be applied on the target metric
+                Collection<CompositionOperation> compositionOperations  = new ArrayList<CompositionOperation>();
+                compositionRule.setOperations(compositionOperations);
+
+                //add the value of pkts_out metric
+                {
+                    CompositionOperation compositionOperation = new CompositionOperation();
+                    compositionOperation.setOperation(CompositionOperationType.SUM);
+                    compositionOperations.add(compositionOperation);
+                }
+
+            }
+
+            {
+                CompositionRule compositionRule = new CompositionRule();
+                compositionRule.setMetricSourceServiceElementLevel(ServiceElement.ServiceElementLevel.VM);
+                Metric targetMetric =  new Metric("cpu_usage");
+                Metric resultingMetric =  new Metric("cpu_usage");
+                resultingMetric.setMeasurementUnit("%");
+                compositionRule.setTargetMetric(targetMetric);
+                compositionRule.setResultingMetric(resultingMetric);
+
+                compositionRules.add(compositionRule);
+
+                //creating the list of operations to be applied on the target metric
+                Collection<CompositionOperation> compositionOperations  = new ArrayList<CompositionOperation>();
+                compositionRule.setOperations(compositionOperations);
+
+                //add the value of pkts_out metric
+                {
+                    CompositionOperation compositionOperation = new CompositionOperation();
+                    compositionOperation.setOperation(CompositionOperationType.AVG);
+                    compositionOperations.add(compositionOperation);
+                }
+
+            }
+
+        }
+//
+//
+        //rules for SERVICE_TOPOLOGY level
+        {
+            CompositionRulesBlock compositionRulesBlock = new CompositionRulesBlock();
+            compositionRulesBlockList.add(compositionRulesBlock);
+
+            compositionRulesBlock.setTargetServiceElementLevel(ServiceElement.ServiceElementLevel.SERVICE_TOPOLOGY);
+            Collection<CompositionRule> compositionRules  = new ArrayList<CompositionRule>();
+
+            compositionRulesBlock.setCompositionRules(compositionRules);
+
+            //memory_free convert to GB from bytes
+            {
+                CompositionRule compositionRule = new CompositionRule();
+                compositionRule.setMetricSourceServiceElementLevel(ServiceElement.ServiceElementLevel.SERVICE_UNIT);
+                Metric targetMetric =  new Metric("mem_free");
+                Metric resultingMetric =  new Metric("mem_free");
+                compositionRule.setTargetMetric(targetMetric);
+                compositionRule.setResultingMetric(resultingMetric);
+
+                compositionRules.add(compositionRule);
+
+                //creating the list of operations to be applied on the target metric
+                Collection<CompositionOperation> compositionOperations  = new ArrayList<CompositionOperation>();
+                compositionRule.setOperations(compositionOperations);
+
+                //average
+                {
+                    CompositionOperation compositionOperation = new CompositionOperation();
+                    compositionOperation.setOperation(CompositionOperationType.AVG);
+                    compositionOperations.add(compositionOperation);
+                }
+
+            }
+
+            //mem_total convert to GB from bytes
+            {
+                CompositionRule compositionRule = new CompositionRule();
+                compositionRule.setMetricSourceServiceElementLevel(ServiceElement.ServiceElementLevel.SERVICE_UNIT);
+                Metric targetMetric =  new Metric("mem_total");
+                Metric resultingMetric =  new Metric("mem_total");
+                compositionRule.setTargetMetric(targetMetric);
+                compositionRule.setResultingMetric(resultingMetric);
+
+                compositionRules.add(compositionRule);
+
+                //creating the list of operations to be applied on the target metric
+                Collection<CompositionOperation> compositionOperations  = new ArrayList<CompositionOperation>();
+                compositionRule.setOperations(compositionOperations);
+
+                //average
+                {
+                    CompositionOperation compositionOperation = new CompositionOperation();
+                    compositionOperation.setOperation(CompositionOperationType.AVG);
+                    compositionOperations.add(compositionOperation);
+                }
+
+            }
+
+
+            {
+                CompositionRule compositionRule = new CompositionRule();
+                compositionRule.setMetricSourceServiceElementLevel(ServiceElement.ServiceElementLevel.VM);
+                Metric targetMetric =  new Metric("pkts_total");
+                Metric resultingMetric =  new Metric("pkts_total");
+                resultingMetric.setMeasurementUnit("no");
+                compositionRule.setTargetMetric(targetMetric);
+                compositionRule.setResultingMetric(resultingMetric);
+
+                compositionRules.add(compositionRule);
+
+                //creating the list of operations to be applied on the target metric
+                Collection<CompositionOperation> compositionOperations  = new ArrayList<CompositionOperation>();
+                compositionRule.setOperations(compositionOperations);
+
+                //add the value of pkts_out metric
+                {
+                    CompositionOperation compositionOperation = new CompositionOperation();
+                    compositionOperation.setOperation(CompositionOperationType.SUM);
+                    compositionOperations.add(compositionOperation);
+                }
+
+            }
+
+
+            {
+                CompositionRule compositionRule = new CompositionRule();
+                compositionRule.setMetricSourceServiceElementLevel(ServiceElement.ServiceElementLevel.SERVICE_UNIT);
+                Metric targetMetric =  new Metric("cpu_usage");
+                Metric resultingMetric =  new Metric("cpu_usage");
+                resultingMetric.setMeasurementUnit("%");
+                compositionRule.setTargetMetric(targetMetric);
+                compositionRule.setResultingMetric(resultingMetric);
+
+                compositionRules.add(compositionRule);
+
+                //creating the list of operations to be applied on the target metric
+                Collection<CompositionOperation> compositionOperations  = new ArrayList<CompositionOperation>();
+                compositionRule.setOperations(compositionOperations);
+
+
+                {
+                    CompositionOperation compositionOperation = new CompositionOperation();
+                    compositionOperation.setOperation(CompositionOperationType.AVG);
+                    compositionOperations.add(compositionOperation);
+                }
+
+            }
+
+        }
+
+
+        //rules for SERVICE level
+        {
+            CompositionRulesBlock compositionRulesBlock = new CompositionRulesBlock();
+            compositionRulesBlockList.add(compositionRulesBlock);
+
+            compositionRulesBlock.setTargetServiceElementLevel(ServiceElement.ServiceElementLevel.SERVICE);
+            Collection<CompositionRule> compositionRules  = new ArrayList<CompositionRule>();
+
+            compositionRulesBlock.setCompositionRules(compositionRules);
+
+            //memory_free convert to GB from bytes
+            {
+                CompositionRule compositionRule = new CompositionRule();
+                compositionRule.setMetricSourceServiceElementLevel(ServiceElement.ServiceElementLevel.SERVICE_TOPOLOGY);
+                Metric targetMetric =  new Metric("mem_free");
+                Metric resultingMetric =  new Metric("mem_free");
+                compositionRule.setTargetMetric(targetMetric);
+                compositionRule.setResultingMetric(resultingMetric);
+
+                compositionRules.add(compositionRule);
+
+                //creating the list of operations to be applied on the target metric
+                Collection<CompositionOperation> compositionOperations  = new ArrayList<CompositionOperation>();
+                compositionRule.setOperations(compositionOperations);
+
+                //average
+                {
+                    CompositionOperation compositionOperation = new CompositionOperation();
+                    compositionOperation.setOperation(CompositionOperationType.AVG);
+                    compositionOperations.add(compositionOperation);
+                }
+
+            }
+
+            //mem_total convert to GB from bytes
+            {
+                CompositionRule compositionRule = new CompositionRule();
+                compositionRule.setMetricSourceServiceElementLevel(ServiceElement.ServiceElementLevel.SERVICE_TOPOLOGY);
+                Metric targetMetric =  new Metric("mem_total");
+                Metric resultingMetric =  new Metric("mem_total");
+                compositionRule.setTargetMetric(targetMetric);
+                compositionRule.setResultingMetric(resultingMetric);
+
+                compositionRules.add(compositionRule);
+
+                //creating the list of operations to be applied on the target metric
+                Collection<CompositionOperation> compositionOperations  = new ArrayList<CompositionOperation>();
+                compositionRule.setOperations(compositionOperations);
+
+                //average
+                {
+                    CompositionOperation compositionOperation = new CompositionOperation();
+                    compositionOperation.setOperation(CompositionOperationType.AVG);
+                    compositionOperations.add(compositionOperation);
+                }
+
+            }
+
+
+            {
+                CompositionRule compositionRule = new CompositionRule();
+                compositionRule.setMetricSourceServiceElementLevel(ServiceElement.ServiceElementLevel.VM);
+                Metric targetMetric =  new Metric("pkts_total");
+                Metric resultingMetric =  new Metric("pkts_total");
+                resultingMetric.setMeasurementUnit("no");
+                compositionRule.setTargetMetric(targetMetric);
+                compositionRule.setResultingMetric(resultingMetric);
+
+                compositionRules.add(compositionRule);
+
+                //creating the list of operations to be applied on the target metric
+                Collection<CompositionOperation> compositionOperations  = new ArrayList<CompositionOperation>();
+                compositionRule.setOperations(compositionOperations);
+
+                //add the value of pkts_out metric
+                {
+                    CompositionOperation compositionOperation = new CompositionOperation();
+                    compositionOperation.setOperation(CompositionOperationType.SUM);
+                    compositionOperations.add(compositionOperation);
+                }
+
+            }
+
+
+            {
+                CompositionRule compositionRule = new CompositionRule();
+                compositionRule.setMetricSourceServiceElementLevel(ServiceElement.ServiceElementLevel.SERVICE_TOPOLOGY);
+                Metric targetMetric =  new Metric("cpu_usage");
+                Metric resultingMetric =  new Metric("cpu_usage");
+                resultingMetric.setMeasurementUnit("%");
+                compositionRule.setTargetMetric(targetMetric);
+                compositionRule.setResultingMetric(resultingMetric);
+
+                compositionRules.add(compositionRule);
+
+                //creating the list of operations to be applied on the target metric
+                Collection<CompositionOperation> compositionOperations  = new ArrayList<CompositionOperation>();
+                compositionRule.setOperations(compositionOperations);
+
+                {
+                    CompositionOperation compositionOperation = new CompositionOperation();
+                    compositionOperation.setOperation(CompositionOperationType.AVG);
+                    compositionOperations.add(compositionOperation);
+                }
+
+            }
+
+        }
+
+
+
+
+
+    }
