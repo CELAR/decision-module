@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<ns2:Definitions xmlns:ns2="http://docs.oasis-open.org/tosca/ns/2011/12">
+    <ns2:ServiceTemplate>
+        <ns2:TopologyTemplate>
+            <ns2:NodeTemplate id="os" minInstances="1" maxInstances="unbounded">
+            	
+            </ns2:NodeTemplate>
+            <ns2:NodeTemplate id="bin"/>
+            <ns2:NodeTemplate id="sh"/>
+            <ns2:NodeTemplate id="jre"/>
+            <ns2:NodeTemplate id="tomcat" minInstances="1" maxInstances="1">
+            	<ns2:Properties>
+            		<MappingProperties>
+            			<MappingProperty type="action">
+            				<property name="deploy"><![CDATA[apt-get -y install tomcat7]]></property>
+            				<property name="undeploy"><![CDATA[apt-get -y erase tomcat7]]></property>            				
+            				<property name="start"><![CDATA[service tomcat7 start]]></property>
+            				<property name="stop"><![CDATA[service tomcat7 stop]]></property>
+            			</MappingProperty>
+            		</MappingProperties>
+            	</ns2:Properties>
+            </ns2:NodeTemplate>
+            
+            
+            <ns2:NodeTemplate id="war"/>
+            <ns2:NodeTemplate id="image"/>
+            <ns2:NodeTemplate id="software"/>
+            <ns2:NodeTemplate id="docker" />
+            <ns2:RelationshipTemplate type="HOSTON">
+                <ns2:SourceElement ref="software"/>
+                <ns2:TargetElement ref="os"/>
+            </ns2:RelationshipTemplate>
+             <ns2:RelationshipTemplate type="HOSTON">
+                <ns2:SourceElement ref="docker"/>
+                <ns2:TargetElement ref="os"/>
+            </ns2:RelationshipTemplate>
+            <ns2:RelationshipTemplate type="HOSTON">
+                <ns2:SourceElement ref="sh"/>
+                <ns2:TargetElement ref="os"/>
+            </ns2:RelationshipTemplate>
+            <ns2:RelationshipTemplate type="HOSTON">
+                <ns2:SourceElement ref="bin"/>
+                <ns2:TargetElement ref="os"/>
+            </ns2:RelationshipTemplate>
+            <ns2:RelationshipTemplate type="HOSTON">
+                <ns2:SourceElement ref="jre"/>
+                <ns2:TargetElement ref="os"/>
+            </ns2:RelationshipTemplate>
+            <ns2:RelationshipTemplate type="HOSTON">
+                <ns2:SourceElement ref="tomcat"/>
+                <ns2:TargetElement ref="os"/>
+            </ns2:RelationshipTemplate>
+            <ns2:RelationshipTemplate type="HOSTON">
+                <ns2:SourceElement ref="war"/>
+                <ns2:TargetElement ref="tomcat"/>
+            </ns2:RelationshipTemplate>
+            <ns2:RelationshipTemplate type="HOSTON">
+                <ns2:SourceElement ref="image"/>
+                <ns2:TargetElement ref="os"/>
+            </ns2:RelationshipTemplate>
+            <ns2:RelationshipTemplate type="LOCAL">
+                <ns2:SourceElement ref="tomcat"/>
+                <ns2:TargetElement ref="jre"/>
+            </ns2:RelationshipTemplate>
+            <ns2:RelationshipTemplate type="HOSTON">
+                <ns2:SourceElement ref="tomcat"/>
+                <ns2:TargetElement ref="os"/>
+            </ns2:RelationshipTemplate>
+        </ns2:TopologyTemplate>
+    </ns2:ServiceTemplate>
+</ns2:Definitions>
