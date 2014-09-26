@@ -47,7 +47,7 @@ public class EnforcementPluginCELAR implements EnforcementInterface {
     private Node cloudService;
     boolean cleanupGoingOn = false;
     boolean cleanupNecessary = true;
-    public static String API_URL = "http://localhost:8080/celar-orchestrator-war/resizing/";
+    public static String API_URL = "http://localhost:8080/celar-orchestrator-war/resizing";
     public HashMap<Integer, ResizingAction> actionsAvailable = new HashMap<Integer, ResizingAction>();
 
     public EnforcementPluginCELAR(Node cloudService) {
@@ -305,7 +305,7 @@ public class EnforcementPluginCELAR implements EnforcementInterface {
         URL url = null;
         HttpURLConnection connection = null;
         try {
-            url = new URL(API_URL + "/?query=" + actionID + "/");
+            url = new URL(API_URL + "?query=" + actionID + "/");
 
 
 
@@ -354,7 +354,7 @@ public class EnforcementPluginCELAR implements EnforcementInterface {
         URL url = null;
         HttpURLConnection connection = null;
         try {
-            url = new URL(API_URL + "?query=" + actionID + "/");
+            url = new URL(API_URL+"?action_id="+actionID  );
 
 
 
@@ -364,7 +364,6 @@ public class EnforcementPluginCELAR implements EnforcementInterface {
             connection.setRequestProperty("Content-Type", "application/xml");
             connection.setRequestProperty("Accept", "application/xml");
             OutputStream os = connection.getOutputStream();
-            JAXBContext jaxbContext = JAXBContext.newInstance(Parameters.class);
             String body="";
             os.write(body.getBytes());
             os.flush();
@@ -497,7 +496,7 @@ public class EnforcementPluginCELAR implements EnforcementInterface {
         try {
 
             if (!ip.equalsIgnoreCase("")) {
-                url = new URL(API_URL + "resizestatus/?action=" + action + "&ip=" + ip);
+                url = new URL(API_URL + "resizestatus?action=" + action + "&ip=" + ip);
             } else {
                 url = new URL(API_URL + "resizestatus/?action=" + action);
                 RuntimeLogger.logger.info("Check cleanup status " + url);

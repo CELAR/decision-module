@@ -15,8 +15,8 @@
 
   <modules>
     <module>rSYBL</module>
-<!--<module>MELA-AnalysisService</module>
-    <module>SALSA</module> -->
+    <module>MELA-AnalysisService</module>
+    <!--<module>SALSA</module> -->
   </modules>
 
   <profiles>
