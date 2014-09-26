@@ -17,12 +17,29 @@ import at.ac.tuwien.dsg.csdg.Node;
 import at.ac.tuwien.dsg.csdg.Node.NodeType;
 import at.ac.tuwien.dsg.csdg.Relationship;
 import at.ac.tuwien.dsg.csdg.Relationship.RelationshipType;
+import at.ac.tuwien.dsg.csdg.SimpleRelationship;
 import at.ac.tuwien.dsg.csdg.relationships.ElasticityRelationship;
 import at.ac.tuwien.dsg.rSybl.cloudInteractionUnit.celar.dbalancer.ElasticityAction;
 import at.ac.tuwien.dsg.rSybl.cloudInteractionUnit.enforcementPlugins.interfaces.EnforcementInterface;
 import at.ac.tuwien.dsg.rSybl.cloudInteractionUnit.utils.Configuration;
 import at.ac.tuwien.dsg.rSybl.cloudInteractionUnit.utils.RuntimeLogger;
 import at.ac.tuwien.dsg.rSybl.dataProcessingUnit.api.MonitoringAPIInterface;
+import at.ac.tuwien.dsg.rSybl.dataProcessingUnit.monitoringPlugins.melaPlugin.MELA_API3;
+import com.sun.org.apache.xalan.internal.xsltc.compiler.NodeTest;
+import gr.ntua.cslab.orchestrator.beans.ExecutedResizingAction;
+import gr.ntua.cslab.orchestrator.beans.Parameter;
+import gr.ntua.cslab.orchestrator.beans.Parameters;
+import gr.ntua.cslab.orchestrator.beans.ResizingAction;
+import gr.ntua.cslab.orchestrator.beans.ResizingActionList;
+import gr.ntua.cslab.orchestrator.beans.ResizingActionType;
+import gr.ntua.cslab.orchestrator.beans.ResizingExecutionStatus;
+import java.io.OutputStream;
+import java.io.StringWriter;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map.Entry;
+import javax.xml.bind.JAXBContext;
+import org.codehaus.jackson.map.ObjectMapper;
 
 public class EnforcementPluginCELAR implements EnforcementInterface {
 
@@ -30,76 +47,45 @@ public class EnforcementPluginCELAR implements EnforcementInterface {
     private Node cloudService;
     boolean cleanupGoingOn = false;
     boolean cleanupNecessary = true;
-    public static String API_URL = "https://83.212.107.38:8443/deployment/";
+    public static String API_URL = "http://localhost:8080/celar-orchestrator-war/resizing/";
+    public HashMap<Integer, ResizingAction> actionsAvailable = new HashMap<Integer, ResizingAction>();
 
     public EnforcementPluginCELAR(Node cloudService) {
-        this.cloudService = cloudService;
-        API_URL = Configuration.getEnforcementServiceURL();
-
-    }
-    private void checkElasticityActionStatus(int actionID){
         
-    }
-    public  void executeElasticityAction(int actionID, String actionName) {
-        ElasticityAction action = new ElasticityAction();
-        action.setId(actionID);
-        action.setName(actionName);
+        this.cloudService = cloudService;
+//        API_URL = Configuration.getEnforcementServiceURL();
+
     }
 
-    public static String executeResizingCommand(String actionType) {
+    public void refreshElasticityActionsList() {
         String ip = "";
         URL url = null;
         HttpURLConnection connection = null;
         try {
-            url = new URL(API_URL + "resize/?action=" + actionType);
+            url = new URL(API_URL);
 
 
-            InputStream is = url.openStream();
-            try {
-                BufferedReader rd = new BufferedReader(new InputStreamReader(is, Charset.forName("UTF-8")));
+            connection = (HttpURLConnection) url.openConnection();
+            connection.setRequestMethod("GET");
+            connection.setRequestProperty("Content-Type", "application/xml");
+            connection.setRequestProperty("Accept", "application/xml");
 
-                StringBuilder sb = new StringBuilder();
-
-
-                String cp = new String();
-
-                while ((cp = rd.readLine()) != null) {
-
-                    sb.append(cp);
+            InputStream errorStream = connection.getErrorStream();
+            if (errorStream != null) {
+                BufferedReader reader = new BufferedReader(new InputStreamReader(errorStream));
+                String line;
+                while ((line = reader.readLine()) != null) {
+                    Logger.getLogger(EnforcementPluginCELAR.class.getName()).log(Level.SEVERE, line);
                 }
-
-                String jsonText = sb.toString();
-
-                JSONObject array = new JSONObject(jsonText);
-                if (array.getJSONObject("1").getString("stderr").equalsIgnoreCase("")) {
-                    if ((array.getJSONObject("1").getString("stdout")).contains("Removing:")) {
-                        String strs[] = (array.getJSONObject("1").getString("stdout")).split("Removing: ");
-
-
-                        return strs[strs.length - 1];
-                    } else {
-                        if ((array.getJSONObject("1").getString("stdout")).contains("Adding: ")) {
-                            String strs[] = (array.getJSONObject("1").getString("stdout")).split("Adding: ");
-                            //  System.out.println(strs[strs.length-1].split("xss")[0]);
-                            // System.out.println(strs[strs.length-1].split("xss")[1]);
-                            return strs[strs.length - 1].split("xss")[0];
-                        }
-                    }
-                    if (array.getJSONObject("1").getString("stdout").charAt(0) >= '0' && array.getJSONObject("1").getString("stdout").charAt(0) <= '9' && !array.getJSONObject("1").getString("stdout").contains(" ")) {
-                        return array.getJSONObject("1").getString("stdout");
-                    } else {
-                        return "";
-                    }
-                } else {
-                    RuntimeLogger.logger.error(array.getJSONObject("1").getString("stderr"));
-                    return "";
-                }
-            } catch (Exception e) {
-
-                //Logger.getLogger(EnforcementPluginCELAR.class.getName()).log(Level.WARNING, "Failing the action "+actionType);
-                RuntimeLogger.logger.error("Failing the action " + actionType + " with error " + e.getMessage());
-
             }
+
+            InputStream inputStream = connection.getInputStream();
+            JAXBContext jAXBContext = JAXBContext.newInstance(ResizingActionList.class);
+            ResizingActionList retrievedData = (ResizingActionList) jAXBContext.createUnmarshaller().unmarshal(inputStream);
+            for (ResizingAction action : retrievedData.getResizingActions()) {
+                this.actionsAvailable.put(action.getId(), action);
+            }
+
         } catch (Exception e) {
             // Logger.getLogger(MELA_API.class.getName()).log(Level.SEVERE, e.getMessage(), e);
             e.printStackTrace();
@@ -111,7 +97,304 @@ public class EnforcementPluginCELAR implements EnforcementInterface {
                 connection.disconnect();
             }
         }
-        return "";
+    }
+
+    @Override
+    public boolean scaleIn(Node node) {
+        boolean ok = true;
+        DependencyGraph dependencyGraph = new DependencyGraph();
+        dependencyGraph.setCloudService(cloudService);
+        Node toBeScaled = dependencyGraph.getNodeWithID(node.getId());
+        for (Entry<Integer, ResizingAction> actionE : actionsAvailable.entrySet()) {
+            ResizingAction action = actionE.getValue();
+            System.out.println(action.getModuleName());
+            if (action.getType() == ResizingActionType.SCALE_IN && toBeScaled.getId().equalsIgnoreCase(action.getModuleName())) {
+                ExecutedResizingAction executedResizingAction = executeResizingCommand(action.getId());
+                ResizingExecutionStatus status = checkForAction(executedResizingAction.getUniqueId());
+                while (status == ResizingExecutionStatus.ONGOING) {
+                    try {
+                        Thread.sleep(10000);
+                    } catch (InterruptedException ex) {
+                        Logger.getLogger(EnforcementPluginCELAR.class.getName()).log(Level.SEVERE, null, ex);
+                    }
+                    status = checkForAction(executedResizingAction.getUniqueId());
+                }
+                if (status == ResizingExecutionStatus.SUCCESS) {
+                    //TODO : Assume we have value IP returned
+                    Parameters par = executedResizingAction.getParameters();
+                    Parameter p = (Parameter) par.getParameters().get(0);
+                    if (p.getKey().equalsIgnoreCase("ip")) {
+                        String ip = p.getValue();
+                        toBeScaled.removeNode(ip);
+                        monitoringAPI.refreshServiceStructure(cloudService);
+
+                    }
+                }
+
+                if (status == ResizingExecutionStatus.FAILED) {
+                }
+                break;
+            }
+        }
+        return ok;
+    }
+
+    public boolean scaleIn(Node node, String ip) {
+        boolean ok = true;
+        DependencyGraph dependencyGraph = new DependencyGraph();
+        dependencyGraph.setCloudService(cloudService);
+        Node toBeScaled = dependencyGraph.getNodeWithID(node.getId());
+        for (Entry<Integer, ResizingAction> actionE : actionsAvailable.entrySet()) {
+            ResizingAction action = actionE.getValue();
+            if (action.getType() == ResizingActionType.SCALE_IN && toBeScaled.getId().equalsIgnoreCase(action.getModuleName())) {
+                Parameters pars = new Parameters();
+                Parameter par = new Parameter();
+                par.setKey("IP");
+                par.setValue(ip);
+                pars.addParameter(par);
+                ExecutedResizingAction executedResizingAction = executeResizingCommand(action.getId(), pars);
+                ResizingExecutionStatus status = checkForAction(executedResizingAction.getUniqueId());
+                while (status == ResizingExecutionStatus.ONGOING) {
+                    try {
+                        Thread.sleep(10000);
+                    } catch (InterruptedException ex) {
+                        Logger.getLogger(EnforcementPluginCELAR.class.getName()).log(Level.SEVERE, null, ex);
+                    }
+                    status = checkForAction(executedResizingAction.getUniqueId());
+                }
+                if (status == ResizingExecutionStatus.SUCCESS) {
+                    //TODO : Assume we have value IP returned
+                    //Parameters par = executedResizingAction.getParameters();
+                    //Parameter p = (Parameter) par.getParameters().get(0);
+                    //  String ip = p.getValue();
+                    toBeScaled.removeNode(ip);
+                    monitoringAPI.refreshServiceStructure(cloudService);
+
+
+                }
+
+                if (status == ResizingExecutionStatus.FAILED) {
+                }
+                break;
+            }
+        }
+        return ok;
+    }
+
+    public static ResizingExecutionStatus checkForAction(String uniqueID) {
+        URL url = null;
+        HttpURLConnection connection = null;
+        try {
+            url = new URL(API_URL + "/status");
+
+            connection = (HttpURLConnection) url.openConnection();
+            connection.setRequestMethod("GET");
+            connection.setRequestProperty("Content-Type", "application/xml");
+            connection.setRequestProperty("Accept", "application/xml");
+
+            InputStream errorStream = connection.getErrorStream();
+            if (errorStream != null) {
+                BufferedReader reader = new BufferedReader(new InputStreamReader(errorStream));
+                String line;
+                while ((line = reader.readLine()) != null) {
+                    Logger.getLogger(EnforcementPluginCELAR.class.getName()).log(Level.SEVERE, line);
+                }
+            }
+
+            InputStream inputStream = connection.getInputStream();
+            JAXBContext jAXBContext = JAXBContext.newInstance(ResizingExecutionStatus.class);
+            ResizingExecutionStatus retrievedData = (ResizingExecutionStatus) jAXBContext.createUnmarshaller().unmarshal(inputStream);
+            return retrievedData;
+
+        } catch (Exception e) {
+            // Logger.getLogger(MELA_API.class.getName()).log(Level.SEVERE, e.getMessage(), e);
+            e.printStackTrace();
+            Logger.getLogger(EnforcementPluginCELAR.class.getName()).log(Level.WARNING, "Trying to connect to the Orchestrator - failing ... . Retrying later");
+            RuntimeLogger.logger.error("Failing to connect to Orchestrator");
+
+        } finally {
+            if (connection != null) {
+                connection.disconnect();
+            }
+
+        }
+        return null;
+    }
+
+    @Override
+    public boolean scaleOut(Node node) {
+        boolean ok = true;
+        DependencyGraph dependencyGraph = new DependencyGraph();
+        dependencyGraph.setCloudService(cloudService);
+        Node toBeScaled = dependencyGraph.getNodeWithID(node.getId());
+        for (Entry<Integer, ResizingAction> actionE : actionsAvailable.entrySet()) {
+            ResizingAction action = actionE.getValue();
+            if (action.getType() == ResizingActionType.SCALE_OUT && toBeScaled.getId().equalsIgnoreCase(action.getModuleName())) {
+                ExecutedResizingAction executedResizingAction = executeResizingCommand(action.getId());
+                ResizingExecutionStatus status = checkForAction(executedResizingAction.getUniqueId());
+                while (status == ResizingExecutionStatus.ONGOING) {
+                    try {
+                        Thread.sleep(10000);
+                    } catch (InterruptedException ex) {
+                        Logger.getLogger(EnforcementPluginCELAR.class.getName()).log(Level.SEVERE, null, ex);
+                    }
+                    status = checkForAction(executedResizingAction.getUniqueId());
+                }
+                if (status == ResizingExecutionStatus.SUCCESS) {
+                    //TODO : Assume we have value IP returned
+                    Parameters par = executedResizingAction.getParameters();
+                    Parameter p = (Parameter) par.getParameters().get(0);
+                    if (p.getKey().equalsIgnoreCase("ip")) {
+                        String ip = p.getValue();
+                        if (!ip.equalsIgnoreCase("err") && !ip.equalsIgnoreCase("")) {
+                            Node artifact = null;
+                            Node container = null;
+                            Node newNode = new Node();
+                            if (node.getAllRelatedNodesOfType(RelationshipType.HOSTED_ON_RELATIONSHIP, NodeType.ARTIFACT) != null && node.getAllRelatedNodesOfType(RelationshipType.HOSTED_ON_RELATIONSHIP, NodeType.ARTIFACT).size() > 0) {
+                                artifact = node.getAllRelatedNodesOfType(RelationshipType.HOSTED_ON_RELATIONSHIP, NodeType.ARTIFACT).get(0);
+                                if (artifact.getAllRelatedNodesOfType(RelationshipType.HOSTED_ON_RELATIONSHIP, NodeType.CONTAINER) != null && node.getAllRelatedNodesOfType(RelationshipType.HOSTED_ON_RELATIONSHIP, NodeType.CONTAINER).size() > 0) {
+
+                                    container = artifact.getAllRelatedNodesOfType(RelationshipType.HOSTED_ON_RELATIONSHIP, NodeType.CONTAINER).get(0);
+                                }
+                            }
+                            newNode.getStaticInformation().put("IP", ip);
+                            newNode.setId(ip);
+                            newNode.setNodeType(NodeType.VIRTUAL_MACHINE);
+
+                            SimpleRelationship rel = new SimpleRelationship();
+                            rel.setTargetElement(newNode.getId());
+                            rel.setType(RelationshipType.HOSTED_ON_RELATIONSHIP);
+                            RuntimeLogger.logger.info("Adding to " + node.getId() + " vm with ip " + ip);
+
+
+
+                            if (artifact == null && container == null) {
+                                rel.setSourceElement(node.getId());
+                                node.addNode(newNode, rel);
+                            } else {
+                                if (container == null) {
+                                    rel.setSourceElement(artifact.getId());
+                                    artifact.addNode(newNode, rel);
+                                } else {
+                                    rel.setSourceElement(container.getId());
+                                    container.addNode(newNode, rel);
+                                }
+
+                            }
+                        } else {
+                            ok = false;
+                        }
+                        ok = true;
+                        RuntimeLogger.logger.info("The controlled service is now " + cloudService.toString());
+
+                        monitoringAPI.refreshServiceStructure(cloudService);
+                        return ok;
+
+                    }
+                }
+
+                if (status == ResizingExecutionStatus.FAILED) {
+                }
+                break;
+            }
+        }
+        return ok;
+    }
+
+    public static ExecutedResizingAction executeResizingCommand(Integer actionID, Parameters pars) {
+        URL url = null;
+        HttpURLConnection connection = null;
+        try {
+            url = new URL(API_URL + "/?query=" + actionID + "/");
+
+
+
+            connection = (HttpURLConnection) url.openConnection();
+            connection.setRequestMethod("POST");
+            connection.setRequestProperty("Content-Type", "application/xml");
+            connection.setRequestProperty("Accept", "application/xml");
+            OutputStream os = connection.getOutputStream();
+            JAXBContext jaxbContext = JAXBContext.newInstance(Parameters.class);
+            jaxbContext.createMarshaller().marshal(pars, os);
+            StringWriter stringWriter = new StringWriter();
+            jaxbContext.createMarshaller().marshal(pars, stringWriter);
+
+            RuntimeLogger.logger.info(stringWriter.toString());
+            os.flush();
+            os.close();
+            InputStream errorStream = connection.getErrorStream();
+            if (errorStream != null) {
+                BufferedReader reader = new BufferedReader(new InputStreamReader(errorStream));
+                String line;
+                while ((line = reader.readLine()) != null) {
+                    Logger.getLogger(EnforcementPluginCELAR.class.getName()).log(Level.SEVERE, line);
+                }
+            }
+
+            InputStream inputStream = connection.getInputStream();
+            JAXBContext jAXBContext = JAXBContext.newInstance(ExecutedResizingAction.class);
+            ExecutedResizingAction retrievedData = (ExecutedResizingAction) jAXBContext.createUnmarshaller().unmarshal(inputStream);
+            return retrievedData;
+
+        } catch (Exception e) {
+            // Logger.getLogger(MELA_API.class.getName()).log(Level.SEVERE, e.getMessage(), e);
+            e.printStackTrace();
+            Logger.getLogger(EnforcementPluginCELAR.class.getName()).log(Level.WARNING, "Trying to connect to the Orchestrator - failing ... . Retrying later");
+            RuntimeLogger.logger.error("Failing to connect to Orchestrator");
+
+        } finally {
+            if (connection != null) {
+                connection.disconnect();
+            }
+        }
+        return null;
+    }
+
+    public static ExecutedResizingAction executeResizingCommand(Integer actionID) {
+        URL url = null;
+        HttpURLConnection connection = null;
+        try {
+            url = new URL(API_URL + "?query=" + actionID + "/");
+
+
+
+            connection = (HttpURLConnection) url.openConnection();
+            connection.setRequestMethod("POST");
+            connection.setDoOutput(true);
+            connection.setRequestProperty("Content-Type", "application/xml");
+            connection.setRequestProperty("Accept", "application/xml");
+            OutputStream os = connection.getOutputStream();
+            JAXBContext jaxbContext = JAXBContext.newInstance(Parameters.class);
+            String body="";
+            os.write(body.getBytes());
+            os.flush();
+            os.close(); 
+            InputStream errorStream = connection.getErrorStream();
+            if (errorStream != null) {
+                BufferedReader reader = new BufferedReader(new InputStreamReader(errorStream));
+                String line;
+                while ((line = reader.readLine()) != null) {
+                    Logger.getLogger(EnforcementPluginCELAR.class.getName()).log(Level.SEVERE, line);
+                }
+            }
+
+            InputStream inputStream = connection.getInputStream();
+            JAXBContext jAXBContext = JAXBContext.newInstance(ExecutedResizingAction.class);
+            ExecutedResizingAction retrievedData = (ExecutedResizingAction) jAXBContext.createUnmarshaller().unmarshal(inputStream);
+            return retrievedData;
+
+        } catch (Exception e) {
+            // Logger.getLogger(MELA_API.class.getName()).log(Level.SEVERE, e.getMessage(), e);
+            e.printStackTrace();
+            Logger.getLogger(EnforcementPluginCELAR.class.getName()).log(Level.WARNING, "Trying to connect to the Orchestrator - failing ... . Retrying later");
+            RuntimeLogger.logger.error("Failing to connect to Orchestrator");
+
+        } finally {
+            if (connection != null) {
+                connection.disconnect();
+            }
+        }
+        return null;
 //		try{
 //		Process p = Runtime.getRuntime().exec(command);                                                                                                                                                     
 //		BufferedReader stdInput = new BufferedReader(new InputStreamReader(p.getInputStream()));
@@ -142,14 +425,39 @@ public class EnforcementPluginCELAR implements EnforcementInterface {
     }
 
     public static void main(String[] args) {
-        String ip = executeResizingCommand("addvm");
-        if (!ip.equalsIgnoreCase("")) {
-            System.err.println(ip);
-        } else {
-            System.err.println("IP is empty " + ip);
-        }
-
-        //System.err.println(executeCommand("removevm"));
+        Node cloudService = new Node ();
+        cloudService.setId("myCloudServ");
+        cloudService.setNodeType(NodeType.CLOUD_SERVICE);
+        Node servTop = new Node();
+        servTop.setId("servTop");
+        servTop.setNodeType(NodeType.SERVICE_TOPOLOGY);
+        SimpleRelationship relationship= new SimpleRelationship();
+        relationship.setId("rel1");
+        relationship.setSourceElement(cloudService.getId());
+        relationship.setTargetElement(servTop.getId());
+        relationship.setType(RelationshipType.COMPOSITION_RELATIONSHIP);
+        cloudService.addNode(servTop, relationship);
+        
+        Node node = new Node ();
+        
+        node.setId("name1=2");
+        node.setNodeType(NodeType.SERVICE_UNIT);
+         relationship= new SimpleRelationship();
+        relationship.setId("rel");
+        relationship.setSourceElement(servTop.getId());
+        relationship.setTargetElement(node.getId());
+        relationship.setType(RelationshipType.COMPOSITION_RELATIONSHIP);
+        servTop.addNode(node, relationship);
+        DependencyGraph dependencyGraph = new DependencyGraph();
+        dependencyGraph.setCloudService(cloudService);
+        System.out.println(dependencyGraph.graphToString());
+        EnforcementPluginCELAR enforcementPluginCELAR = new EnforcementPluginCELAR(cloudService);
+        enforcementPluginCELAR.refreshElasticityActionsList();
+       for(String action: enforcementPluginCELAR.getElasticityCapabilities()){
+           System.out.println(action);
+           
+       }
+       enforcementPluginCELAR.scaleIn(node);
     }
 
     public void cleanup() {
@@ -224,144 +532,14 @@ public class EnforcementPluginCELAR implements EnforcementInterface {
 
     }
 
-    public boolean scaleOut(Node toBeScaled) {
-
-        while (cleanupGoingOn) {
-            try {
-                Thread.sleep(10000);
-            } catch (InterruptedException e) {
-                // TODO Auto-generated catch block
-                e.printStackTrace();
-            }
-        }
-        String ip = executeResizingCommand("addvm");
-        if (!ip.equalsIgnoreCase("")) {
-            monitoringAPI.scaleoutstarted(toBeScaled);
-            RuntimeLogger.logger.info("The IP of the Virtual Machine to be ADDED is " + ip);
-
-            while (!checkStatus(ip, "addvm")) {
-                try {
-                    RuntimeLogger.logger.info("Waiting for scale out...");
-                    Thread.sleep(10000);
-
-                } catch (InterruptedException e) {
-                    // TODO Auto-generated catch block
-                    e.printStackTrace();
-                }
-            }
-        }
-
-        if (!ip.equalsIgnoreCase("")) {
-            RuntimeLogger.logger.info("The IP of the Virtual Machine to be ADDED is " + ip);
-            DependencyGraph dependencyGraph = new DependencyGraph();
-            dependencyGraph.setCloudService(cloudService);
-            if (toBeScaled.getAllRelatedNodesOfType(RelationshipType.HOSTED_ON_RELATIONSHIP).get(0).getNodeType().equals(NodeType.ARTIFACT)) {
-                Node toAdd = dependencyGraph.getNodeWithID(toBeScaled.getId());
-                Node artifact = toAdd.getAllRelatedNodesOfType(RelationshipType.HOSTED_ON_RELATIONSHIP).get(0);
-
-                Node newVM = new Node();
-                newVM.setNodeType(NodeType.VIRTUAL_MACHINE);
-                ElasticityRelationship rel = new ElasticityRelationship();
-                rel.setSourceElement(artifact.getId());
-                rel.setTargetElement(ip);
-                rel.setType(RelationshipType.HOSTED_ON_RELATIONSHIP);
-                newVM.setId(ip);
-                artifact.addNode(newVM, rel);
-
-            } else {
-                Node toAdd = dependencyGraph.getNodeWithID(toBeScaled.getId());
-
-                Node newVM = new Node();
-                newVM.setNodeType(NodeType.VIRTUAL_MACHINE);
-                ElasticityRelationship rel = new ElasticityRelationship();
-                rel.setSourceElement(toAdd.getId());
-                rel.setTargetElement(ip);
-                rel.setType(RelationshipType.HOSTED_ON_RELATIONSHIP);
-                newVM.setId(ip);
-                toAdd.addNode(newVM, rel);
-            }
-
-
-            RuntimeLogger.logger.info("Cloud new service is " + dependencyGraph.graphToString());
-            monitoringAPI.scaleoutended(toBeScaled);
-
-            monitoringAPI.refreshServiceStructure(cloudService);
-            cleanupNecessary = true;
-            return true;
-        } else {
-            RuntimeLogger.logger.error("IP is empty " + ip);
-            return false;
-        }
-    }
-
-    public boolean scaleIn(Node toBeScaled) {
-        while (cleanupGoingOn) {
-            try {
-                Thread.sleep(10000);
-            } catch (InterruptedException e) {
-                // TODO Auto-generated catch block
-                e.printStackTrace();
-            }
-        }
-        DependencyGraph d = new DependencyGraph();
-        d.setCloudService(cloudService);
-        DependencyGraph dep = new DependencyGraph();
-        dep.setCloudService(cloudService);
-        toBeScaled = dep.getNodeWithID(toBeScaled.getId());
-        if (d.getNodeWithID(toBeScaled.getId()).getAllRelatedNodesOfType(RelationshipType.HOSTED_ON_RELATIONSHIP, NodeType.VIRTUAL_MACHINE).size() > 4) {
-            RuntimeLogger.logger.info("Executing scaling action, number of VMs available for node " + toBeScaled.getId() + " " + d.getNodeWithID(toBeScaled.getId()).getAllRelatedNodesOfType(RelationshipType.HOSTED_ON_RELATIONSHIP, NodeType.VIRTUAL_MACHINE).size());
-
-            String ip = executeResizingCommand("removevm");
-            if (!ip.equalsIgnoreCase("")) {
-                monitoringAPI.scaleinstarted(toBeScaled);
-                while (!checkStatus(ip, "removevm")) {
-                    try {
-                        RuntimeLogger.logger.info("Waiting for scale in...");
-                        Thread.sleep(10000);
-                    } catch (InterruptedException e) {
-                        // TODO Auto-generated catch block
-                        e.printStackTrace();
-                    }
-                }
-
-                RuntimeLogger.logger.info("The IP of the Virtual Machine to be REMOVED is " + ip);
-                try {
-                    Node toBeDel = dep.getNodeWithID(ip);
-                    if (toBeScaled.getAllRelatedNodesOfType(RelationshipType.HOSTED_ON_RELATIONSHIP).get(0).getNodeType().equals(NodeType.ARTIFACT)) {
-                        Node artifact = toBeScaled.getAllRelatedNodesOfType(RelationshipType.HOSTED_ON_RELATIONSHIP).get(0);
-
-                        artifact.removeNode(toBeDel);
-                        RuntimeLogger.logger.info("Cloud new service is " + dep.graphToString());
-                       
-                    } else {
-                        toBeScaled.removeNode(toBeDel);
-                        RuntimeLogger.logger.info("Cloud new service is " + dep.graphToString());
-                
-                    }
-                    monitoringAPI.scaleinended(toBeScaled);
-                        monitoringAPI.refreshServiceStructure(cloudService);
-                        cleanupNecessary = true;
-                } catch (Exception e) {
-                    RuntimeLogger.logger.info("Failed to remove node " + ip);
-                    return false;
-                }
-                return true;
-            }
-//		}else{
-//			if (cleanupNecessary)
-//			{
-//				cleanup();
-//				cleanupNecessary=false;
-//			}
-//			
-        }
-        return false;
-    }
-
     @Override
     public List<String> getElasticityCapabilities() {
         // TODO Auto-generated method stub
-        return null;
+        List<String> avActions = new ArrayList<String>();
+        for (ResizingAction action : this.actionsAvailable.values()) {
+            avActions.add(action.getName());
+        }
+        return avActions;
     }
 
     public boolean enforceAction(String actionName, Node entity) {
