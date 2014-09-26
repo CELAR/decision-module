@@ -25,6 +25,7 @@ import at.ac.tuwien.dsg.rSybl.cloudInteractionUnit.utils.Configuration;
 import at.ac.tuwien.dsg.rSybl.cloudInteractionUnit.utils.RuntimeLogger;
 import at.ac.tuwien.dsg.rSybl.dataProcessingUnit.api.MonitoringAPIInterface;
 import at.ac.tuwien.dsg.rSybl.dataProcessingUnit.monitoringPlugins.melaPlugin.MELA_API3;
+import com.sun.org.apache.xalan.internal.xsltc.compiler.NodeTest;
 import gr.ntua.cslab.orchestrator.beans.ExecutedResizingAction;
 import gr.ntua.cslab.orchestrator.beans.Parameter;
 import gr.ntua.cslab.orchestrator.beans.Parameters;
@@ -46,16 +47,17 @@ public class EnforcementPluginCELAR implements EnforcementInterface {
     private Node cloudService;
     boolean cleanupGoingOn = false;
     boolean cleanupNecessary = true;
-    public static String API_URL = "https://83.212.107.38:8443/resizing/";
+    public static String API_URL = "http://localhost:8080/celar-orchestrator-war/resizing/";
     public HashMap<Integer, ResizingAction> actionsAvailable = new HashMap<Integer, ResizingAction>();
 
     public EnforcementPluginCELAR(Node cloudService) {
+        
         this.cloudService = cloudService;
-        API_URL = Configuration.getEnforcementServiceURL();
+//        API_URL = Configuration.getEnforcementServiceURL();
 
     }
 
-    public void refreshElasticityActionsList(String actionName) {
+    public void refreshElasticityActionsList() {
         String ip = "";
         URL url = null;
         HttpURLConnection connection = null;
@@ -105,7 +107,8 @@ public class EnforcementPluginCELAR implements EnforcementInterface {
         Node toBeScaled = dependencyGraph.getNodeWithID(node.getId());
         for (Entry<Integer, ResizingAction> actionE : actionsAvailable.entrySet()) {
             ResizingAction action = actionE.getValue();
-            if (action.getType() == ResizingActionType.SCALE_IN && toBeScaled.getId() == action.getModuleId() + "") {
+            System.out.println(action.getModuleName());
+            if (action.getType() == ResizingActionType.SCALE_IN && toBeScaled.getId().equalsIgnoreCase(action.getModuleName())) {
                 ExecutedResizingAction executedResizingAction = executeResizingCommand(action.getId());
                 ResizingExecutionStatus status = checkForAction(executedResizingAction.getUniqueId());
                 while (status == ResizingExecutionStatus.ONGOING) {
@@ -143,7 +146,7 @@ public class EnforcementPluginCELAR implements EnforcementInterface {
         Node toBeScaled = dependencyGraph.getNodeWithID(node.getId());
         for (Entry<Integer, ResizingAction> actionE : actionsAvailable.entrySet()) {
             ResizingAction action = actionE.getValue();
-            if (action.getType() == ResizingActionType.SCALE_IN && toBeScaled.getId() == action.getModuleId() + "") {
+            if (action.getType() == ResizingActionType.SCALE_IN && toBeScaled.getId().equalsIgnoreCase(action.getModuleName())) {
                 Parameters pars = new Parameters();
                 Parameter par = new Parameter();
                 par.setKey("IP");
@@ -226,7 +229,7 @@ public class EnforcementPluginCELAR implements EnforcementInterface {
         Node toBeScaled = dependencyGraph.getNodeWithID(node.getId());
         for (Entry<Integer, ResizingAction> actionE : actionsAvailable.entrySet()) {
             ResizingAction action = actionE.getValue();
-            if (action.getType() == ResizingActionType.SCALE_OUT && toBeScaled.getId() == action.getModuleId() + "") {
+            if (action.getType() == ResizingActionType.SCALE_OUT && toBeScaled.getId().equalsIgnoreCase(action.getModuleName())) {
                 ExecutedResizingAction executedResizingAction = executeResizingCommand(action.getId());
                 ResizingExecutionStatus status = checkForAction(executedResizingAction.getUniqueId());
                 while (status == ResizingExecutionStatus.ONGOING) {
@@ -351,15 +354,21 @@ public class EnforcementPluginCELAR implements EnforcementInterface {
         URL url = null;
         HttpURLConnection connection = null;
         try {
-            url = new URL(API_URL + "/?query=" + actionID + "/");
+            url = new URL(API_URL + "?query=" + actionID + "/");
 
 
 
             connection = (HttpURLConnection) url.openConnection();
             connection.setRequestMethod("POST");
+            connection.setDoOutput(true);
             connection.setRequestProperty("Content-Type", "application/xml");
             connection.setRequestProperty("Accept", "application/xml");
-
+            OutputStream os = connection.getOutputStream();
+            JAXBContext jaxbContext = JAXBContext.newInstance(Parameters.class);
+            String body="";
+            os.write(body.getBytes());
+            os.flush();
+            os.close(); 
             InputStream errorStream = connection.getErrorStream();
             if (errorStream != null) {
                 BufferedReader reader = new BufferedReader(new InputStreamReader(errorStream));
@@ -416,6 +425,39 @@ public class EnforcementPluginCELAR implements EnforcementInterface {
     }
 
     public static void main(String[] args) {
+        Node cloudService = new Node ();
+        cloudService.setId("myCloudServ");
+        cloudService.setNodeType(NodeType.CLOUD_SERVICE);
+        Node servTop = new Node();
+        servTop.setId("servTop");
+        servTop.setNodeType(NodeType.SERVICE_TOPOLOGY);
+        SimpleRelationship relationship= new SimpleRelationship();
+        relationship.setId("rel1");
+        relationship.setSourceElement(cloudService.getId());
+        relationship.setTargetElement(servTop.getId());
+        relationship.setType(RelationshipType.COMPOSITION_RELATIONSHIP);
+        cloudService.addNode(servTop, relationship);
+        
+        Node node = new Node ();
+        
+        node.setId("name1=2");
+        node.setNodeType(NodeType.SERVICE_UNIT);
+         relationship= new SimpleRelationship();
+        relationship.setId("rel");
+        relationship.setSourceElement(servTop.getId());
+        relationship.setTargetElement(node.getId());
+        relationship.setType(RelationshipType.COMPOSITION_RELATIONSHIP);
+        servTop.addNode(node, relationship);
+        DependencyGraph dependencyGraph = new DependencyGraph();
+        dependencyGraph.setCloudService(cloudService);
+        System.out.println(dependencyGraph.graphToString());
+        EnforcementPluginCELAR enforcementPluginCELAR = new EnforcementPluginCELAR(cloudService);
+        enforcementPluginCELAR.refreshElasticityActionsList();
+       for(String action: enforcementPluginCELAR.getElasticityCapabilities()){
+           System.out.println(action);
+           
+       }
+       enforcementPluginCELAR.scaleIn(node);
     }
 
     public void cleanup() {
