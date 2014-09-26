@@ -73,7 +73,7 @@ public class SyblControlWS {
 		
 	}
 	 @PUT
-	 @Path("/applicationDescriptionInternalModel")
+	 @Path("/descriptionInternalModel")
 	 @Consumes("application/xml")
 	public void setApplicationDescriptionInfoInternalModel(String applicationDescriptionXML, String elasticityRequirementsXML, String deploymentInfoXML){
 		 controlCoordination.setApplicationDescriptionInfoInternalModel(applicationDescriptionXML, elasticityRequirementsXML, deploymentInfoXML);
@@ -88,7 +88,7 @@ public class SyblControlWS {
 	}
 
 	 @PUT
-	 @Path("/{id}/applicationDescription")
+	 @Path("/{id}/description")
 	 @Consumes("application/xml")
 	public void setApplicationDescriptionInfo(@PathParam("id")String cloudServiceId,String celar){
 		 controlCoordination.setApplicationDescriptionInfo(cloudServiceId,celar);
@@ -108,7 +108,7 @@ public class SyblControlWS {
 	}
 	 
 	 @PUT
-	 @Path("/{id}/applicationDeployment")
+	 @Path("/{id}/deployment")
 	 @Consumes("application/xml")
 	public void setApplicationDeploymentInfoCELAR(@PathParam("id")String cloudServiceId,String celar){
 		 controlCoordination.setApplicationDeploymentDescription(cloudServiceId,celar);
@@ -117,7 +117,7 @@ public class SyblControlWS {
 	 
 	 
 	 @POST
-	 @Path("/{id}/applicationDeployment")
+	 @Path("/{id}/deployment")
 	 @Consumes("application/xml")
 	public void setApplicationRefreshDeploymentInfo(String celar){
 		 controlCoordination.refreshApplicationDeploymentDescription(celar);
@@ -145,7 +145,7 @@ public class SyblControlWS {
 	}
 	 
 	 @POST
-	 @Path("/{id}/applicationDescription")
+	 @Path("/{id}/description")
 	 @Consumes("application/xml")
 	public void replaceCloudService(@PathParam("id")String cloudServiceId,String cloudService){
 		 controlCoordination.replaceCloudServiceWithRequirements(cloudServiceId, cloudService);
