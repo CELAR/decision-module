@@ -51,15 +51,17 @@
             <version>0.1-SNAPSHOT</version>
             <type>jar</type>
         </dependency>
-        <dependency>
-	<groupId>org.codehaus.jackson</groupId>
-	<artifactId>jackson-mapper-asl</artifactId>
-	<version>1.9.13</version>
-</dependency>
+        
 
         <dependency>
             <groupId>gr.ntua.cslab</groupId>
             <artifactId>orchestrator-beans</artifactId>
+            <version>0.1-SNAPSHOT</version>
+            <type>jar</type>
+        </dependency>
+         <dependency>
+            <groupId>gr.ntua.cslab</groupId>
+            <artifactId>orchestrator-client</artifactId>
             <version>0.1</version>
             <type>jar</type>
         </dependency>

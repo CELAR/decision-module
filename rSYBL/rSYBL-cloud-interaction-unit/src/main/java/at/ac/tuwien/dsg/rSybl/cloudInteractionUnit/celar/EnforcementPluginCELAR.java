@@ -25,7 +25,6 @@ import at.ac.tuwien.dsg.rSybl.cloudInteractionUnit.utils.Configuration;
 import at.ac.tuwien.dsg.rSybl.cloudInteractionUnit.utils.RuntimeLogger;
 import at.ac.tuwien.dsg.rSybl.dataProcessingUnit.api.MonitoringAPIInterface;
 import at.ac.tuwien.dsg.rSybl.dataProcessingUnit.monitoringPlugins.melaPlugin.MELA_API3;
-import com.sun.org.apache.xalan.internal.xsltc.compiler.NodeTest;
 import gr.ntua.cslab.orchestrator.beans.ExecutedResizingAction;
 import gr.ntua.cslab.orchestrator.beans.Parameter;
 import gr.ntua.cslab.orchestrator.beans.Parameters;
@@ -33,23 +32,22 @@ import gr.ntua.cslab.orchestrator.beans.ResizingAction;
 import gr.ntua.cslab.orchestrator.beans.ResizingActionList;
 import gr.ntua.cslab.orchestrator.beans.ResizingActionType;
 import gr.ntua.cslab.orchestrator.beans.ResizingExecutionStatus;
+import gr.ntua.cslab.orchestrator.client.ResizingActionsClient;
+import java.io.IOException;
 import java.io.OutputStream;
 import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map.Entry;
-import javax.xml.bind.JAXBContext;
-import org.codehaus.jackson.map.ObjectMapper;
 
-public class EnforcementPluginCELAR implements EnforcementInterface {
+public class EnforcementPluginCELAR {
 
     private MonitoringAPIInterface monitoringAPI;
     private Node cloudService;
     boolean cleanupGoingOn = false;
     boolean cleanupNecessary = true;
-    public static String API_URL = "http://localhost:8080/celar-orchestrator-war/resizing";
-    public HashMap<Integer, ResizingAction> actionsAvailable = new HashMap<Integer, ResizingAction>();
-
+    private HashMap<Integer, ResizingAction> actionsAvailable = new HashMap<Integer, ResizingAction>();
+    private static ResizingActionsClient resizingActionsClient = new ResizingActionsClient();
     public EnforcementPluginCELAR(Node cloudService) {
         
         this.cloudService = cloudService;
@@ -58,48 +56,18 @@ public class EnforcementPluginCELAR implements EnforcementInterface {
     }
 
     public void refreshElasticityActionsList() {
-        String ip = "";
-        URL url = null;
-        HttpURLConnection connection = null;
+        actionsAvailable = new HashMap<Integer,ResizingAction>();
         try {
-            url = new URL(API_URL);
-
-
-            connection = (HttpURLConnection) url.openConnection();
-            connection.setRequestMethod("GET");
-            connection.setRequestProperty("Content-Type", "application/xml");
-            connection.setRequestProperty("Accept", "application/xml");
-
-            InputStream errorStream = connection.getErrorStream();
-            if (errorStream != null) {
-                BufferedReader reader = new BufferedReader(new InputStreamReader(errorStream));
-                String line;
-                while ((line = reader.readLine()) != null) {
-                    Logger.getLogger(EnforcementPluginCELAR.class.getName()).log(Level.SEVERE, line);
-                }
-            }
-
-            InputStream inputStream = connection.getInputStream();
-            JAXBContext jAXBContext = JAXBContext.newInstance(ResizingActionList.class);
-            ResizingActionList retrievedData = (ResizingActionList) jAXBContext.createUnmarshaller().unmarshal(inputStream);
-            for (ResizingAction action : retrievedData.getResizingActions()) {
+            for (ResizingAction action : resizingActionsClient.listResizingActions().getResizingActions()) {
                 this.actionsAvailable.put(action.getId(), action);
             }
-
-        } catch (Exception e) {
-            // Logger.getLogger(MELA_API.class.getName()).log(Level.SEVERE, e.getMessage(), e);
-            e.printStackTrace();
-            Logger.getLogger(EnforcementPluginCELAR.class.getName()).log(Level.WARNING, "Trying to connect to the Orchestrator - failing ... . Retrying later");
-            RuntimeLogger.logger.error("Failing to connect to Orchestrator");
-
-        } finally {
-            if (connection != null) {
-                connection.disconnect();
-            }
+        } catch (IOException ex) {
+            Logger.getLogger(EnforcementPluginCELAR.class.getName()).log(Level.SEVERE, null, ex);
         }
+
+     
     }
 
-    @Override
     public boolean scaleIn(Node node) {
         boolean ok = true;
         DependencyGraph dependencyGraph = new DependencyGraph();
@@ -182,28 +150,10 @@ public class EnforcementPluginCELAR implements EnforcementInterface {
     }
 
     public static ResizingExecutionStatus checkForAction(String uniqueID) {
-        URL url = null;
-        HttpURLConnection connection = null;
+
         try {
-            url = new URL(API_URL + "/status");
-
-            connection = (HttpURLConnection) url.openConnection();
-            connection.setRequestMethod("GET");
-            connection.setRequestProperty("Content-Type", "application/xml");
-            connection.setRequestProperty("Accept", "application/xml");
-
-            InputStream errorStream = connection.getErrorStream();
-            if (errorStream != null) {
-                BufferedReader reader = new BufferedReader(new InputStreamReader(errorStream));
-                String line;
-                while ((line = reader.readLine()) != null) {
-                    Logger.getLogger(EnforcementPluginCELAR.class.getName()).log(Level.SEVERE, line);
-                }
-            }
-
-            InputStream inputStream = connection.getInputStream();
-            JAXBContext jAXBContext = JAXBContext.newInstance(ResizingExecutionStatus.class);
-            ResizingExecutionStatus retrievedData = (ResizingExecutionStatus) jAXBContext.createUnmarshaller().unmarshal(inputStream);
+          
+            ResizingExecutionStatus retrievedData = resizingActionsClient.getActionStatus(uniqueID).getExecutionStatus();
             return retrievedData;
 
         } catch (Exception e) {
@@ -212,16 +162,10 @@ public class EnforcementPluginCELAR implements EnforcementInterface {
             Logger.getLogger(EnforcementPluginCELAR.class.getName()).log(Level.WARNING, "Trying to connect to the Orchestrator - failing ... . Retrying later");
             RuntimeLogger.logger.error("Failing to connect to Orchestrator");
 
-        } finally {
-            if (connection != null) {
-                connection.disconnect();
-            }
-
-        }
+        } 
         return null;
     }
 
-    @Override
     public boolean scaleOut(Node node) {
         boolean ok = true;
         DependencyGraph dependencyGraph = new DependencyGraph();
@@ -302,38 +246,9 @@ public class EnforcementPluginCELAR implements EnforcementInterface {
     }
 
     public static ExecutedResizingAction executeResizingCommand(Integer actionID, Parameters pars) {
-        URL url = null;
-        HttpURLConnection connection = null;
         try {
-            url = new URL(API_URL + "?query=" + actionID + "/");
 
-
-
-            connection = (HttpURLConnection) url.openConnection();
-            connection.setRequestMethod("POST");
-            connection.setRequestProperty("Content-Type", "application/xml");
-            connection.setRequestProperty("Accept", "application/xml");
-            OutputStream os = connection.getOutputStream();
-            JAXBContext jaxbContext = JAXBContext.newInstance(Parameters.class);
-            jaxbContext.createMarshaller().marshal(pars, os);
-            StringWriter stringWriter = new StringWriter();
-            jaxbContext.createMarshaller().marshal(pars, stringWriter);
-
-            RuntimeLogger.logger.info(stringWriter.toString());
-            os.flush();
-            os.close();
-            InputStream errorStream = connection.getErrorStream();
-            if (errorStream != null) {
-                BufferedReader reader = new BufferedReader(new InputStreamReader(errorStream));
-                String line;
-                while ((line = reader.readLine()) != null) {
-                    Logger.getLogger(EnforcementPluginCELAR.class.getName()).log(Level.SEVERE, line);
-                }
-            }
-
-            InputStream inputStream = connection.getInputStream();
-            JAXBContext jAXBContext = JAXBContext.newInstance(ExecutedResizingAction.class);
-            ExecutedResizingAction retrievedData = (ExecutedResizingAction) jAXBContext.createUnmarshaller().unmarshal(inputStream);
+            ExecutedResizingAction retrievedData = resizingActionsClient.executeResizingAction(actionID, pars);
             return retrievedData;
 
         } catch (Exception e) {
@@ -342,57 +257,28 @@ public class EnforcementPluginCELAR implements EnforcementInterface {
             Logger.getLogger(EnforcementPluginCELAR.class.getName()).log(Level.WARNING, "Trying to connect to the Orchestrator - failing ... . Retrying later");
             RuntimeLogger.logger.error("Failing to connect to Orchestrator");
 
-        } finally {
-            if (connection != null) {
-                connection.disconnect();
-            }
         }
         return null;
     }
 
     public static ExecutedResizingAction executeResizingCommand(Integer actionID) {
-        URL url = null;
-        HttpURLConnection connection = null;
         try {
-            url = new URL(API_URL+"?action_id="+actionID  );
-
-
-
-            connection = (HttpURLConnection) url.openConnection();
-            connection.setRequestMethod("POST");
-            connection.setDoOutput(true);
-            connection.setRequestProperty("Content-Type", "application/xml");
-            connection.setRequestProperty("Accept", "application/xml");
-            OutputStream os = connection.getOutputStream();
-            String body="";
-            os.write(body.getBytes());
-            os.flush();
-            os.close(); 
-            InputStream errorStream = connection.getErrorStream();
-            if (errorStream != null) {
-                BufferedReader reader = new BufferedReader(new InputStreamReader(errorStream));
-                String line;
-                while ((line = reader.readLine()) != null) {
-                    Logger.getLogger(EnforcementPluginCELAR.class.getName()).log(Level.SEVERE, line);
+            
+            ExecutedResizingAction resizingAction=resizingActionsClient.executeResizingAction(actionID, null);
+            while (resizingActionsClient.getActionStatus(resizingAction.getUniqueId()).getExecutionStatus()==ResizingExecutionStatus.ONGOING){
+                try {
+                    Thread.sleep(10000);
+                } catch (InterruptedException ex) {
+                    Logger.getLogger(EnforcementPluginCELAR.class.getName()).log(Level.SEVERE, null, ex);
                 }
+            
             }
-
-            InputStream inputStream = connection.getInputStream();
-            JAXBContext jAXBContext = JAXBContext.newInstance(ExecutedResizingAction.class);
-            ExecutedResizingAction retrievedData = (ExecutedResizingAction) jAXBContext.createUnmarshaller().unmarshal(inputStream);
-            return retrievedData;
-
-        } catch (Exception e) {
-            // Logger.getLogger(MELA_API.class.getName()).log(Level.SEVERE, e.getMessage(), e);
-            e.printStackTrace();
-            Logger.getLogger(EnforcementPluginCELAR.class.getName()).log(Level.WARNING, "Trying to connect to the Orchestrator - failing ... . Retrying later");
-            RuntimeLogger.logger.error("Failing to connect to Orchestrator");
-
-        } finally {
-            if (connection != null) {
-                connection.disconnect();
-            }
+            return resizingAction;
+        } catch (IOException ex) {
+            Logger.getLogger(EnforcementPluginCELAR.class.getName()).log(Level.SEVERE, null, ex);
         }
+         
+     
         return null;
 //		try{
 //		Process p = Runtime.getRuntime().exec(command);                                                                                                                                                     
@@ -459,79 +345,10 @@ public class EnforcementPluginCELAR implements EnforcementInterface {
        enforcementPluginCELAR.scaleIn(node);
     }
 
-    public void cleanup() {
-        URL url = null;
-        try {
-            url = new URL(API_URL + "resize/?action=cleanup");
-            InputStream is = url.openStream();
-            BufferedReader rd = new BufferedReader(new InputStreamReader(is, Charset.forName("UTF-8")));
+   
 
-            StringBuilder sb = new StringBuilder();
+   
 
-
-            String cp = new String();
-            String s = "";
-            while ((cp = rd.readLine()) != null) {
-
-                sb.append(cp);
-                s += cp;
-            }
-            RuntimeLogger.logger.info("Cleanup returning " + s);
-            while (!checkStatus("", "cleanup")) {
-                try {
-                    Thread.sleep(10000);
-                } catch (InterruptedException e) {
-                    // TODO Auto-generated catch block
-                    e.printStackTrace();
-                }
-            }
-        } catch (Exception e) {
-            RuntimeLogger.logger.error("Error at cleanup" + e.getMessage() + " " + e.getCause());
-        }
-    }
-
-    public boolean checkStatus(String ip, String action) {
-        URL url = null;
-        HttpURLConnection connection = null;
-        try {
-
-            if (!ip.equalsIgnoreCase("")) {
-                url = new URL(API_URL + "resizestatus?action=" + action + "&ip=" + ip);
-            } else {
-                url = new URL(API_URL + "resizestatus/?action=" + action);
-                RuntimeLogger.logger.info("Check cleanup status " + url);
-
-            }
-
-            InputStream is = url.openStream();
-            BufferedReader rd = new BufferedReader(new InputStreamReader(is, Charset.forName("UTF-8")));
-
-            StringBuilder sb = new StringBuilder();
-
-
-            String cp = new String();
-            String s = "";
-            while ((cp = rd.readLine()) != null) {
-
-                sb.append(cp);
-                s += cp;
-            }
-            RuntimeLogger.logger.info("STATUS:" + sb);
-
-            if (s.contains("true")) {
-                return true;
-            } else {
-                return false;
-            }
-        } catch (Exception e) {
-            RuntimeLogger.logger.error("Error when checking for status of " + ip + " with action " + action);
-            return false;
-        }
-
-
-    }
-
-    @Override
     public List<String> getElasticityCapabilities() {
         // TODO Auto-generated method stub
         List<String> avActions = new ArrayList<String>();
@@ -541,34 +358,20 @@ public class EnforcementPluginCELAR implements EnforcementInterface {
         return avActions;
     }
 
-    public boolean enforceAction(String actionName, Node entity) {
-        if (actionName.equalsIgnoreCase("cleanup")) {
-            cleanupGoingOn = true;
-            cleanup();
-
-            cleanupGoingOn = false;
-            return true;
-        }
-        return false;
-    }
-
-    @Override
+   
     public void setControlledService(Node controlledService) {
         cloudService = controlledService;
 
     }
 
-    @Override
     public Node getControlledService() {
         return cloudService;
     }
 
-    @Override
     public void setMonitoringPlugin(MonitoringAPIInterface monitoring) {
         monitoringAPI = monitoring;
     }
 
-    @Override
     public boolean containsElasticityCapability(Node entity, String capability) {
         switch (capability.toLowerCase()) {
             case "scalein":
