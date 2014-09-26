@@ -22,7 +22,6 @@ LOG_DIR=/tmp/dmm-service
 test -x $JAVA -a -f $DAEMONDIR/$DAEMON || echo "test -x $JAVA -a -f $DAEMONDIR/$DAEMON failed"  
 test -x $JAVA -a -f $DAEMONDIR/$DAEMON || exit 0
 
-. /lib/lsb/init-functions
 . /etc/init.d/functions
 
 case "$1" in
