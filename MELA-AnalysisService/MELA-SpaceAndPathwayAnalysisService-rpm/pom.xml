@@ -12,7 +12,7 @@
         <relativePath>../../pom.xml</relativePath>
     </parent>
 
-    <url>https://github.com/CELAR/multilevel-metrics-evaluation</url>
+    <url>https://github.com/CELAR/decision-module</url>
 
     <description>
         CELAR MELA
@@ -69,7 +69,7 @@
                 <extensions>true</extensions>
                 <configuration>
                     <classifier>${package.os}</classifier>
-                    <!-- <release>${BUILD_NUMBER}.${package.os}</release> -->
+                    <release>${BUILD_NUMBER}.${package.os}</release> 
                     <version>2.0</version>
                     <summary>mela-analysis-service</summary>
                     <name>mela-analysis-service</name>
@@ -79,7 +79,7 @@
                     <copyright>Apache License, Version 2.0</copyright>
                     <url>http://infosys.tuwien.ac.at</url>
                     <needarch>noarch</needarch>
-                    <description>Multilevel Metrics Evaluation module</description>
+                    <description>Multilevel Metrics Evaluation module -Analysis</description>
                     <!--
                               <requires>
                                 <require>java&gt;= 1.7</require>
