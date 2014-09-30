@@ -16,7 +16,7 @@ DAEMONDIR=/opt/dmm-service
 DAEMON=rSYBL-analysis-engine-0.1-SNAPSHOT-exec-war.jar
 PIDDIR=/tmp
 PIDFILE=$PIDDIR/dmm-service.pid
-rsybl_HTTP_PORT=8182
+rsybl_HTTP_PORT=8280
 LOG_DIR=/tmp/dmm-service
 
 test -x $JAVA -a -f $DAEMONDIR/$DAEMON || echo "test -x $JAVA -a -f $DAEMONDIR/$DAEMON failed"  
