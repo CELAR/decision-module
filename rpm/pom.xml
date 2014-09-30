@@ -8,7 +8,7 @@
     <parent>
         <groupId>eu.celar</groupId>
         <artifactId>decision-making-module</artifactId>
-        <version>1.0.0-SNAPSHOT</version>
+        <version>1.0-SNAPSHOT</version>
     </parent>
 
     <url>https://github.com/CELAR/decision-module</url>
@@ -58,7 +58,7 @@
                                     <groupId>eu.celar.decision-making</groupId>
                                     <artifactId>rSYBL-analysis-engine</artifactId>
                                     <type>jar</type>
-                                    <version>0.1-SNAPSHOT</version>
+                                    <version>1.0-SNAPSHOT</version>
                                     <classifier>exec-war</classifier>
                                 </artifactItem>
                             </artifactItems>
@@ -95,7 +95,7 @@
                     <classifier>${package.os}</classifier>
                     <release>${BUILD_NUMBER}.${package.os}</release> 
                     <summary>Decision Making Module</summary>
-                    <version>1.0.0</version>
+                    <version>1.0</version>
                     <name>celar-decision-making</name>
                     <group>Applications/Engineering</group>
                     <vendor>TUWien</vendor>
@@ -114,7 +114,7 @@
                             <directoryIncluded>false</directoryIncluded>
                             <sources>
                                 <source>
-                                    <location>${project.build.directory}/decision-making-rpm-1.0.0-SNAPSHOT/decision-making-rpm-1.0.0-SNAPSHOT/</location>
+                                    <location>${project.build.directory}/decision-making-rpm-1.0-SNAPSHOT/decision-making-rpm-1.0-SNAPSHOT/</location>
                                 </source>
                             </sources>
                         </mapping>
@@ -127,7 +127,7 @@
                             <directoryIncluded>false</directoryIncluded>
                             <sources>
                                 <source>
-                                    <location>${project.build.directory}/decision-making-rpm-1.0.0-SNAPSHOT/decision-making-rpm-1.0.0-SNAPSHOT/dmm-service</location>
+                                    <location>${project.build.directory}/decision-making-rpm-1.0-SNAPSHOT/decision-making-rpm-1.0-SNAPSHOT/dmm-service</location>
                                 </source>
                             </sources>
                         </mapping>
