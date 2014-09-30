@@ -15,6 +15,7 @@ NAME=mela-analysis-service
 DAEMONDIR=./
 DAEMON=MELA-AnalysisService-1.0-SNAPSHOT-war-exec.jar
 PIDDIR=/tmp/
+LOG_DIR=/tmp/mela
 PIDFILE=$PIDDIR/mela-analysis-service.pid
 MELA_HTTP_PORT=8181
 
