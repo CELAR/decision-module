@@ -1,14 +1,14 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<artifactId>rSYBL-analysis-engine</artifactId>
-	<version>0.1-SNAPSHOT</version>
+	<version>1.0-SNAPSHOT</version>
 	<name>CELAR DMM Analysis Engine</name>
 	<description>CELAR DMM Analysis Engine</description>
 	<packaging>war</packaging>
 	<parent>
 		<groupId>eu.celar.decision-making</groupId>
 		<artifactId>rSYBL-decision-making-pom</artifactId>
-		<version>0.1-SNAPSHOT</version>
+                <version>1.0-SNAPSHOT</version>
 	</parent>
 	<dependencies>
 		<dependency>
@@ -65,72 +65,72 @@
 		<dependency>
 			<groupId>com.sun.jersey</groupId>
 			<artifactId>jersey-atom</artifactId>
-			<version>1.17.1</version>
+			<version>1.8</version>
 		</dependency>
 		<dependency>
 			<groupId>com.sun.jersey</groupId>
 			<artifactId>jersey-json</artifactId>
-			<version>1.17.1</version>
+			<version>1.8</version>
 		</dependency>
 		<dependency>
 			<groupId>com.sun.jersey</groupId>
 			<artifactId>jersey-core</artifactId>
-			<version>1.17.1</version>
+			<version>1.8</version>
 		</dependency>
 		<dependency>
 			<groupId>com.sun.jersey</groupId>
 			<artifactId>jersey-server</artifactId>
-			<version>1.17.1</version>
+			<version>1.8</version>
 		</dependency>
 		<dependency>
 			<groupId>com.sun.jersey</groupId>
 			<artifactId>jersey-client</artifactId>
-			<version>1.17.1</version>
+			<version>1.8</version>
 		</dependency>
 		<dependency>
 			<groupId>com.sun.jersey.contribs</groupId>
 			<artifactId>jersey-atom-abdera</artifactId>
-			<version>1.17.1</version>
+			<version>1.8</version>
 		</dependency>
 		<dependency>
 			<groupId>com.sun.jersey.contribs</groupId>
 			<artifactId>jersey-apache-client</artifactId>
-			<version>1.17.1</version>
+			<version>1.8</version>
 		</dependency>
 		<dependency>
 			<groupId>com.sun.jersey.contribs</groupId>
 			<artifactId>jersey-spring</artifactId>
-			<version>1.17.1</version>
+			<version>1.8</version>
 		</dependency>
 		<dependency>
 			<groupId>com.sun.jersey.contribs</groupId>
 			<artifactId>jersey-multipart</artifactId>
-			<version>1.17.1</version>
+			<version>1.8</version>
 		</dependency>
 		<dependency>
 			<groupId>com.sun.jersey.contribs</groupId>
 			<artifactId>jersey-guice</artifactId>
-			<version>1.17.1</version>
+			<version>1.8</version>
 		</dependency>
 		<dependency>
 			<groupId>com.sun.jersey.contribs</groupId>
 			<artifactId>jersey-simple-server</artifactId>
-			<version>1.17.1</version>
+			<version>1.8</version>
 		</dependency>
 		<dependency>
 			<groupId>com.sun.jersey.contribs.jersey-oauth</groupId>
 			<artifactId>oauth-client</artifactId>
-			<version>1.17.1</version>
+			<version>1.8</version>
 		</dependency>
 		<dependency>
 			<groupId>com.sun.jersey.contribs.jersey-oauth</groupId>
 			<artifactId>oauth-server</artifactId>
-			<version>1.17.1</version>
+			<version>1.8</version>
 		</dependency>
 		<dependency>
 			<groupId>com.sun.jersey.contribs.jersey-oauth</groupId>
 			<artifactId>oauth-signature</artifactId>
-			<version>1.17.1</version>
+			<version>1.8</version>
 		</dependency>
 		<dependency>
 			<groupId>xstream</groupId>
@@ -140,7 +140,7 @@
 		<dependency>
 			<groupId>com.sun.xml.bind</groupId>
 			<artifactId>jaxb-impl</artifactId>
-			<version>2.1.12</version>
+			<version>1.0.6</version>
 		</dependency>
 		<dependency>
 			<groupId>xerces</groupId>
@@ -150,34 +150,34 @@
 		<dependency>
 			<groupId>at.ac.tuwien.rSYBL.control-service</groupId>
 			<artifactId>rSYBL-analysis-engine</artifactId>
-			<version>0.1-SNAPSHOT</version>
-			<type>jar</type>
+            <version>0.1-SNAPSHOT</version>
+            <type>jar</type>
 			<classifier>sources</classifier>
 		</dependency>
 		<dependency>
 			<groupId>eu.celar.decision-making</groupId>
 			<artifactId>rSYBL-cloud-application-dependency-graph</artifactId>
-			<version>0.1-SNAPSHOT</version>
+			<version>1.0-SNAPSHOT</version>
 		</dependency>
 		<dependency>
 			<groupId>eu.celar.decision-making</groupId>
 			<artifactId>rSYBL-data-processing-unit</artifactId>
-			<version>0.1-SNAPSHOT</version>
+			<version>1.0-SNAPSHOT</version>
 		</dependency>
 		<dependency>
 			<groupId>eu.celar.decision-making</groupId>
 			<artifactId>rSYBL-planning-engine</artifactId>
-			<version>0.1-SNAPSHOT</version>
+			<version>1.0-SNAPSHOT</version>
 		</dependency>
 		<dependency>
 			<groupId>eu.celar.decision-making</groupId>
 			<artifactId>rSYBL-cloud-interaction-unit</artifactId>
-			<version>0.1-SNAPSHOT</version>
+			<version>1.0-SNAPSHOT</version>
 		</dependency>
 		<dependency>
 			<groupId>eu.celar.decision-making</groupId>
 			<artifactId>rSYBL-sybl-processing-unit</artifactId>
-			<version>0.1-SNAPSHOT</version>
+			<version>1.0-SNAPSHOT</version>
 		</dependency>
 	</dependencies>
 	<build>
