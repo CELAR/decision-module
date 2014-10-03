@@ -23,7 +23,7 @@
         <dependency>
             <groupId>eu.celar.decision-making</groupId>
             <artifactId>rSYBL-analysis-engine</artifactId>
-            <version>0.1-SNAPSHOT</version>
+            <version>1.0-SNAPSHOT</version>
             <type>jar</type>
             <classifier>exec-war</classifier>
         </dependency>

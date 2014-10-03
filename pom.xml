@@ -19,6 +19,11 @@
     <!--<module>SALSA</module> -->
   </modules>
 
+ <properties>
+        <spring.version>4.0.0.RELEASE</spring.version>
+        <slf4j.version>1.5.11</slf4j.version>
+    </properties>
+
   <profiles>
     <profile>
       <id>build-server-rpm</id>

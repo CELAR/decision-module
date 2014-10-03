@@ -12,7 +12,8 @@
     <artifactId>MELA-AnalysisService</artifactId>
     <name>MELA-AnalysisService</name>
     <description> MELA Service profiding elasticity analysis to the decision module </description>
-    
+
+
     <packaging>pom</packaging>
 
     <modules>
