@@ -70,7 +70,7 @@
                 <configuration>
                     <classifier>${package.os}</classifier>
                     <release>${BUILD_NUMBER}.${package.os}</release> 
-                    <version>2.0</version>
+                    <version>1.0</version>
                     <summary>mela-analysis-service</summary>
                     <name>mela-analysis-service</name>
                     <group>Applications/Engineering</group>
