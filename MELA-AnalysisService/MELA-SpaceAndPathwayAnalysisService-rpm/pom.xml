@@ -9,7 +9,6 @@
         <groupId>eu.celar.multilevel-metrics-evaluation</groupId>
         <artifactId>MELA-Pom</artifactId>
         <version>1.0-SNAPSHOT</version>
-        <relativePath>../../pom.xml</relativePath>
     </parent>
 
     <url>https://github.com/CELAR/decision-module</url>
@@ -42,7 +41,7 @@
         <plugins>
 
             <plugin>
-               	<groupId>org.apache.maven.plugins</groupId>
+                <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-assembly-plugin</artifactId>
                 <configuration>
                     <descriptors>
