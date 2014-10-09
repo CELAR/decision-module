@@ -93,6 +93,12 @@ public class SyblControlWS {
 	public void setApplicationDescriptionInfo(@PathParam("id")String cloudServiceId,String celar){
 		 controlCoordination.setApplicationDescriptionInfo(cloudServiceId,celar);
 	}
+          @PUT
+	 @Path("/{id}/description/tosca")
+	 @Consumes("application/xml")
+	public void setApplicationDescriptionTOSCA(@PathParam("id")String cloudServiceId,String celar){
+		 controlCoordination.setApplicationDescriptionInfoTOSCA(cloudServiceId,celar);
+	}
 	 @PUT
 	 @Path("/{id}/elasticityCapabilitiesEffects")
 	 @Consumes("application/json")
