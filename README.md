@@ -1,4 +1,7 @@
 CELAR Decision Module
+<figure>
+<img src="https://github.com/tuwiendsg/rSYBL/blob/master/docs/logo.png?raw=true" width="300px" >
+</figure>
 
 ===============
 
