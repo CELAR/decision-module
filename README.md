@@ -1,6 +1,7 @@
+<h1>CELAR Decision Module</h1>
 <figure>
 <img src="http://www.celarcloud.eu/wp-content/uploads/2012/12/Celar.png" width="300px" >
-</figure> <h1>CELAR Decision Module</h1>
+</figure> 
 
 
 ===============
