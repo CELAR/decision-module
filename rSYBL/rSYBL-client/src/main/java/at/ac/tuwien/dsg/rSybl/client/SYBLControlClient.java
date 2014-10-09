@@ -59,7 +59,7 @@ public class SYBLControlClient {
 
     public void setApplicationDescription(String applicationID,String appDescription) {
         
-        callPUT(appDescription, applicationID+"/description");        
+        callPUT(appDescription, applicationID+"/description/tosca");        
         
         
         

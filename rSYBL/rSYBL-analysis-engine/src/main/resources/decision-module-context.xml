@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:jaxrs="http://cxf.apache.org/jaxrs" xmlns:cxf="http://cxf.apache.org/core"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+       http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd
+       http://cxf.apache.org/jaxrs http://cxf.apache.org/schemas/jaxrs.xsd
+       http://cxf.apache.org/core http://cxf.apache.org/schemas/core.xsd">
+
+    <!-- MELA properties -->
+    <context:property-placeholder location="file:./config.properties"/>
+
+    <import resource="classpath:META-INF/cxf/cxf.xml"/>
+
+    <!-- Adds annotated spring beans -->
+    <context:component-scan base-package="at.ac.tuwien.dsg.rSybl.analysisEngine.celar"/>
+     
+    <jaxrs:server id="api" address="/">
+        <jaxrs:serviceBeans>
+            <ref bean="syblControlWS"/>
+            <!--<bean id="swaggerResourceJSON" class="com.wordnik.swagger.jaxrs.listing.ApiListingResourceJSON"/>-->
+        </jaxrs:serviceBeans>
+        <jaxrs:features>
+            <cxf:logging/>
+        </jaxrs:features>
+        <jaxrs:providers>
+            <bean class="com.wordnik.swagger.jaxrs.listing.ResourceListingProvider"/>
+            <bean class="com.wordnik.swagger.jaxrs.listing.ApiDeclarationProvider"/>
+        </jaxrs:providers>
+    </jaxrs:server><!--
+
+    <bean id="swaggerConfig" class="com.wordnik.swagger.jaxrs.config.BeanConfig">
+        <property name="resourcePackage" value="at.ac.tuwien.dsg.rSybl.analysisEngine.celar.api"/>
+        <property name="version" value="0.1.0"/>
+        <property name="basePath" value="http://localhost:8081/REST_WS"/>
+        <property name="title" value="Decision module service"/>
+        <property name="description" value="A service for configuring decision module" />
+        <property name="contact" value="e.copil@dsg.tuwien.ac.at"/>
+        <property name="license" value="Apache 2.0 License"/>
+        <property name="licenseUrl" value="http://www.apache.org/licenses/LICENSE-2.0.html"/>
+        <property name="scan" value="true"/>
+    </bean>-->
+
+
+
+</beans>

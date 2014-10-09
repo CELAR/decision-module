@@ -33,7 +33,7 @@
 </style>
 <body>
     <script src="http://d3js.org/d3.v3.js"></script>
-    <script src="./spin.js" type="text/javascript"></script>
+     <script src="scripts/spin.js" type="text/javascript"></script>
     <div id="loadingIcon"></div>
     <script>
 
@@ -506,7 +506,7 @@
             }
 
             elasticityPathwayRequest.onreadystatechange = processElasticityPathwayRequestResponse;
-            elasticityPathwayRequest.open("POST", "./REST_WS/" + vars[0] + "/elasticitypathway", true);
+            elasticityPathwayRequest.open("POST", "./REST_WS/" + vars[0] + "/elasticitypathway/json", true);
             elasticityPathwayRequest.setRequestHeader('Content-type', 'application/xml');
             elasticityPathwayRequest.send("<MonitoredElement id=\"" + vars[1] + "\" level=\"" + vars[2] + "\"/>");
 
