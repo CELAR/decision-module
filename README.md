@@ -1,6 +1,4 @@
 <h1>CELAR Decision Module</h1>
-===============
-
 Please consult the wiki https://github.com/CELAR/decision-module/wiki for deployment, bootstrapping and customization information.
 
 The Decision Module contains three main components:
