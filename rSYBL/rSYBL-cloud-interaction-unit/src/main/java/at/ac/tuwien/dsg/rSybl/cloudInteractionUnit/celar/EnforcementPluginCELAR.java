@@ -81,7 +81,7 @@ public class EnforcementPluginCELAR {
                 String status = checkForAction(executedResizingAction.getUniqueId());
                 while (status.equalsIgnoreCase("ONGOING")) { 
                     try {
-                        Thread.sleep(10001);
+                        Thread.sleep(10000);
                     } catch (InterruptedException ex) {
                         Logger.getLogger(EnforcementPluginCELAR.class.getName()).log(Level.SEVERE, null, ex);
                     }
