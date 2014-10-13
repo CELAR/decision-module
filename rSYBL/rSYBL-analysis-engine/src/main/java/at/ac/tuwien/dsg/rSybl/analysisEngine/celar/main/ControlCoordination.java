@@ -77,7 +77,9 @@ public class ControlCoordination {
     public void setApplicationDescriptionInfo(String currentControls, String descriptionInfo) {
         controls.get(currentControls).setApplicationDescriptionInfo(descriptionInfo);
     }
-
+   public void setApplicationDescriptionInfoTOSCA(String currentControls, String descriptionInfo) {
+        controls.get(currentControls).setApplicationDescriptionInfoTOSCABased(descriptionInfo);
+    }
     public void startControl(String cloudServiceId) {
         controls.get(cloudServiceId).start();
     }
