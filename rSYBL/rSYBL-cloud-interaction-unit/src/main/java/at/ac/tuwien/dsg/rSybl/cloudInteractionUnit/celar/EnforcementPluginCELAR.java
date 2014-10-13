@@ -78,8 +78,8 @@ public class EnforcementPluginCELAR {
             System.out.println(action.getModuleName());
             if (action.getType() == ResizingActionType.SCALE_IN && toBeScaled.getId().equalsIgnoreCase(action.getModuleName())) {
                 ExecutedResizingAction executedResizingAction = executeResizingCommand(action.getId());
-                ResizingExecutionStatus status = checkForAction(executedResizingAction.getUniqueId());
-                while (status == ResizingExecutionStatus.ONGOING) {
+                String status = checkForAction(executedResizingAction.getUniqueId());
+                while (status.equalsIgnoreCase("ONGOING")) {
                     try {
                         Thread.sleep(10000);
                     } catch (InterruptedException ex) {
@@ -87,7 +87,7 @@ public class EnforcementPluginCELAR {
                     }
                     status = checkForAction(executedResizingAction.getUniqueId());
                 }
-                if (status == ResizingExecutionStatus.SUCCESS) {
+                if (status.equalsIgnoreCase("SUCCESS")) {
                     //TODO : Assume we have value IP returned
                     Parameters par = executedResizingAction.getParameters();
                     Parameter p = (Parameter) par.getParameters().get(0);
@@ -99,7 +99,7 @@ public class EnforcementPluginCELAR {
                     }
                 }
 
-                if (status == ResizingExecutionStatus.FAILED) {
+                if (status.equalsIgnoreCase("FAILED")) {
                 }
                 break;
             }
@@ -121,8 +121,8 @@ public class EnforcementPluginCELAR {
                 par.setValue(ip);
                 pars.addParameter(par);
                 ExecutedResizingAction executedResizingAction = executeResizingCommand(action.getId(), pars);
-                ResizingExecutionStatus status = checkForAction(executedResizingAction.getUniqueId());
-                while (status == ResizingExecutionStatus.ONGOING) {
+                String status = checkForAction(executedResizingAction.getUniqueId());
+                while (status.equalsIgnoreCase("ONGOING")) {
                     try {
                         Thread.sleep(10000);
                     } catch (InterruptedException ex) {
@@ -130,7 +130,7 @@ public class EnforcementPluginCELAR {
                     }
                     status = checkForAction(executedResizingAction.getUniqueId());
                 }
-                if (status == ResizingExecutionStatus.SUCCESS) {
+                if (status.equalsIgnoreCase("SUCCESS")) {
                     //TODO : Assume we have value IP returned
                     //Parameters par = executedResizingAction.getParameters();
                     //Parameter p = (Parameter) par.getParameters().get(0);
@@ -141,7 +141,7 @@ public class EnforcementPluginCELAR {
 
                 }
 
-                if (status == ResizingExecutionStatus.FAILED) {
+                if (status.equalsIgnoreCase("FAILED")) {
                 }
                 break;
             }
@@ -149,11 +149,11 @@ public class EnforcementPluginCELAR {
         return ok;
     }
 
-    public static ResizingExecutionStatus checkForAction(String uniqueID) {
+    public static String checkForAction(String uniqueID) {
 
         try {
           
-            ResizingExecutionStatus retrievedData = resizingActionsClient.getActionStatus(uniqueID).getExecutionStatus();
+            String retrievedData = resizingActionsClient.getActionStatus(uniqueID).getExecutionStatus();
             return retrievedData;
 
         } catch (Exception e) {
@@ -175,8 +175,8 @@ public class EnforcementPluginCELAR {
             ResizingAction action = actionE.getValue();
             if (action.getType() == ResizingActionType.SCALE_OUT && toBeScaled.getId().equalsIgnoreCase(action.getModuleName())) {
                 ExecutedResizingAction executedResizingAction = executeResizingCommand(action.getId());
-                ResizingExecutionStatus status = checkForAction(executedResizingAction.getUniqueId());
-                while (status == ResizingExecutionStatus.ONGOING) {
+                String status = checkForAction(executedResizingAction.getUniqueId());
+                while (status.equalsIgnoreCase("ONGOING")) {
                     try {
                         Thread.sleep(10000);
                     } catch (InterruptedException ex) {
@@ -184,7 +184,7 @@ public class EnforcementPluginCELAR {
                     }
                     status = checkForAction(executedResizingAction.getUniqueId());
                 }
-                if (status == ResizingExecutionStatus.SUCCESS) {
+                if (status.equalsIgnoreCase("SUCCESS")) {
                     //TODO : Assume we have value IP returned
                     Parameters par = executedResizingAction.getParameters();
                     Parameter p = (Parameter) par.getParameters().get(0);
@@ -237,7 +237,7 @@ public class EnforcementPluginCELAR {
                     }
                 }
 
-                if (status == ResizingExecutionStatus.FAILED) {
+                if (status.equalsIgnoreCase("FAILED")) {
                 }
                 break;
             }
@@ -265,7 +265,7 @@ public class EnforcementPluginCELAR {
         try {
             
             ExecutedResizingAction resizingAction=resizingActionsClient.executeResizingAction(actionID, null);
-            while (resizingActionsClient.getActionStatus(resizingAction.getUniqueId()).getExecutionStatus()==ResizingExecutionStatus.ONGOING){
+            while (resizingActionsClient.getActionStatus(resizingAction.getUniqueId()).getExecutionStatus().equalsIgnoreCase("ONGOING")){
                 try {
                     Thread.sleep(10000);
                 } catch (InterruptedException ex) {
