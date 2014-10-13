@@ -51,10 +51,12 @@ public class SYBLControlClient {
     
     public void initialInstantiationLifecycle(String applicationID,String appDescription, String appDeployment, String effects, String compRules) {
         this.compRules = compRules;
+		prepareControl(applicationID);
         setApplicationDescription(applicationID,appDescription);
         setApplicationDeployment(applicationID,appDeployment);
         setElasticityCapabilitiesEffects(applicationID,effects);
         setMetricsCompositionRules(applicationID,compRules);
+		startApplication(applicationID);
     }
 
     public void setApplicationDescription(String applicationID,String appDescription) {
@@ -69,7 +71,13 @@ public class SYBLControlClient {
         callPUT(appDescription, applicationID+"/deployment");        
         
     }
-    
+     public void prepareControl(String id) {
+        
+        
+        callPUT("", id+"/prepareControl");
+        
+        
+    }
     public void setMetricsCompositionRules(String id,String rules) {
         
         
