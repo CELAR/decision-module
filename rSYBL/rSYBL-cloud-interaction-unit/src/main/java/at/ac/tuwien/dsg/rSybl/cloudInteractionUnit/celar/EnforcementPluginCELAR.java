@@ -79,9 +79,9 @@ public class EnforcementPluginCELAR {
             if (action.getType() == ResizingActionType.SCALE_IN && toBeScaled.getId().equalsIgnoreCase(action.getModuleName())) {
                 ExecutedResizingAction executedResizingAction = executeResizingCommand(action.getId());
                 String status = checkForAction(executedResizingAction.getUniqueId());
-                while (status.equalsIgnoreCase("ONGOING")) {
+                while (status.equalsIgnoreCase("ONGOING")) { 
                     try {
-                        Thread.sleep(10000);
+                        Thread.sleep(10001);
                     } catch (InterruptedException ex) {
                         Logger.getLogger(EnforcementPluginCELAR.class.getName()).log(Level.SEVERE, null, ex);
                     }
