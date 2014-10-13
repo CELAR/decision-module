@@ -46,6 +46,7 @@
         <url>https://github.com/CELAR/decision-module/issues</url>
     </issueManagement>
 
+
     <scm>
         <connection>scm:git:ssh://git@github.com:CELAR/decision-module.git</connection>
         <developerConnection>scm:git:ssh://git@github.com:CELAR/decision-module.git</developerConnection>
