@@ -52,7 +52,11 @@
             <type>jar</type>
         </dependency>
         
-
+ <dependency>
+            <groupId>com.sixsq.slipstream</groupId>
+            <artifactId>SlipStreamPersistence</artifactId>
+            <version>2.3.0</version>
+        </dependency>
         <dependency>
             <groupId>gr.ntua.cslab</groupId>
             <artifactId>orchestrator-beans</artifactId>
@@ -77,6 +81,30 @@
              <version>1.0-SNAPSHOT</version>
         </dependency>
     </dependencies>
+    <repositories>
+          <repository>
+            <releases>
+                <enabled>true</enabled>
+            </releases>
+            <snapshots>
+                <enabled>false</enabled>
+            </snapshots>
+            <id>slipstream.releases</id>
+            <name>SlipStream Releases</name>
+            <url>http://nexus.sixsq.com/content/repositories/releases</url>
+        </repository>
+        <repository>
+            <releases>
+                <enabled>false</enabled>
+            </releases>
+            <snapshots>
+                <enabled>true</enabled>
+            </snapshots>
+            <id>slipstream.snapshots</id>
+            <name>SlipStream Snapshots</name>
+            <url>http://nexus.sixsq.com/content/repositories/snapshots</url>
+        </repository>
+    </repositories>
     <build>
         <plugins>
     
