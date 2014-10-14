@@ -20,8 +20,9 @@ import at.ac.tuwien.dsg.csdg.Relationship.RelationshipType;
 import at.ac.tuwien.dsg.csdg.SimpleRelationship;
 import at.ac.tuwien.dsg.csdg.relationships.ElasticityRelationship;
 import at.ac.tuwien.dsg.rSybl.cloudInteractionUnit.celar.dbalancer.ElasticityAction;
+import at.ac.tuwien.dsg.rSybl.cloudInteractionUnit.celar.utils.Configuration;
 import at.ac.tuwien.dsg.rSybl.cloudInteractionUnit.enforcementPlugins.interfaces.EnforcementInterface;
-import at.ac.tuwien.dsg.rSybl.cloudInteractionUnit.utils.Configuration;
+
 import at.ac.tuwien.dsg.rSybl.cloudInteractionUnit.utils.RuntimeLogger;
 import at.ac.tuwien.dsg.rSybl.dataProcessingUnit.api.MonitoringAPIInterface;
 import at.ac.tuwien.dsg.rSybl.dataProcessingUnit.monitoringPlugins.melaPlugin.MELA_API3;
@@ -40,7 +41,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map.Entry;
 import com.sixsq.slipstream.statemachine.States;
-
+import gr.ntua.cslab.orchestrator.client.conf.ClientConfiguration;
+ 
 public class EnforcementPluginCELAR {
 
     private MonitoringAPIInterface monitoringAPI;
@@ -53,7 +55,10 @@ public class EnforcementPluginCELAR {
         
         this.cloudService = cloudService;
 //        API_URL = Configuration.getEnforcementServiceURL();
-
+        ClientConfiguration clientConfiguration = new ClientConfiguration();
+        clientConfiguration.setHost(Configuration.getOrchestratorHost());
+        clientConfiguration.setPort(Integer.parseInt(Configuration.getOrchestratorPort()));
+        resizingActionsClient.setConfiguration(clientConfiguration);
     }
 
     public void refreshElasticityActionsList() {
