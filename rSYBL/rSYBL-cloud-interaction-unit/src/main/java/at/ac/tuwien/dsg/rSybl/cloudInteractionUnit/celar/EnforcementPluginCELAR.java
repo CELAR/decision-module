@@ -43,7 +43,7 @@ import java.util.Map.Entry;
 import com.sixsq.slipstream.statemachine.States;
 import gr.ntua.cslab.orchestrator.client.conf.ClientConfiguration;
  
-public class EnforcementPluginCELAR {
+public class EnforcementPluginCELAR implements EnforcementInterface{
 
     private MonitoringAPIInterface monitoringAPI;
     private Node cloudService;
@@ -385,5 +385,21 @@ public class EnforcementPluginCELAR {
             default:
                 return false;
         }
+    }
+
+    @Override
+    public boolean scaleOut(double violationDegree, Node toBeScaled) {
+      return scaleOut(toBeScaled);
+    }
+
+    @Override
+    public boolean enforceAction(String actionName, Node entity) {
+        RuntimeLogger.logger.info("Generic data not implemetned for CELAR ");
+        return false;
+    }
+
+    @Override
+    public void undeployService(Node serviceID) {
+        RuntimeLogger.logger.info("Undeploy service not implemented yet");
     }
 }
