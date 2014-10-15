@@ -31,8 +31,9 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.UriInfo;
 
 import at.ac.tuwien.dsg.csdg.elasticityInformation.elasticityRequirements.SYBLAnnotation;
-import at.ac.tuwien.dsg.rSybl.analysisEngine.celar.main.ControlCoordination;
+import at.ac.tuwien.dsg.rSybl.analysisEngine.main.ControlCoordination;
 import com.wordnik.swagger.annotations.Api;
+import javax.ws.rs.DELETE;
 import javax.ws.rs.PathParam;
 
 import javax.ws.rs.ext.Provider;
@@ -46,140 +47,185 @@ import org.springframework.stereotype.Service;
 public class SyblControlWS {
 
     @Context
-    private UriInfo context;
+        private UriInfo context;
+	private ControlCoordination controlCoordination;
+	
+	public SyblControlWS(){
+		controlCoordination=new ControlCoordination();
+	}
+	@GET
+	@Path("/test")
+	@Produces(MediaType.TEXT_PLAIN)
+	public String test(){
+		return "Test working";
+	}
+        @PUT
+        @Path("/{id}/onDemandControl/unhealthy")
+        @Consumes("plain/txt")
+        public void checkUnhealthyState(String servicePartID,@PathParam("id")String id){
+            controlCoordination.triggerHealthFixServicePart(servicePartID, servicePartID);
+        }
+	
+	 @PUT
+	 @Path("/processAnotation")
+	 @Consumes("application/xml")
+	public void processAnnotation(String serviceId,String entity,SYBLAnnotation annotation){
+			controlCoordination.processAnnotation(serviceId,entity, annotation);
+		
+	}
+	 @PUT
+	 @Path("/descriptionInternalModel")
+	 @Consumes("application/xml")
+	public void setApplicationDescriptionInfoInternalModel(String applicationDescriptionXML, String elasticityRequirementsXML, String deploymentInfoXML){
+		 controlCoordination.setApplicationDescriptionInfoInternalModel(applicationDescriptionXML, elasticityRequirementsXML, deploymentInfoXML);
+	}
+	 
+	 @PUT
+	 @Path("/TOSCADescriptionAndStartControl")
+	 @Consumes("application/xml")
+	public void setTOSCAAndStartControl(String tosca){
+		 controlCoordination.setAndStartToscaControl(tosca);
+		 
+	}
+            @PUT
+	 @Path("/{id}/description/tosca")
+	 @Consumes("application/xml")
+	public void setApplicationDescriptionTOSCA(@PathParam("id")String cloudServiceId,String celar){
+		 controlCoordination.setApplicationDescriptionInfoTOSCA(cloudServiceId,celar);
+	}
+            
+             @DELETE
+	 @Path("/{id}")
+	 @Consumes("application/xml")
+	public void removeService(@PathParam("id")String cloudServiceId){
+		 controlCoordination.removeService(cloudServiceId);
+	}
+             
+	 @PUT
+	 @Path("/{id}/description")
+	 @Consumes("application/xml")
+	public void setApplicationDescriptionInfo(@PathParam("id")String cloudServiceId,String celar){
+		 controlCoordination.setApplicationDescriptionInfo(cloudServiceId,celar);
+	}
+          @GET
+	 @Path("/{id}/description")
+	 @Produces("application/xml")
+	public String getApplicationDescriptionInfo(@PathParam("id")String cloudServiceId){
+		 return controlCoordination.getApplicationDescriptionInfo(cloudServiceId);
+	}
+          
+	 @PUT
+	 @Path("/{id}/elasticityCapabilitiesEffects")
+	 @Consumes("application/json")
+	public void setElasticityCapabilitiesEffects(@PathParam("id")String cloudServiceId,String effects){
+		 controlCoordination.setElasticityCapabilitiesEffects(effects);
+	}
+	 
+	 @PUT
+	 @Path("/{id}/compositionRules")
+	 @Consumes("application/xml")
+	public void setMetricsComposition(@PathParam("id")String cloudServiceId,String composition){
+		 controlCoordination.setMetricComposition(cloudServiceId,composition);
+	}
+	 
+	 @PUT
+	 @Path("/{id}/deployment")
+	 @Consumes("application/xml")
+	public void setApplicationDeploymentInfoCELAR(@PathParam("id")String cloudServiceId,String celar){
+		 controlCoordination.setApplicationDeploymentDescription(cloudServiceId,celar);
 
-    @Autowired
-    private ControlCoordination controlCoordination;
+	} 
+	 
+	 
+	 @POST
+	 @Path("/{id}/deployment")
+	 @Consumes("application/xml")
+	public void setApplicationRefreshDeploymentInfo(@PathParam("id")String cloudServiceId,String description){
+		 controlCoordination.refreshApplicationDeploymentDescription(description);
 
-//    public SyblControlWS() {
-//        controlCoordination = new ControlCoordination();
-//    }
+	} 
+	 
+	 @PUT
+	 @Path("/{id}/prepareControl")
+	 @Consumes("application/xml")
+	public void prepareControl(@PathParam("id")String cloudServiceId){
+		 controlCoordination.prepareControl(cloudServiceId);
+	} 
+	 @PUT
+	 @Path("/{id}/startControl")
+	 @Consumes("application/xml")
+	public void startControl(@PathParam("id")String cloudServiceId){
+		 controlCoordination.startControl(cloudServiceId);
+	} 
+	
+	 @PUT
+	 @Path("/{id}/stopControl")
+	 @Consumes("application/xml")
+	public void stopControl(@PathParam("id")String cloudServiceId){
+		 controlCoordination.stopControl(cloudServiceId);
+	}
+	 
+	 @POST
+	 @Path("/{id}/description")
+	 @Consumes("application/xml")
+	public void replaceCloudService(@PathParam("id")String cloudServiceId,String cloudService){
+		 controlCoordination.replaceCloudServiceWithRequirements(cloudServiceId, cloudService);
+	}
 
-    @GET
-    @Path("/test")
-    @Produces(MediaType.TEXT_PLAIN)
-    public String test() {
-        return "Test working";
-    }
+	
+	 @POST
+	 @Path("/{id}/compositionRules")
+	 @Consumes("application/xml")
+	public void replaceCompositionRules(@PathParam("id")String cloudServiceId,String composition){
+		 controlCoordination.replaceCompositionRules(cloudServiceId,composition);
+	}
+	 @POST
+	 @Path("/{id}/elasticityRequirements/xml")
+	 @Consumes("application/xml")
+	public void replaceRequirements(@PathParam("id")String cloudServiceId,String requirements){
+		controlCoordination.replaceRequirements(cloudServiceId, requirements); 
+	}
+         
+         @GET
+	 @Path("/{id}/elasticityRequirements/xml")
+	 @Produces("application/xml")
+	public String getXMLRequirements(@PathParam("id")String cloudServiceId){
+		return controlCoordination.getRequirements(cloudServiceId); 
+	}
 
-    @PUT
-    @Path("/{id}/onDemandControl/unhealthy")
-    @Consumes("plain/txt")
-    public void checkUnhealthyState(String servicePartID, @PathParam("id") String id) {
-        controlCoordination.triggerHealthFixServicePart(servicePartID, servicePartID);
-    }
+          @POST
+	 @Path("/{id}/elasticityCapabilitiesEffects")
+	 @Consumes("application/json")
+	public void replaceEffects(@PathParam("id") String id,String effects){
+		 controlCoordination.replaceEffects(id,effects);
+	}
+         
+        @GET
+        @Produces(MediaType.APPLICATION_JSON)
+	 @Path("/{id}/structuralData/json")
+	public String getStructuralData(@PathParam("id") String id){
+            return controlCoordination.getJSONStructureOfService(id);
+	}
+        @GET
+        @Produces(MediaType.TEXT_PLAIN)
+	 @Path("/elasticservices")
+	public String getServices(){
+            return controlCoordination.getServices();
+	}
+        
+  
+        @POST
+        @Consumes(MediaType.TEXT_PLAIN)
+	 @Path("/{id}/replaceRequirements/plain")
+	public void replaceRequirementsString(@PathParam("id") String id,String requirement){
+          controlCoordination.replaceRequirementsString(id,requirement);
+	}
+        
+	public UriInfo getContext() {
+		return context;
+	}
 
-    @PUT
-    @Path("/processAnotation")
-    @Consumes("application/xml")
-    public void processAnnotation(String serviceId, String entity, SYBLAnnotation annotation) {
-        controlCoordination.processAnnotation(serviceId, entity, annotation);
-
-    }
-
-    @PUT
-    @Path("/descriptionInternalModel")
-    @Consumes("application/xml")
-    public void setApplicationDescriptionInfoInternalModel(String applicationDescriptionXML, String elasticityRequirementsXML, String deploymentInfoXML) {
-        controlCoordination.setApplicationDescriptionInfoInternalModel(applicationDescriptionXML, elasticityRequirementsXML, deploymentInfoXML);
-    }
-
-    @PUT
-    @Path("/TOSCADescriptionAndStartControl")
-    @Consumes("application/xml")
-    public void setTOSCAAndStartControl(String tosca) {
-        controlCoordination.setAndStartToscaControl(tosca);
-
-    }
-
-    @PUT
-    @Path("/{id}/description")
-    @Consumes("application/xml")
-    public void setApplicationDescriptionInfo(@PathParam("id") String cloudServiceId, String celar) {
-        controlCoordination.setApplicationDescriptionInfo(cloudServiceId, celar);
-    }
-    @PUT
-    @Path("/{id}/description/tosca")
-    @Consumes("application/xml")
-    public void setApplicationDescriptionInfoTOSCA(@PathParam("id") String cloudServiceId, String celar) {
-        controlCoordination.setApplicationDescriptionInfoTOSCA(cloudServiceId, celar);
-    }
-    @PUT
-    @Path("/{id}/elasticityCapabilitiesEffects")
-    @Consumes("application/json")
-    public void setElasticityCapabilitiesEffects(@PathParam("id") String cloudServiceId, String effects) {
-        controlCoordination.setElasticityCapabilitiesEffects(effects);
-    }
-
-    @PUT
-    @Path("/{id}/compositionRules")
-    @Consumes("application/xml")
-    public void setMetricsComposition(@PathParam("id") String cloudServiceId, String composition) {
-        controlCoordination.setMetricComposition(cloudServiceId, composition);
-    }
-
-    @PUT
-    @Path("/{id}/deployment")
-    @Consumes("application/xml")
-    public void setApplicationDeploymentInfoCELAR(@PathParam("id") String cloudServiceId, String celar) {
-        controlCoordination.setApplicationDeploymentDescription(cloudServiceId, celar);
-
-    }
-
-    @POST
-    @Path("/{id}/deployment")
-    @Consumes("application/xml")
-    public void setApplicationRefreshDeploymentInfo(String celar) {
-        controlCoordination.refreshApplicationDeploymentDescription(celar);
-
-    }
-
-    @PUT
-    @Path("/{id}/prepareControl")
-    @Consumes("application/xml")
-    public void prepareControl(@PathParam("id") String cloudServiceId) {
-        controlCoordination.prepareControl(cloudServiceId);
-    }
-
-    @PUT
-    @Path("/{id}/startControl")
-    @Consumes("application/xml")
-    public void startControl(@PathParam("id") String cloudServiceId) {
-        controlCoordination.startControl(cloudServiceId);
-    }
-
-    @PUT
-    @Path("/{id}/stopControl")
-    @Consumes("application/xml")
-    public void stopControl(@PathParam("id") String cloudServiceId) {
-        controlCoordination.stopControl(cloudServiceId);
-    }
-
-    @POST
-    @Path("/{id}/description")
-    @Consumes("application/xml")
-    public void replaceCloudService(@PathParam("id") String cloudServiceId, String cloudService) {
-        controlCoordination.replaceCloudServiceWithRequirements(cloudServiceId, cloudService);
-    }
-
-    @POST
-    @Path("/{id}/compositionRules")
-    @Consumes("application/xml")
-    public void replaceCompositionRules(@PathParam("id") String cloudServiceId, String composition) {
-        controlCoordination.replaceCompositionRules(cloudServiceId, composition);
-    }
-
-    @POST
-    @Path("/{id}/elasticityRequirements")
-    @Consumes("application/xml")
-    public void replaceRequirements(@PathParam("id") String cloudServiceId, String requirements) {
-        controlCoordination.replaceRequirements(cloudServiceId, requirements);
-    }
-
-    @POST
-    @Path("/{id}/elasticityCapabilitiesEffects")
-    @Consumes("application/json")
-    public void replaceEffects(String effects) {
-        controlCoordination.replaceEffects(effects);
-    }
+	public void setContext(UriInfo context) {
+		this.context = context;
+	}
 }
