@@ -31,7 +31,7 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.UriInfo;
 
 import at.ac.tuwien.dsg.csdg.elasticityInformation.elasticityRequirements.SYBLAnnotation;
-import at.ac.tuwien.dsg.rSybl.analysisEngine.celar.main.ControlCoordination;
+import at.ac.tuwien.dsg.rSybl.analysisEngine.main.ControlCoordination;
 import com.wordnik.swagger.annotations.Api;
 import javax.ws.rs.PathParam;
 
