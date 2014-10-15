@@ -13,39 +13,7 @@
 
     <context:property-placeholder location="file:./config/mela-analysis-service.properties"/>
 
-    <context:component-scan base-package="at.ac.tuwien.dsg"/>
     
-    <import resource="classpath:META-INF/cxf/cxf.xml"/>
-
-    <jaxrs:server id="spaceAndPathwayAnalysisServiceAPIServer" address="/">
-        <jaxrs:serviceBeans>
-            <ref bean="spaceAndPathwayAnalysisServiceAPI"/>
-            <!--<bean id="swaggerResourceJSON" class="com.wordnik.swagger.jaxrs.listing.ApiListingResourceJSON"/>-->
-        </jaxrs:serviceBeans>
-        <jaxrs:features>
-            <cxf:logging/>
-        </jaxrs:features>
-        <jaxrs:providers>
-            <bean class="at.ac.tuwien.dsg.celar.mela.analysisservice.spring.MelaSpaceAndPathwayAnalysisServiceExceptionMapper"/>
-            <bean class="com.wordnik.swagger.jaxrs.listing.ResourceListingProvider"/>
-            <bean class="com.wordnik.swagger.jaxrs.listing.ApiDeclarationProvider"/>
-        </jaxrs:providers>
-    </jaxrs:server>
-
-    <bean id="swaggerConfig" class="com.wordnik.swagger.jaxrs.config.BeanConfig">
-        <property name="resourcePackage" value="at.ac.tuwien.dsg.mela.analysisservice.api"/>
-        <property name="version" value="0.1.0"/>
-        <property name="basePath" value="http://localhost:8080/REST_WS"/>
-        <property name="title" value="MELA Analysis Service"/>
-        <property name="description" value="A service for monitoring cloud elasticity" />
-        <property name="contact" value="d.moldovan@dsg.tuwien.ac.at"/>
-        <property name="license" value="Apache 2.0 License"/>
-        <property name="licenseUrl" value="http://www.apache.org/licenses/LICENSE-2.0.html"/>
-        <property name="scan" value="true"/>
-    </bean>
-
-    <!--    <bean class="at.ac.tuwien.dsg.mela.common.persistence.PersistenceSQLAccess"/>-->
-
  
     <!-- JMS stuff -->
     <bean id="jmsFactory" class="org.apache.activemq.ActiveMQConnectionFactory">
@@ -59,12 +27,85 @@
         <property name="defaultDestination" ref="destination"/>
     </bean>
     
-    <bean id="melaDBConnector" class="org.springframework.jdbc.datasource.DriverManagerDataSource">
-        <property name="driverClassName" value="org.hsqldb.jdbcDriver"/>
-        <property name="url" value="jdbc:hsqldb:hsql://${dataservice.ip}:9001/mela"/>
-        <property name="username" value="SA"/>
-        <property name="password" value=""/>
-    </bean>
-     
     
+    <beans profile="PORTABLE">
+         
+    
+        <!--HyperSQL connector-->
+        <bean id="melaDBConnector" class="org.springframework.jdbc.datasource.DriverManagerDataSource">
+            <property name="driverClassName" value="org.hsqldb.jdbcDriver"/>
+            <property name="url" value="jdbc:hsqldb:hsql://localhost:9001/mela;hsqldb.cache_rows=100;hsqldb.log_data=false"/>
+            <property name="username" value="SA"/>
+            <property name="password" value=""/>
+        </bean>
+       
+    
+    </beans>
+    
+    
+    <beans profile="H2">
+        
+        <!-- H2 connector-->
+        <bean id="melaDBConnector" class="org.apache.commons.dbcp.BasicDataSource" destroy-method="close"  >
+            <property name="driverClassName" value="org.h2.Driver"/>
+            <property name="url" value="jdbc:h2:tcp://localhost:9001/${dataservice.configuration.databasePath};;DB_CLOSE_DELAY=-1"/>
+            <property name="username" value="SA"/>
+            <property name="password" value=""/>
+        </bean> 
+       
+
+    
+    </beans>
+    
+    
+    <beans profile="MYSQL">
+      
+        <bean id="melaDBConnector"  class="org.springframework.jdbc.datasource.DriverManagerDataSource">
+            <property name="driverClassName" value="com.mysql.jdbc.Driver"/>
+            <property name="url" value="jdbc:mysql://localhost/mela"/>
+            <property name="username" value="mela"/>
+            <property name="password" value="mela"/>
+        </bean>
+        
+    
+    </beans>
+    
+    <beans>
+        <context:component-scan base-package="at.ac.tuwien.dsg.mela"/>
+    
+        <import resource="classpath:META-INF/cxf/cxf.xml"/>
+
+        <jaxrs:server id="customerService" address="/">
+            <jaxrs:serviceBeans>
+                <ref bean="elasticityAnalysisService"/>
+                <bean id="swaggerResourceJSON" class="com.wordnik.swagger.jaxrs.listing.ApiListingResourceJSON"/>
+            </jaxrs:serviceBeans>
+            <jaxrs:features>
+                <cxf:logging/>
+            </jaxrs:features>
+            <jaxrs:providers>
+                <bean class="at.ac.tuwien.dsg.mela.analysisservice.cxf.MelaElasticityAnalysisServiceExceptionMapper"/>
+                <bean class="com.wordnik.swagger.jaxrs.listing.ResourceListingProvider"/>
+                <bean class="com.wordnik.swagger.jaxrs.listing.ApiDeclarationProvider"/>
+            </jaxrs:providers>
+        </jaxrs:server>
+
+        <bean id="swaggerConfig" class="com.wordnik.swagger.jaxrs.config.BeanConfig">
+            <property name="resourcePackage" value="at.ac.tuwien.dsg.mela.analysisservice.api"/>
+            <property name="version" value="0.1.0"/>
+            <property name="basePath" value="http://localhost:8080/REST_WS"/>
+            <property name="title" value="MELA Analysis Service"/>
+            <property name="description" value="A service for monitoring cloud elasticity" />
+            <property name="contact" value="d.moldovan@dsg.tuwien.ac.at"/>
+            <property name="license" value="Apache 2.0 License"/>
+            <property name="licenseUrl" value="http://www.apache.org/licenses/LICENSE-2.0.html"/>
+            <property name="scan" value="true"/>
+        </bean>
+
+        <!--    <bean class="at.ac.tuwien.dsg.mela.common.persistence.PersistenceSQLAccess"/>-->
+
+    </beans>
+   
+     
 </beans>
+
