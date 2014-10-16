@@ -15,10 +15,7 @@
             <elasticity:Flavor>vcpus:1 ram:1024 disk:20</elasticity:Flavor>
           </elasticity:NodeProperties>
         </tosca:Properties>
-        <tosca:Policies>
-          <tosca:Policy name="STRATEGY CASE x &gt; 9 : scaleIn" policyRef="C166737880" policyType="sybl:Strategy"/>
-          <tosca:Policy name="STRATEGY fulfilled(Co1) : scaleOut" policyRef="C1414842380" policyType="sybl:Strategy"/>
-        </tosca:Policies>
+        
         <tosca:DeploymentArtifacts>
           <tosca:DeploymentArtifact artifactRef="cassandraSeedNodeImage" artifactType="VMI" name="Ubuntu 12.04.1 LTS"/>
           <tosca:DeploymentArtifact artifactRef="cassandraSeedNodeScript" artifactType="SD" name="seedNode.sh"/>
@@ -30,6 +27,9 @@
             <elasticity:Flavor>vcpus:1 ram:1024 disk:20</elasticity:Flavor>
           </elasticity:NodeProperties>
         </tosca:Properties>
+		<tosca:Policies>
+          <tosca:Policy name="Co3:CONSTRAINT cpuUsage &gt; 15 % AND cpuUsage &lt; 75 %" policyRef="C1414842380" policyType="sybl:Constraint"/>
+        </tosca:Policies>
         <tosca:DeploymentArtifacts>
           <tosca:DeploymentArtifact artifactRef="cassandraNodeImage" artifactType="VMI" name="Ubuntu 12.04.1 LTS"/>
           <tosca:DeploymentArtifact artifactRef="cassandraNodeScript" artifactType="SD" name="node.sh"/>
@@ -42,7 +42,8 @@
           </elasticity:NodeProperties>
         </tosca:Properties>
         <tosca:Policies>
-          <tosca:Policy name="STRATEGY CASE cpuUsage &lt; 20 : maximize(throughput)" policyRef="C1703884439" policyType="sybl:Strategy"/>
+          <tosca:Policy name="St2:STRATEGY CASE throughput &lt; 1000 AND latency &lt; 500 : scalein(CassandraNode);" policyRef="C1703884439" policyType="sybl:Strategy"/>
+		  <tosca:Policy name="Co2:CONSTRAINT latency &lt; 50 ms ;" policyRef="C1703884439" policyType="sybl:Constraint"/>
         </tosca:Policies>
         <tosca:DeploymentArtifacts>
           <tosca:DeploymentArtifact artifactRef="ycsbClientImage" artifactType="VMI" name="Ubuntu 12.04.1 LTS"/>
