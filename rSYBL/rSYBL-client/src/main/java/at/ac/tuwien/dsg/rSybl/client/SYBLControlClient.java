@@ -53,7 +53,7 @@ public class SYBLControlClient {
         try {
             String applicationID= "Cassandra";
             String tosca = readFile("Application.tosca", Charset.defaultCharset());
-            String deployment = readFile("Application.tosca", Charset.defaultCharset());
+            String deployment = readFile("deployment.xml", Charset.defaultCharset());
             SYBLControlClient sYBLControlClient = new SYBLControlClient("http://localhost:8080/rSYBL/restWS");
             sYBLControlClient.prepareControl(applicationID);
             sYBLControlClient.setApplicationDescription(applicationID, tosca);

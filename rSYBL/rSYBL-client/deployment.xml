@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <DeploymentDescription CloudServiceID="CloudService" AccessIP="localhost">
-	<DeploymentUnit serviceUnitID="C999948340" 
+	<DeploymentUnit serviceUnitID="C999948340"
 		defaultFlavor="m1.tiny" defaultImage="a4fe953e-d4c8-40a5-9c73-d9fee3f00c08" >
 	        <AssociatedVM IP="10.99.0.39"/>
 	</DeploymentUnit>

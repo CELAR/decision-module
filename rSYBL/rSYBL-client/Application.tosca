@@ -16,8 +16,8 @@
           </elasticity:NodeProperties>
         </tosca:Properties>
         <tosca:Policies>
-          <tosca:Policy name="STRATEGY CASE x &gt;9:scaleIn" policyRef="C166737880" policyType="sybl:Strategy"/>
-          <tosca:Policy name="STRATEGY fulfilled(Co1):scaleOut" policyRef="C1414842380" policyType="sybl:Strategy"/>
+          <tosca:Policy name="STRATEGY CASE x &gt; 9 : scaleIn" policyRef="C166737880" policyType="sybl:Strategy"/>
+          <tosca:Policy name="STRATEGY fulfilled(Co1) : scaleOut" policyRef="C1414842380" policyType="sybl:Strategy"/>
         </tosca:Policies>
         <tosca:DeploymentArtifacts>
           <tosca:DeploymentArtifact artifactRef="cassandraSeedNodeImage" artifactType="VMI" name="Ubuntu 12.04.1 LTS"/>
@@ -42,7 +42,7 @@
           </elasticity:NodeProperties>
         </tosca:Properties>
         <tosca:Policies>
-          <tosca:Policy name="STRATEGY CASE cpuUsage &lt; 20: maximize(throughput)" policyRef="C1703884439" policyType="sybl:Strategy"/>
+          <tosca:Policy name="STRATEGY CASE cpuUsage &lt; 20 : maximize(throughput)" policyRef="C1703884439" policyType="sybl:Strategy"/>
         </tosca:Policies>
         <tosca:DeploymentArtifacts>
           <tosca:DeploymentArtifact artifactRef="ycsbClientImage" artifactType="VMI" name="Ubuntu 12.04.1 LTS"/>
