@@ -35,6 +35,7 @@ import at.ac.tuwien.dsg.rSybl.analysisEngine.main.ControlCoordination;
 import com.wordnik.swagger.annotations.Api;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.PathParam;
+import javax.ws.rs.core.Response;
 
 import javax.ws.rs.ext.Provider;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -90,8 +91,13 @@ public class SyblControlWS {
             @PUT
 	 @Path("/{id}/description/tosca")
 	 @Consumes("application/xml")
-	public void setApplicationDescriptionTOSCA(@PathParam("id")String cloudServiceId,String celar){
-		 controlCoordination.setApplicationDescriptionInfoTOSCA(cloudServiceId,celar);
+	public Response setApplicationDescriptionTOSCA(@PathParam("id")String cloudServiceId,String celar){
+                try{
+		 controlCoordination.setApplicationDescriptionInfoTOSCA(celar,cloudServiceId);
+                 return Response.ok().build();
+                }catch(Exception e){
+                    return Response.serverError().entity(e).build();
+                }
 	}
             
              @DELETE
@@ -104,8 +110,15 @@ public class SyblControlWS {
 	 @PUT
 	 @Path("/{id}/description")
 	 @Consumes("application/xml")
-	public void setApplicationDescriptionInfo(@PathParam("id")String cloudServiceId,String celar){
+	public Response setApplicationDescriptionInfo(@PathParam("id")String cloudServiceId,String celar){
+             
+             try{
 		 controlCoordination.setApplicationDescriptionInfo(cloudServiceId,celar);
+             }catch(Exception e){
+                 e.getMessage();
+                 return Response.serverError().entity(e).build();
+             }
+             return Response.ok().build();
 	}
           @GET
 	 @Path("/{id}/description")
@@ -117,73 +130,82 @@ public class SyblControlWS {
 	 @PUT
 	 @Path("/{id}/elasticityCapabilitiesEffects")
 	 @Consumes("application/json")
-	public void setElasticityCapabilitiesEffects(@PathParam("id")String cloudServiceId,String effects){
+	public Response setElasticityCapabilitiesEffects(@PathParam("id")String cloudServiceId,String effects){
 		 controlCoordination.setElasticityCapabilitiesEffects(effects);
+                 return Response.ok().build();
 	}
 	 
 	 @PUT
 	 @Path("/{id}/compositionRules")
 	 @Consumes("application/xml")
-	public void setMetricsComposition(@PathParam("id")String cloudServiceId,String composition){
+	public Response setMetricsComposition(@PathParam("id")String cloudServiceId,String composition){
 		 controlCoordination.setMetricComposition(cloudServiceId,composition);
+                 return Response.ok().build();
 	}
 	 
 	 @PUT
 	 @Path("/{id}/deployment")
 	 @Consumes("application/xml")
-	public void setApplicationDeploymentInfoCELAR(@PathParam("id")String cloudServiceId,String celar){
+	public Response setApplicationDeploymentInfoCELAR(@PathParam("id")String cloudServiceId,String celar){
 		 controlCoordination.setApplicationDeploymentDescription(cloudServiceId,celar);
-
+ return Response.ok().build();
 	} 
 	 
 	 
 	 @POST
 	 @Path("/{id}/deployment")
 	 @Consumes("application/xml")
-	public void setApplicationRefreshDeploymentInfo(@PathParam("id")String cloudServiceId,String description){
+	public Response setApplicationRefreshDeploymentInfo(@PathParam("id")String cloudServiceId,String description){
 		 controlCoordination.refreshApplicationDeploymentDescription(description);
-
+ return Response.ok().build();
 	} 
 	 
 	 @PUT
 	 @Path("/{id}/prepareControl")
 	 @Consumes("application/xml")
-	public void prepareControl(@PathParam("id")String cloudServiceId){
+	public Response prepareControl(@PathParam("id")String cloudServiceId){
 		 controlCoordination.prepareControl(cloudServiceId);
+                 
+                  return Response.ok().build();
 	} 
 	 @PUT
 	 @Path("/{id}/startControl")
 	 @Consumes("application/xml")
-	public void startControl(@PathParam("id")String cloudServiceId){
+	public Response startControl(@PathParam("id")String cloudServiceId){
 		 controlCoordination.startControl(cloudServiceId);
-	} 
+	 return Response.ok().build();
+         } 
 	
 	 @PUT
 	 @Path("/{id}/stopControl")
 	 @Consumes("application/xml")
-	public void stopControl(@PathParam("id")String cloudServiceId){
+	public Response stopControl(@PathParam("id")String cloudServiceId){
 		 controlCoordination.stopControl(cloudServiceId);
+                 return Response.ok().build();
 	}
 	 
 	 @POST
 	 @Path("/{id}/description")
 	 @Consumes("application/xml")
-	public void replaceCloudService(@PathParam("id")String cloudServiceId,String cloudService){
+	public Response replaceCloudService(@PathParam("id")String cloudServiceId,String cloudService){
 		 controlCoordination.replaceCloudServiceWithRequirements(cloudServiceId, cloudService);
+                 return Response.ok().build();
 	}
 
 	
 	 @POST
 	 @Path("/{id}/compositionRules")
 	 @Consumes("application/xml")
-	public void replaceCompositionRules(@PathParam("id")String cloudServiceId,String composition){
+	public Response replaceCompositionRules(@PathParam("id")String cloudServiceId,String composition){
 		 controlCoordination.replaceCompositionRules(cloudServiceId,composition);
+                 return Response.ok().build();
 	}
 	 @POST
 	 @Path("/{id}/elasticityRequirements/xml")
 	 @Consumes("application/xml")
-	public void replaceRequirements(@PathParam("id")String cloudServiceId,String requirements){
+	public Response replaceRequirements(@PathParam("id")String cloudServiceId,String requirements){
 		controlCoordination.replaceRequirements(cloudServiceId, requirements); 
+                return Response.ok().build();
 	}
          
          @GET
@@ -196,8 +218,9 @@ public class SyblControlWS {
           @POST
 	 @Path("/{id}/elasticityCapabilitiesEffects")
 	 @Consumes("application/json")
-	public void replaceEffects(@PathParam("id") String id,String effects){
+	public Response replaceEffects(@PathParam("id") String id,String effects){
 		 controlCoordination.replaceEffects(id,effects);
+                 return Response.ok().build();
 	}
          
         @GET
@@ -217,8 +240,9 @@ public class SyblControlWS {
         @POST
         @Consumes(MediaType.TEXT_PLAIN)
 	 @Path("/{id}/replaceRequirements/plain")
-	public void replaceRequirementsString(@PathParam("id") String id,String requirement){
+	public Response replaceRequirementsString(@PathParam("id") String id,String requirement){
           controlCoordination.replaceRequirementsString(id,requirement);
+          return Response.ok().build();
 	}
         
 	public UriInfo getContext() {

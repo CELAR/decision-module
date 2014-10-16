@@ -23,27 +23,53 @@ package at.ac.tuwien.dsg.rSybl.client;
  */
 
 
+import com.sun.jersey.api.client.Client;
+import com.sun.jersey.api.client.WebResource;
+import com.sun.jersey.api.client.config.ClientConfig;
 import java.io.BufferedReader;
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.nio.charset.Charset;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.ws.rs.core.MediaType;
 
-import javax.xml.bind.JAXBContext;
 
 public class SYBLControlClient {
 
-    protected String REST_API_URL = "http://localhost/rSYBL/restWS";
+    protected String REST_API_URL = "http://localhost:8280/rSYBL/restWS";
     protected String compRules;
 
     public SYBLControlClient(String rsyblurl) {
         REST_API_URL = rsyblurl;
     }
-    
+    public static void main(String[] args){
+        try {
+            String applicationID= "Cassandra";
+            String tosca = readFile("Application.tosca", Charset.defaultCharset());
+            String deployment = readFile("Application.tosca", Charset.defaultCharset());
+            SYBLControlClient sYBLControlClient = new SYBLControlClient("http://localhost:8080/rSYBL/restWS");
+            sYBLControlClient.prepareControl(applicationID);
+            sYBLControlClient.setApplicationDescription(applicationID, tosca);
+            sYBLControlClient.setApplicationDeployment(applicationID, deployment);
+            sYBLControlClient.startApplication(applicationID);
+            
+        } catch (IOException ex) {
+            Logger.getLogger(SYBLControlClient.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
+    static String readFile(String path, Charset encoding) 
+  throws IOException 
+{
+  byte[] encoded = Files.readAllBytes(Paths.get(path));
+  return new String(encoded, encoding);
+}
     public void modifyAppDescription(String applicationID, String newAppDescription, String appDeployment, String effects) {
         stopApplication(applicationID);
         initialInstantiationLifecycle(applicationID,newAppDescription, appDeployment, effects, compRules);
@@ -74,7 +100,7 @@ public class SYBLControlClient {
      public void prepareControl(String id) {
         
         
-        callPUT("", id+"/prepareControl");
+        callPUT(id, id+"/prepareControl");
         
         
     }
@@ -88,48 +114,17 @@ public class SYBLControlClient {
 
     private void callPUT(String body, String methodName) {
         
-        URL url = null;
-        HttpURLConnection connection = null;
-        try {
-            url = new URL(REST_API_URL + "/" + methodName);
-            connection = (HttpURLConnection) url.openConnection();
-            connection.setDoOutput(true);
-            connection.setInstanceFollowRedirects(false);
-            connection.setRequestMethod("PUT");
-            connection.setRequestProperty("Content-Type", "application/xml");
-            connection.setRequestProperty("Accept", "application/json");
-
-            //write message body
-            OutputStream os = connection.getOutputStream();
-            os.write(body.getBytes(Charset.forName("UTF-8")));
-            os.flush();
-            os.close();
-            
-            InputStream errorStream = connection.getErrorStream();
-            if (errorStream != null) {
-                BufferedReader reader = new BufferedReader(new InputStreamReader(errorStream));
-                String line;
-                while ((line = reader.readLine()) != null) {
-                    Logger.getLogger(SYBLControlClient.class.getName()).log(Level.SEVERE, line);
-                }
-            }
-            
-            InputStream inputStream = connection.getInputStream();
-            if (inputStream != null) {
-                BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream));
-                String line;
-                while ((line = reader.readLine()) != null) {
-                    Logger.getLogger(SYBLControlClient.class.getName()).log(Level.SEVERE, line);
-                }
-            }
-            
-        } catch (Exception e) {
-            Logger.getLogger(SYBLControlClient.class.getName()).log(Level.SEVERE, e.getMessage(), e);
-        } finally {
-            if (connection != null) {
-                connection.disconnect();
-            }
-        }
+       Client c = Client.create();
+        
+       c.getProperties().put(
+        ClientConfig.PROPERTY_FOLLOW_REDIRECTS, true);
+       WebResource r = c.resource(REST_API_URL+"/"+methodName);
+    String response = r.accept(
+        MediaType.APPLICATION_XML_TYPE).
+        header("Content-Type", "application/xml; charset=utf-8").
+        header("Accept", "application/xml, multipart/related").
+        put(String.class, body);
+     System.out.println(response);
     }
     
     private void callPOST(String body, String methodName) {
