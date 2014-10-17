@@ -85,6 +85,7 @@ public class SyblControlWS {
 	 @Path("/TOSCADescriptionAndStartControl")
 	 @Consumes("application/xml")
 	public void setTOSCAAndStartControl(String tosca){
+             tosca=tosca.replaceAll("&amp;", "&");
 		 controlCoordination.setAndStartToscaControl(tosca);
 		 
 	}
@@ -93,6 +94,7 @@ public class SyblControlWS {
 	 @Consumes("application/xml")
 	public Response setApplicationDescriptionTOSCA(@PathParam("id")String cloudServiceId,String celar){
                 try{
+                    celar=celar.replaceAll("&amp;", "&");
 		 controlCoordination.setApplicationDescriptionInfoTOSCA(celar,cloudServiceId);
                  return Response.ok().build();
                 }catch(Exception e){
