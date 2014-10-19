@@ -101,7 +101,42 @@ public class SyblControlWS {
                     return Response.serverError().entity(e).build();
                 }
 	}
-            
+         
+             @PUT
+	 @Path("/{id}/startTEST")
+	 @Consumes("application/xml")
+	public Response startTest(@PathParam("id")String cloudServiceId){
+                try{
+		 controlCoordination.setTESTState(cloudServiceId);
+                 return Response.ok().build();
+                }catch(Exception e){
+                    return Response.serverError().entity(e).build();
+                }
+	}
+                 @PUT
+	 @Path("/{id}/{componentID}/testElasticityCapability")
+	 @Consumes("application/xml")
+	public Response startElasticityCapability(@PathParam("id")String cloudServiceId,@PathParam("componentID")String componentID,@PathParam("capabilityID") String capabilityID){
+                try{
+
+		 controlCoordination.testEnforcementCapability(cloudServiceId,capabilityID,componentID);
+                 return Response.ok().build();
+                }catch(Exception e){
+                    return Response.serverError().entity(e).build();
+                }
+	}
+                     @PUT
+	 @Path("/{id}/{componentID}/testElasticityCapability/{pluginID}/{capabilityID}")
+	 @Consumes("application/xml")
+	public Response startElasticityCapabilityWithPlugin(@PathParam("id")String cloudServiceId,@PathParam("componentID")String componentID,@PathParam("pluginID")String pluginID,@PathParam("capabilityID") String capabilityID){
+                try{
+		 controlCoordination.testEnforcementCapabilityOnPlugin(cloudServiceId,pluginID,capabilityID,componentID);
+                 return Response.ok().build();
+                }catch(Exception e){
+                    return Response.serverError().entity(e).build();
+                }
+	}
+             
              @DELETE
 	 @Path("/{id}")
 	 @Consumes("application/xml")
