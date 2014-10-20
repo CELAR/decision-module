@@ -58,7 +58,7 @@ public class SYBLControlClient {
             sYBLControlClient.setApplicationDescription(applicationID, tosca);
             sYBLControlClient.setApplicationDeployment(applicationID, deployment);
             sYBLControlClient.startTest(applicationID);
-            sYBLControlClient.testElasticityCapability(applicationID, "cassandraNode", "scaleIn");
+            sYBLControlClient.testElasticityCapability(applicationID, "cassandraNode", "scaleOut");
 //            sYBLControlClient.prepareControl(applicationID);
 //            sYBLControlClient.setApplicationDescription(applicationID, tosca);
 //            sYBLControlClient.setApplicationDeployment(applicationID, deployment);

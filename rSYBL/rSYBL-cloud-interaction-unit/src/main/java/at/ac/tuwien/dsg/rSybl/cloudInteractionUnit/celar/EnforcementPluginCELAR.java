@@ -55,10 +55,12 @@ public class EnforcementPluginCELAR implements EnforcementInterface{
         
         this.cloudService = cloudService;
 //        API_URL = Configuration.getEnforcementServiceURL();
+        
         ClientConfiguration clientConfiguration = new ClientConfiguration();
         clientConfiguration.setHost(Configuration.getOrchestratorHost());
         clientConfiguration.setPort(Integer.parseInt(Configuration.getOrchestratorPort()));
         resizingActionsClient.setConfiguration(clientConfiguration);
+        refreshElasticityActionsList();
     }
 
     public void refreshElasticityActionsList() {
