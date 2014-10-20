@@ -32,12 +32,15 @@ import javax.ws.rs.core.UriInfo;
 
 import at.ac.tuwien.dsg.csdg.elasticityInformation.elasticityRequirements.SYBLAnnotation;
 import at.ac.tuwien.dsg.rSybl.analysisEngine.main.ControlCoordination;
+import com.sun.jersey.api.client.ClientResponse.Status;
 import com.wordnik.swagger.annotations.Api;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.core.Response;
 
 import javax.ws.rs.ext.Provider;
+import org.jclouds.cloudstack.domain.AsyncJob;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -119,8 +122,12 @@ public class SyblControlWS {
 	public Response startElasticityCapability(@PathParam("id")String cloudServiceId,@PathParam("componentID")String componentID,@PathParam("capabilityID") String capabilityID){
                 try{
 
-		 controlCoordination.testEnforcementCapability(cloudServiceId,capabilityID,componentID);
-                 return Response.ok().build();
+		 if (controlCoordination.testEnforcementCapability(cloudServiceId,capabilityID,componentID)){
+                 return Response.ok().build();}
+                 else{ 
+
+                     return Response.status(Status.CONFLICT).build();
+                 }
                 }catch(Exception e){
                     return Response.serverError().entity(e).build();
                 }
@@ -130,8 +137,12 @@ public class SyblControlWS {
 	 @Consumes("application/xml")
 	public Response startElasticityCapabilityWithPlugin(@PathParam("id")String cloudServiceId,@PathParam("componentID")String componentID,@PathParam("pluginID")String pluginID,@PathParam("capabilityID") String capabilityID){
                 try{
-		 controlCoordination.testEnforcementCapabilityOnPlugin(cloudServiceId,pluginID,capabilityID,componentID);
-                 return Response.ok().build();
+		 if (controlCoordination.testEnforcementCapabilityOnPlugin(cloudServiceId,pluginID,capabilityID,componentID)){
+                 return Response.ok().build();}
+                 else{ 
+
+                     return Response.status(Status.CONFLICT).build();
+                 }
                 }catch(Exception e){
                     return Response.serverError().entity(e).build();
                 }
