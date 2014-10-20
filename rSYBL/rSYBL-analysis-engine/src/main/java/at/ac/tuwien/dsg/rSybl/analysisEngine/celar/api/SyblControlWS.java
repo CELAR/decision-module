@@ -117,7 +117,7 @@ public class SyblControlWS {
                 }
 	}
                  @PUT
-	 @Path("/{id}/{componentID}/testElasticityCapability")
+	 @Path("/{id}/{componentID}/testElasticityCapability/{capabilityID}")
 	 @Consumes("application/xml")
 	public Response startElasticityCapability(@PathParam("id")String cloudServiceId,@PathParam("componentID")String componentID,@PathParam("capabilityID") String capabilityID){
                 try{
