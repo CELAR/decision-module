@@ -87,20 +87,11 @@ public class EnforcementPluginCELAR implements EnforcementInterface{
             if (action.getType() == ResizingActionType.SCALE_IN && toBeScaled.getId().equalsIgnoreCase(action.getModuleName())) {
                 ExecutedResizingAction executedResizingAction = executeResizingCommand(action.getId());
                 States status = checkForAction(executedResizingAction.getUniqueId());
-                while (status!=States.Ready || status!=States.Done && status!=States.Aborted && status!=States.Cancelled) { 
-                    try {
-                        Thread.sleep(10001);
-                    } catch (InterruptedException ex) {
-                        Logger.getLogger(EnforcementPluginCELAR.class.getName()).log(Level.SEVERE, null, ex);
-                    }
-                    status = checkForAction(executedResizingAction.getUniqueId());
-                }
+                
                 if (status==States.Ready ) {
                     //TODO : Assume we have value IP returned
-                    Parameters par = executedResizingAction.getParameters();
-                    Parameter p = (Parameter) par.getParameters().get(0);
-                    if (p.getKey().equalsIgnoreCase("ip")) {
-                        String ip = p.getValue();
+                   String ip = getIP(executedResizingAction.getUniqueId(), node.getId());
+                   if (!ip.equalsIgnoreCase("")){
                         toBeScaled.removeNode(ip);
                         monitoringAPI.refreshServiceStructure(cloudService);
 
@@ -129,7 +120,7 @@ public class EnforcementPluginCELAR implements EnforcementInterface{
                 pars.addParameter(par);
                 ExecutedResizingAction executedResizingAction = executeResizingCommand(action.getId(), pars);
                 States status = checkForAction(executedResizingAction.getUniqueId());
-                while (status!=States.Ready || status!=States.Done && status!=States.Aborted && status!=States.Cancelled) {
+                while (status!=States.Ready && status!=States.Done && status!=States.Aborted && status!=States.Cancelled) {
                     try {
                         Thread.sleep(10000);
                     } catch (InterruptedException ex) {
@@ -154,7 +145,21 @@ public class EnforcementPluginCELAR implements EnforcementInterface{
         }
         return ok;
     }
+   public static ExecutedResizingAction refreshExecutedAction(String uniqueID) {
 
+        try {
+          
+            return resizingActionsClient.getActionStatus(uniqueID);
+
+        } catch (Exception e) {
+            // Logger.getLogger(MELA_API.class.getName()).log(Level.SEVERE, e.getMessage(), e);
+            e.printStackTrace();
+            Logger.getLogger(EnforcementPluginCELAR.class.getName()).log(Level.WARNING, "Trying to connect to the Orchestrator - failing ... . Retrying later");
+            RuntimeLogger.logger.error("Failing to connect to Orchestrator");
+
+        } 
+        return null;
+    }
     public static States checkForAction(String uniqueID) {
 
         try {
@@ -171,6 +176,24 @@ public class EnforcementPluginCELAR implements EnforcementInterface{
         } 
         return null;
     }
+    public static String getIP (String uniqueActionID, String moduleName){
+        String ip = "";
+        try {
+            HashMap<String, String> effects=resizingActionsClient.getActionEffect(uniqueActionID);
+            for (String domainID:effects.keySet()){
+                if (domainID.toLowerCase().contains(moduleName.toLowerCase())){
+                    if (!effects.get(domainID).equalsIgnoreCase("") && effects.get(domainID)!=null){
+                        ip = effects.get(domainID);
+                        break;
+                    }
+                }
+            }
+        } catch (IOException ex) {
+            Logger.getLogger(EnforcementPluginCELAR.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        
+        return ip;
+    }
 
     public boolean scaleOut(Node node) {
         boolean ok = true;
@@ -182,20 +205,15 @@ public class EnforcementPluginCELAR implements EnforcementInterface{
             if (action.getType() == ResizingActionType.SCALE_OUT && toBeScaled.getId().equalsIgnoreCase(action.getModuleName())) {
                 ExecutedResizingAction executedResizingAction = executeResizingCommand(action.getId());
                 States status = checkForAction(executedResizingAction.getUniqueId());
-                while (status!=States.Ready || status!=States.Done && status!=States.Aborted && status!=States.Cancelled) {
-                    try {
-                        Thread.sleep(10000);
-                    } catch (InterruptedException ex) {
-                        Logger.getLogger(EnforcementPluginCELAR.class.getName()).log(Level.SEVERE, null, ex);
-                    }
-                    status = checkForAction(executedResizingAction.getUniqueId());
-                }
+                
+                executedResizingAction=refreshExecutedAction(executedResizingAction.getUniqueId());
                 if (status==States.Ready ) {
                     //TODO : Assume we have value IP returned
                     Parameters par = executedResizingAction.getParameters();
-                    Parameter p = (Parameter) par.getParameters().get(0);
-                    if (p.getKey().equalsIgnoreCase("ip")) {
-                        String ip = p.getValue();
+                   // Parameter p = (Parameter) par.getParameters().get(0);
+                    
+                    
+                        String ip = getIP(executedResizingAction.getUniqueId(), node.getId());
                         if (!ip.equalsIgnoreCase("err") && !ip.equalsIgnoreCase("")) {
                             Node artifact = null;
                             Node container = null;
@@ -240,7 +258,7 @@ public class EnforcementPluginCELAR implements EnforcementInterface{
                         monitoringAPI.refreshServiceStructure(cloudService);
                         return ok;
 
-                    }
+                    
                 }
 
                 
@@ -271,13 +289,13 @@ public class EnforcementPluginCELAR implements EnforcementInterface{
             
             ExecutedResizingAction resizingAction=resizingActionsClient.executeResizingAction(actionID, null);
             States status = resizingActionsClient.getActionStatus(resizingAction.getUniqueId()).getExecutionStatus();
-            while (status!=States.Ready || status!=States.Done && status!=States.Aborted && status!=States.Cancelled){
+            while (status!=States.Ready && status!=States.Done && status!=States.Aborted && status!=States.Cancelled){
                 try {
                     Thread.sleep(10000);
                 } catch (InterruptedException ex) {
                     Logger.getLogger(EnforcementPluginCELAR.class.getName()).log(Level.SEVERE, null, ex);
                 }
-            
+             status = resizingActionsClient.getActionStatus(resizingAction.getUniqueId()).getExecutionStatus();
             }
             return resizingAction;
         } catch (IOException ex) {
