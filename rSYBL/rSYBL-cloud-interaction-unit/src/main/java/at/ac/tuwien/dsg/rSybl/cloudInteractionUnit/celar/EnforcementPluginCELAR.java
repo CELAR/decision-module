@@ -218,9 +218,9 @@ public class EnforcementPluginCELAR implements EnforcementInterface{
                             Node artifact = null;
                             Node container = null;
                             Node newNode = new Node();
-                            if (node.getAllRelatedNodesOfType(RelationshipType.HOSTED_ON_RELATIONSHIP, NodeType.ARTIFACT) != null && node.getAllRelatedNodesOfType(RelationshipType.HOSTED_ON_RELATIONSHIP, NodeType.ARTIFACT).size() > 0) {
-                                artifact = node.getAllRelatedNodesOfType(RelationshipType.HOSTED_ON_RELATIONSHIP, NodeType.ARTIFACT).get(0);
-                                if (artifact.getAllRelatedNodesOfType(RelationshipType.HOSTED_ON_RELATIONSHIP, NodeType.CONTAINER) != null && node.getAllRelatedNodesOfType(RelationshipType.HOSTED_ON_RELATIONSHIP, NodeType.CONTAINER).size() > 0) {
+                            if (toBeScaled.getAllRelatedNodesOfType(RelationshipType.HOSTED_ON_RELATIONSHIP, NodeType.ARTIFACT) != null && toBeScaled.getAllRelatedNodesOfType(RelationshipType.HOSTED_ON_RELATIONSHIP, NodeType.ARTIFACT).size() > 0) {
+                                artifact = toBeScaled.getAllRelatedNodesOfType(RelationshipType.HOSTED_ON_RELATIONSHIP, NodeType.ARTIFACT).get(0);
+                                if (artifact.getAllRelatedNodesOfType(RelationshipType.HOSTED_ON_RELATIONSHIP, NodeType.CONTAINER) != null && toBeScaled.getAllRelatedNodesOfType(RelationshipType.HOSTED_ON_RELATIONSHIP, NodeType.CONTAINER).size() > 0) {
 
                                     container = artifact.getAllRelatedNodesOfType(RelationshipType.HOSTED_ON_RELATIONSHIP, NodeType.CONTAINER).get(0);
                                 }
@@ -228,17 +228,18 @@ public class EnforcementPluginCELAR implements EnforcementInterface{
                             newNode.getStaticInformation().put("IP", ip);
                             newNode.setId(ip);
                             newNode.setNodeType(NodeType.VIRTUAL_MACHINE);
-
+                            
                             SimpleRelationship rel = new SimpleRelationship();
                             rel.setTargetElement(newNode.getId());
                             rel.setType(RelationshipType.HOSTED_ON_RELATIONSHIP);
                             RuntimeLogger.logger.info("Adding to " + node.getId() + " vm with ip " + ip);
+                            
 
-
-
+                                            
                             if (artifact == null && container == null) {
-                                rel.setSourceElement(node.getId());
-                                node.addNode(newNode, rel);
+                                rel.setSourceElement(toBeScaled.getId());
+                                toBeScaled.addNode(newNode, rel);     
+                                //node.addNode(newNode, rel);
                             } else {
                                 if (container == null) {
                                     rel.setSourceElement(artifact.getId());
