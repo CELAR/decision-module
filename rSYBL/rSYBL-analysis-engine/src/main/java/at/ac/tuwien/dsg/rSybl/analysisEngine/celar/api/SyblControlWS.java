@@ -151,8 +151,24 @@ public class SyblControlWS {
              @DELETE
 	 @Path("/{id}")
 	 @Consumes("application/xml")
-	public void removeService(@PathParam("id")String cloudServiceId){
-		 controlCoordination.removeService(cloudServiceId);
+	public Response undeployService(@PathParam("id")String cloudServiceId){	
+try{
+		 controlCoordination.undeployService(cloudServiceId);	
+return Response.ok().build();
+}catch(Exception e){
+	 return Response.serverError().entity(e).build();
+}
+	}
+             @DELETE
+	 @Path("/managedService/{id}")
+	 @Consumes("application/xml")
+	public Response removeServiceFromControl(@PathParam("id")String cloudServiceId){
+try{
+		 controlCoordination.removeService(cloudServiceId);	 
+return Response.ok().build();
+}catch(Exception e){
+	 return Response.serverError().entity(e).build();
+}
 	}
              
 	 @PUT
