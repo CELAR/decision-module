@@ -43,7 +43,6 @@ import java.util.Map.Entry;
 import com.sixsq.slipstream.statemachine.States;
 import gr.ntua.cslab.orchestrator.client.conf.ClientConfiguration;
 import java.util.Random;
-import org.slf4j.LoggerFactory;
 
 public class EnforcementPluginCELAR implements EnforcementInterface {
 
@@ -53,7 +52,6 @@ public class EnforcementPluginCELAR implements EnforcementInterface {
     boolean cleanupNecessary = true;
     private HashMap<Integer, ResizingAction> actionsAvailable = new HashMap<Integer, ResizingAction>();
     private static ResizingActionsClient resizingActionsClient = new ResizingActionsClient();
-    static final org.slf4j.Logger log = LoggerFactory.getLogger(EnforcementPluginCELAR.class);
 
     public EnforcementPluginCELAR(Node cloudService) {
 
@@ -95,11 +93,11 @@ public class EnforcementPluginCELAR implements EnforcementInterface {
                     //TODO : Assume we have value IP returned
                     String ip = getIP(executedResizingAction.getUniqueId(), node.getId());
                     if (!ip.equalsIgnoreCase("")) {
-                        log.debug("Removing from node " + node.getId() + " IP " + ip);
+                         RuntimeLogger.logger.debug("Removing from node " + node.getId() + " IP " + ip);
                         toBeScaled.removeNode(ip);
                         monitoringAPI.refreshServiceStructure(cloudService);
                     } else {
-                        log.error("Received empty string after scaling in node  " + node.getId());
+                         RuntimeLogger.logger.error("No IP was remove dafter scaling in node  " + node.getId());
                     }
                 }
 
@@ -257,7 +255,7 @@ public class EnforcementPluginCELAR implements EnforcementInterface {
                         ok = false;
                     }
                     ok = true;
-                    log.debug("Addint to node " + node.getId() + " IP " + ip);
+                    RuntimeLogger.logger.debug("Adding to node " + node.getId() + " IP " + ip);
 
                     RuntimeLogger.logger.info("The controlled service is now " + cloudService.toString());
 
