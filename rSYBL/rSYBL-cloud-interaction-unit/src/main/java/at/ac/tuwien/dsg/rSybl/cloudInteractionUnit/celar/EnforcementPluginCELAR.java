@@ -318,13 +318,12 @@ public class EnforcementPluginCELAR implements EnforcementInterface {
 
     public static ExecutedResizingAction executeResizingCommand(Integer actionID) {
         try {
-
             ExecutedResizingAction resizingAction = resizingActionsClient.executeResizingAction(actionID, null);
             States status = resizingActionsClient.getActionStatus(resizingAction.getUniqueId()).getExecutionStatus();
             while (status != States.Ready && status != States.Done && status != States.Aborted && status != States.Cancelled) {
                 try {
                     Thread.sleep(10000);
-                } catch (InterruptedException ex) {
+                } catch (Exception ex) {
                     Logger.getLogger(EnforcementPluginCELAR.class.getName()).log(Level.SEVERE, null, ex);
                 }
                 status = resizingActionsClient.getActionStatus(resizingAction.getUniqueId()).getExecutionStatus();
