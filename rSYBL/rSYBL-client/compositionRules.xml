@@ -640,7 +640,63 @@
             </Operation>
         </CompositionRule>
         
-                
+        
+        <!--    
+        Cassandra metrics
+        node_load
+        usertable_load
+        usertable_readLatency
+        usertable_writeLatency-->
+    
+        <CompositionRule TargetMonitoredElementLevel="SERVICE_TOPOLOGY">
+            
+            <ResultingMetric type="RESOURCE" measurementUnit="KB" name="avgNodeLoad"/>
+            <Operation MetricSourceMonitoredElementLevel="VM" type="AVG">
+                <ReferenceMetric type="RESOURCE" name="node_load"/>
+            </Operation>
+        </CompositionRule>
+        
+        
+        <CompositionRule TargetMonitoredElementLevel="SERVICE_TOPOLOGY">
+            
+            <ResultingMetric type="RESOURCE" measurementUnit="KB" name="maxNodeLoad"/>
+            <Operation MetricSourceMonitoredElementLevel="VM" type="MAX">
+                <ReferenceMetric type="RESOURCE" name="node_load"/>
+            </Operation>
+        </CompositionRule>
+        
+        
+        <CompositionRule TargetMonitoredElementLevel="SERVICE_TOPOLOGY">
+            
+            <ResultingMetric type="RESOURCE" measurementUnit="KB" name="minNodeLoad"/>
+            <Operation MetricSourceMonitoredElementLevel="VM" type="MIN">
+                <ReferenceMetric type="RESOURCE" name="node_load"/>
+            </Operation>
+        </CompositionRule>
+        
+ 
+        <CompositionRule TargetMonitoredElementLevel="SERVICE_TOPOLOGY">
+            
+            <ResultingMetric type="RESOURCE" measurementUnit="" name="dataInbalanceRatio"/>
+            <Operation type="DIV">
+                <Operation MetricSourceMonitoredElementLevel="SERVICE_TOPOLOGY" type="SUM">
+                    <Operation type="MUL" value="-1">
+                        <Operation MetricSourceMonitoredElementLevel="SERVICE_TOPOLOGY" type="KEEP">
+                            <ReferenceMetric type="RESOURCE" name="minNodeLoad" />
+                        </Operation>
+                    </Operation>
+                    
+                    <Operation MetricSourceMonitoredElementLevel="SERVICE_TOPOLOGY" type="KEEP">
+                        <ReferenceMetric type="RESOURCE" name="maxNodeLoad" />
+                    </Operation>
+                </Operation>
+      
+                <Operation MetricSourceMonitoredElementLevel="SERVICE_TOPOLOGY" type="KEEP">
+                    <ReferenceMetric type="RESOURCE" name="avgNodeLoad" />
+                </Operation> 
+            </Operation>
+        </CompositionRule>                            
+                                                    
         <!--Common metrics-->
         <CompositionRule TargetMonitoredElementLevel="SERVICE_UNIT">
             
