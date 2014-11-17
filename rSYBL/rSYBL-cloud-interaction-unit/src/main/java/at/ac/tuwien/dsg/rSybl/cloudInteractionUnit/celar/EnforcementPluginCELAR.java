@@ -76,7 +76,37 @@ public class EnforcementPluginCELAR implements EnforcementInterface {
         }
 
     }
+    public boolean balance(Node node){
+        boolean ok = false;
+        DependencyGraph dependencyGraph = new DependencyGraph();
+        dependencyGraph.setCloudService(cloudService);
+        Node toBeScaled = dependencyGraph.getNodeWithID(node.getId());
+        for (Entry<Integer, ResizingAction> actionE : actionsAvailable.entrySet()) {
+            ResizingAction action = actionE.getValue();
+            System.out.println(action.getModuleName());
+            if (action.getType() == ResizingActionType.BALANCE && toBeScaled.getId().equalsIgnoreCase(action.getModuleName())) {
+                ExecutedResizingAction executedResizingAction = executeResizingCommand(action.getId());
+                States status = checkForAction(executedResizingAction.getUniqueId());
 
+                if (status == States.Ready) {
+                    //TODO : Assume we have value IP returned
+                    String ip = getIP(executedResizingAction.getUniqueId(), node.getId());
+                    if (!ip.equalsIgnoreCase("")) {
+                         RuntimeLogger.logger.debug("Balanced nodes " + node.getId() );
+                       
+                        monitoringAPI.refreshServiceStructure(cloudService);
+                        ok=true;
+                    } else {
+                         RuntimeLogger.logger.error("No IP was remove dafter scaling in node  " + node.getId());
+                    }
+                }
+
+                break;
+            }
+        }
+        return ok;
+        
+    }
     public boolean scaleIn(Node node) {
         boolean ok = true;
         DependencyGraph dependencyGraph = new DependencyGraph();

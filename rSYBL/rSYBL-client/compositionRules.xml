@@ -1,0 +1,787 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<CompositionRulesConfiguration xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                               xsi:noNamespaceSchemaLocation="compositionRules.xsd" >
+    
+    <MetricsCompositionRules>
+    
+        <CompositionRule TargetMonitoredElementLevel="SERVICE_UNIT">
+            
+            <ResultingMetric type="RESOURCE" measurementUnit="%" name="cpuUsage"/>
+            <Operation value="100" type="ADD">
+                <Operation value="-1" type="MUL">
+                    <Operation MetricSourceMonitoredElementLevel="VM" type="AVG">
+                        <ReferenceMetric type="RESOURCE" measurementUnit="%"  name="cpuIdle"/>
+                    </Operation>
+                </Operation>
+            </Operation>
+        </CompositionRule>
+        
+        <!--        
+        Postgres:
+        pgActiveConnections
+        pgBlocksCacheHit
+        pgBlocksDiskRead
+        pgDBsizeKB
+        -->
+        <CompositionRule TargetMonitoredElementLevel="SERVICE_UNIT">
+            <ResultingMetric type="RESOURCE" measurementUnit="#" name="activeConnections"/>
+            <Operation MetricSourceMonitoredElementLevel="VM" type="AVG">
+                <ReferenceMetric type="RESOURCE" name="pgActiveConnections"/>
+            </Operation>
+        </CompositionRule>
+        
+        <CompositionRule TargetMonitoredElementLevel="SERVICE_UNIT">
+            <ResultingMetric type="RESOURCE" measurementUnit="#" name="blocksDiskRead"/>
+            <Operation MetricSourceMonitoredElementLevel="VM" type="AVG">
+                <ReferenceMetric type="RESOURCE" name="pgBlocksDiskRead"/>
+            </Operation>
+        </CompositionRule>
+        
+        <CompositionRule TargetMonitoredElementLevel="SERVICE_UNIT">
+            <ResultingMetric type="RESOURCE" measurementUnit="#" name="blocksCacheHit"/>
+            <Operation MetricSourceMonitoredElementLevel="VM" type="AVG">
+                <ReferenceMetric type="RESOURCE" name="pgBlocksCacheHit"/>
+            </Operation>
+        </CompositionRule>
+        
+        <CompositionRule TargetMonitoredElementLevel="SERVICE_UNIT">
+            <ResultingMetric type="RESOURCE" measurementUnit="kb" name="pgDBsizeKB"/>
+            <Operation MetricSourceMonitoredElementLevel="VM" type="AVG">
+                <ReferenceMetric type="RESOURCE" name="pgDBsizeKB"/>
+            </Operation>
+        </CompositionRule>
+                
+        <!--    
+        HAProxy:
+        activeSessions
+        avgResponseTime
+        errorRate
+        proxyBytesIN
+        proxyBytesOUT
+        requestRate
+        servers-->
+
+        <CompositionRule TargetMonitoredElementLevel="SERVICE_UNIT">
+            
+            <ResultingMetric type="RESOURCE" measurementUnit="#" name="activeSessions"/>
+            <Operation MetricSourceMonitoredElementLevel="VM" type="AVG">
+                <ReferenceMetric type="RESOURCE" name="activeSessions"/>
+            </Operation>
+        </CompositionRule>
+        
+        <CompositionRule TargetMonitoredElementLevel="SERVICE_UNIT">
+            
+            <ResultingMetric type="RESOURCE" measurementUnit="ms" name="avgResponseTime"/>
+            <Operation MetricSourceMonitoredElementLevel="VM" type="AVG">
+                <ReferenceMetric type="RESOURCE" name="avgResponseTime"/>
+            </Operation>
+        </CompositionRule>
+        
+        <CompositionRule TargetMonitoredElementLevel="SERVICE_UNIT">
+            
+            <ResultingMetric type="RESOURCE" measurementUnit="req/s" name="requestRate"/>
+            <Operation MetricSourceMonitoredElementLevel="VM" type="AVG">
+                <ReferenceMetric type="RESOURCE" name="requestRate"/>
+            </Operation>
+        </CompositionRule> 
+        
+        <!--        
+        DataPlay Cassandra:
+        dataplay_load
+        dataplay_readLatency
+        dataplay_writeLatency
+        -->
+         
+        <CompositionRule TargetMonitoredElementLevel="SERVICE_UNIT">
+            
+            <ResultingMetric type="RESOURCE" measurementUnit="ms" name="readLatency"/>
+            <Operation MetricSourceMonitoredElementLevel="VM" type="AVG">
+                <ReferenceMetric type="RESOURCE" name="dataplay_readLatency"/>
+            </Operation>
+        </CompositionRule>
+        
+        <CompositionRule TargetMonitoredElementLevel="SERVICE_UNIT">
+            
+            <ResultingMetric type="RESOURCE" measurementUnit="ms" name="writeLatency"/>
+            <Operation MetricSourceMonitoredElementLevel="VM" type="AVG">
+                <ReferenceMetric type="RESOURCE" name="dataplay_writeLatency"/>
+            </Operation>
+        </CompositionRule>
+        
+        <CompositionRule TargetMonitoredElementLevel="SERVICE_UNIT">
+            <ResultingMetric type="RESOURCE" measurementUnit="ms" name="avgLatency"/>
+                   
+            <Operation type="DIV" value="2">
+                <Operation MetricSourceMonitoredElementLevel="VM" type="SUM">
+                    <Operation MetricSourceMonitoredElementLevel="VM" type="SUM">
+                        <ReferenceMetric type="RESOURCE" name="dataplay_readLatency" />
+                    </Operation>
+                    <Operation MetricSourceMonitoredElementLevel="VM" type="SUM">
+                        <ReferenceMetric type="RESOURCE" name="dataplay_writeLatency" />
+                    </Operation>
+                </Operation>
+            </Operation>
+        </CompositionRule>
+        
+        <!--        SCAN metrics
+        gatk_br_avgMemoryUsage 
+        gatk_br_queueLength 
+        gatk_br_workPerHour 
+        gatk_br_workerUtilisation 
+  
+        -->
+        
+        <!--br-->
+        
+        <CompositionRule TargetMonitoredElementLevel="SERVICE_UNIT">
+            <ResultingMetric type="RESOURCE" measurementUnit="" name="gatk_br_avgMemoryUsage"/>
+            <Operation MetricSourceMonitoredElementLevel="VM" type="AVG">
+                <ReferenceMetric type="RESOURCE" name="gatk_br_avgMemoryUsage"/>
+            </Operation>
+        </CompositionRule>
+                
+        <CompositionRule TargetMonitoredElementLevel="SERVICE_UNIT">
+            <ResultingMetric type="RESOURCE" measurementUnit="" name="gatk_br_queueLength"/>
+            <Operation MetricSourceMonitoredElementLevel="VM" type="AVG">
+                <ReferenceMetric type="RESOURCE" name="gatk_br_queueLength"/>
+            </Operation>
+        </CompositionRule>
+        
+        <CompositionRule TargetMonitoredElementLevel="SERVICE_UNIT">
+            <ResultingMetric type="RESOURCE" measurementUnit="" name="gatk_br_total_queueLength"/>
+            <Operation MetricSourceMonitoredElementLevel="VM" type="SUM">
+                <ReferenceMetric type="RESOURCE" name="gatk_br_queueLength"/>
+            </Operation>
+        </CompositionRule>
+
+        <CompositionRule TargetMonitoredElementLevel="SERVICE_UNIT">
+            <ResultingMetric type="RESOURCE" measurementUnit="" name="gatk_br_workPerHour"/>
+            <Operation MetricSourceMonitoredElementLevel="VM" type="AVG">
+                <ReferenceMetric type="RESOURCE" name="gatk_br_workPerHour"/>
+            </Operation>
+        </CompositionRule>
+
+        <CompositionRule TargetMonitoredElementLevel="SERVICE_UNIT">
+            <ResultingMetric type="RESOURCE" measurementUnit="" name="gatk_br_workerUtilisation"/>
+            <Operation MetricSourceMonitoredElementLevel="VM" type="AVG">
+                <ReferenceMetric type="RESOURCE" name="gatk_br_workerUtilisation"/>
+            </Operation>
+        </CompositionRule>
+
+        <!--        gatk_ir_avgCpuUsage 
+        gatk_ir_avgMemoryUsage 
+        gatk_ir_queueLength 
+        gatk_ir_workPerHour 
+        gatk_ir_workerUtilisation -->
+        
+        <CompositionRule TargetMonitoredElementLevel="SERVICE_UNIT">
+            <ResultingMetric type="RESOURCE" measurementUnit="" name="gatk_ir_avgMemoryUsage"/>
+            <Operation MetricSourceMonitoredElementLevel="VM" type="AVG">
+                <ReferenceMetric type="RESOURCE" name="gatk_ir_avgMemoryUsage"/>
+            </Operation>
+        </CompositionRule>
+        
+        <CompositionRule TargetMonitoredElementLevel="SERVICE_UNIT">
+            <ResultingMetric type="RESOURCE" measurementUnit="" name="gatk_ir_avgCpuUsage"/>
+            <Operation MetricSourceMonitoredElementLevel="VM" type="AVG">
+                <ReferenceMetric type="RESOURCE" name="gatk_ir_avgCpuUsage"/>
+            </Operation>
+        </CompositionRule>
+                
+        <CompositionRule TargetMonitoredElementLevel="SERVICE_UNIT">
+            <ResultingMetric type="RESOURCE" measurementUnit="" name="gatk_ir_total_queueLength"/>
+            <Operation MetricSourceMonitoredElementLevel="VM" type="SUM">
+                <ReferenceMetric type="RESOURCE" name="gatk_ir_queueLength"/>
+            </Operation>
+        </CompositionRule>
+
+        <CompositionRule TargetMonitoredElementLevel="SERVICE_UNIT">
+            <ResultingMetric type="RESOURCE" measurementUnit="" name="gatk_ir_workPerHour"/>
+            <Operation MetricSourceMonitoredElementLevel="VM" type="AVG">
+                <ReferenceMetric type="RESOURCE" name="gatk_ir_workPerHour"/>
+            </Operation>
+        </CompositionRule>
+
+        <CompositionRule TargetMonitoredElementLevel="SERVICE_UNIT">
+            <ResultingMetric type="RESOURCE" measurementUnit="" name="gatk_ir_workerUtilisation"/>
+            <Operation MetricSourceMonitoredElementLevel="VM" type="AVG">
+                <ReferenceMetric type="RESOURCE" name="gatk_ir_workerUtilisation"/>
+            </Operation>
+        </CompositionRule>
+        
+        <!--        gatk_ir_gather_avgCpuUsage 
+        gatk_ir_gather_avgMemoryUsage 
+        gatk_ir_gather_queueLength 
+        gatk_ir_gather_workPerHour 
+        gatk_ir_gather_workerUtilisation -->
+         
+        
+        <CompositionRule TargetMonitoredElementLevel="SERVICE_UNIT">
+            <ResultingMetric type="RESOURCE" measurementUnit="" name="gatk_ir_gather_avgCpuUsage"/>
+            <Operation MetricSourceMonitoredElementLevel="VM" type="AVG">
+                <ReferenceMetric type="RESOURCE" name="gatk_ir_gather_avgCpuUsage"/>
+            </Operation>
+        </CompositionRule>
+        <CompositionRule TargetMonitoredElementLevel="SERVICE_UNIT">
+            <ResultingMetric type="RESOURCE" measurementUnit="" name="gatk_ir_gather_avgMemoryUsage"/>
+            <Operation MetricSourceMonitoredElementLevel="VM" type="AVG">
+                <ReferenceMetric type="RESOURCE" name="gatk_ir_gather_avgMemoryUsage"/>
+            </Operation>
+        </CompositionRule>
+                
+        <CompositionRule TargetMonitoredElementLevel="SERVICE_UNIT">
+            <ResultingMetric type="RESOURCE" measurementUnit="" name="gatk_ir_gather_queueLength"/>
+            <Operation MetricSourceMonitoredElementLevel="VM" type="AVG">
+                <ReferenceMetric type="RESOURCE" name="gatk_ir_gather_queueLength"/>
+            </Operation>
+        </CompositionRule>
+        
+        <CompositionRule TargetMonitoredElementLevel="SERVICE_UNIT">
+            <ResultingMetric type="RESOURCE" measurementUnit="" name="gatk_ir_gather_total_queueLength"/>
+            <Operation MetricSourceMonitoredElementLevel="VM" type="SUM">
+                <ReferenceMetric type="RESOURCE" name="gatk_ir_gather_queueLength"/>
+            </Operation>
+        </CompositionRule>
+
+        <CompositionRule TargetMonitoredElementLevel="SERVICE_UNIT">
+            <ResultingMetric type="RESOURCE" measurementUnit="" name="gatk_ir_gather_workPerHour"/>
+            <Operation MetricSourceMonitoredElementLevel="VM" type="AVG">
+                <ReferenceMetric type="RESOURCE" name="gatk_ir_gather_workPerHour"/>
+            </Operation>
+        </CompositionRule>
+
+        <CompositionRule TargetMonitoredElementLevel="SERVICE_UNIT">
+            <ResultingMetric type="RESOURCE" measurementUnit="" name="gatk_ir_gather_workerUtilisation"/>
+            <Operation MetricSourceMonitoredElementLevel="VM" type="AVG">
+                <ReferenceMetric type="RESOURCE" name="gatk_ir_gather_workerUtilisation"/>
+            </Operation>
+        </CompositionRule>
+        
+        
+        <!--    gatk_pr_avgCpuUsage 
+        gatk_pr_avgMemoryUsage 
+        gatk_pr_queueLength 
+        gatk_pr_workPerHour 
+        gatk_pr_workerUtilisation-->
+        <CompositionRule TargetMonitoredElementLevel="SERVICE_UNIT">
+            <ResultingMetric type="RESOURCE" measurementUnit="" name="gatk_pr_avgCpuUsage"/>
+            <Operation MetricSourceMonitoredElementLevel="VM" type="AVG">
+                <ReferenceMetric type="RESOURCE" name="gatk_pr_avgCpuUsage"/>
+            </Operation>
+        </CompositionRule>
+        <CompositionRule TargetMonitoredElementLevel="SERVICE_UNIT">
+            <ResultingMetric type="RESOURCE" measurementUnit="" name="gatk_pr_avgMemoryUsage"/>
+            <Operation MetricSourceMonitoredElementLevel="VM" type="AVG">
+                <ReferenceMetric type="RESOURCE" name="gatk_pr_avgMemoryUsage"/>
+            </Operation>
+        </CompositionRule>
+                
+        <CompositionRule TargetMonitoredElementLevel="SERVICE_UNIT">
+            <ResultingMetric type="RESOURCE" measurementUnit="" name="gatk_pr_queueLength"/>
+            <Operation MetricSourceMonitoredElementLevel="VM" type="AVG">
+                <ReferenceMetric type="RESOURCE" name="gatk_pr_queueLength"/>
+            </Operation>
+        </CompositionRule>
+        
+        <CompositionRule TargetMonitoredElementLevel="SERVICE_UNIT">
+            <ResultingMetric type="RESOURCE" measurementUnit="" name="gatk_pr_total_queueLength"/>
+            <Operation MetricSourceMonitoredElementLevel="VM" type="SUM">
+                <ReferenceMetric type="RESOURCE" name="gatk_pr_queueLength"/>
+            </Operation>
+        </CompositionRule>
+
+        <CompositionRule TargetMonitoredElementLevel="SERVICE_UNIT">
+            <ResultingMetric type="RESOURCE" measurementUnit="" name="gatk_pr_workPerHour"/>
+            <Operation MetricSourceMonitoredElementLevel="VM" type="AVG">
+                <ReferenceMetric type="RESOURCE" name="gatk_pr_workPerHour"/>
+            </Operation>
+        </CompositionRule>
+
+        <CompositionRule TargetMonitoredElementLevel="SERVICE_UNIT">
+            <ResultingMetric type="RESOURCE" measurementUnit="" name="gatk_pr_workerUtilisation"/>
+            <Operation MetricSourceMonitoredElementLevel="VM" type="AVG">
+                <ReferenceMetric type="RESOURCE" name="gatk_pr_workerUtilisation"/>
+            </Operation>
+        </CompositionRule>
+        
+        <!--        
+        gatk_pr_gather_avgCpuUsage 
+        gatk_pr_gather_avgMemoryUsage 
+        gatk_pr_gather_queueLength 
+        gatk_pr_gather_workPerHour 
+        gatk_pr_gather_workerUtilisation -->
+        
+        <CompositionRule TargetMonitoredElementLevel="SERVICE_UNIT">
+            <ResultingMetric type="RESOURCE" measurementUnit="" name="gatk_pr_gather_avgCpuUsage"/>
+            <Operation MetricSourceMonitoredElementLevel="VM" type="AVG">
+                <ReferenceMetric type="RESOURCE" name="gatk_pr_gather_avgCpuUsage"/>
+            </Operation>
+        </CompositionRule>
+        <CompositionRule TargetMonitoredElementLevel="SERVICE_UNIT">
+            <ResultingMetric type="RESOURCE" measurementUnit="" name="gatk_pr_gather_avgMemoryUsage"/>
+            <Operation MetricSourceMonitoredElementLevel="VM" type="AVG">
+                <ReferenceMetric type="RESOURCE" name="gatk_pr_gather_avgMemoryUsage"/>
+            </Operation>
+        </CompositionRule>
+                
+        <CompositionRule TargetMonitoredElementLevel="SERVICE_UNIT">
+            <ResultingMetric type="RESOURCE" measurementUnit="" name="gatk_pr_gather_queueLength"/>
+            <Operation MetricSourceMonitoredElementLevel="VM" type="AVG">
+                <ReferenceMetric type="RESOURCE" name="gatk_pr_gather_queueLength"/>
+            </Operation>
+        </CompositionRule>
+        
+        <CompositionRule TargetMonitoredElementLevel="SERVICE_UNIT">
+            <ResultingMetric type="RESOURCE" measurementUnit="" name="gatk_pr_gather_total_queueLength"/>
+            <Operation MetricSourceMonitoredElementLevel="VM" type="SUM">
+                <ReferenceMetric type="RESOURCE" name="gatk_pr_gather_queueLength"/>
+            </Operation>
+        </CompositionRule>
+
+        <CompositionRule TargetMonitoredElementLevel="SERVICE_UNIT">
+            <ResultingMetric type="RESOURCE" measurementUnit="" name="gatk_pr_gather_workPerHour"/>
+            <Operation MetricSourceMonitoredElementLevel="VM" type="AVG">
+                <ReferenceMetric type="RESOURCE" name="gatk_pr_gather_workPerHour"/>
+            </Operation>
+        </CompositionRule>
+
+        <CompositionRule TargetMonitoredElementLevel="SERVICE_UNIT">
+            <ResultingMetric type="RESOURCE" measurementUnit="" name="gatk_pr_gather_workerUtilisation"/>
+            <Operation MetricSourceMonitoredElementLevel="VM" type="AVG">
+                <ReferenceMetric type="RESOURCE" name="gatk_pr_gather_workerUtilisation"/>
+            </Operation>
+        </CompositionRule>
+        <!--        
+        gatk_rtc_avgCpuUsage 
+        gatk_rtc_avgMemoryUsage 
+        gatk_rtc_queueLength 
+        gatk_rtc_workPerHour 
+        gatk_rtc_workerUtilisation 
+        -->
+        
+        <CompositionRule TargetMonitoredElementLevel="SERVICE_UNIT">
+            <ResultingMetric type="RESOURCE" measurementUnit="" name="gatk_rtc_avgCpuUsage"/>
+            <Operation MetricSourceMonitoredElementLevel="VM" type="AVG">
+                <ReferenceMetric type="RESOURCE" name="gatk_rtc_avgCpuUsage"/>
+            </Operation>
+        </CompositionRule>
+        <CompositionRule TargetMonitoredElementLevel="SERVICE_UNIT">
+            <ResultingMetric type="RESOURCE" measurementUnit="" name="gatk_rtc_avgMemoryUsage"/>
+            <Operation MetricSourceMonitoredElementLevel="VM" type="AVG">
+                <ReferenceMetric type="RESOURCE" name="gatk_rtc_avgMemoryUsage"/>
+            </Operation>
+        </CompositionRule>
+                
+        <CompositionRule TargetMonitoredElementLevel="SERVICE_UNIT">
+            <ResultingMetric type="RESOURCE" measurementUnit="" name="gatk_rtc_queueLength"/>
+            <Operation MetricSourceMonitoredElementLevel="VM" type="AVG">
+                <ReferenceMetric type="RESOURCE" name="gatk_rtc_queueLength"/>
+            </Operation>
+        </CompositionRule>
+        
+        <CompositionRule TargetMonitoredElementLevel="SERVICE_UNIT">
+            <ResultingMetric type="RESOURCE" measurementUnit="" name="gatk_rtc_total_queueLength"/>
+            <Operation MetricSourceMonitoredElementLevel="VM" type="SUM">
+                <ReferenceMetric type="RESOURCE" name="gatk_rtc_queueLength"/>
+            </Operation>
+        </CompositionRule>
+
+        <CompositionRule TargetMonitoredElementLevel="SERVICE_UNIT">
+            <ResultingMetric type="RESOURCE" measurementUnit="" name="gatk_rtc_workPerHour"/>
+            <Operation MetricSourceMonitoredElementLevel="VM" type="AVG">
+                <ReferenceMetric type="RESOURCE" name="gatk_rtc_workPerHour"/>
+            </Operation>
+        </CompositionRule>
+
+        <CompositionRule TargetMonitoredElementLevel="SERVICE_UNIT">
+            <ResultingMetric type="RESOURCE" measurementUnit="" name="gatk_rtc_workerUtilisation"/>
+            <Operation MetricSourceMonitoredElementLevel="VM" type="AVG">
+                <ReferenceMetric type="RESOURCE" name="gatk_rtc_workerUtilisation"/>
+            </Operation>
+        </CompositionRule>
+        
+        <!--        
+        gatk_ug_avgCpuUsage 
+        gatk_ug_avgMemoryUsage 
+        gatk_ug_queueLength 
+        gatk_ug_workPerHour 
+        gatk_ug_workerUtilisation -->
+        
+        
+        <CompositionRule TargetMonitoredElementLevel="SERVICE_UNIT">
+            <ResultingMetric type="RESOURCE" measurementUnit="" name="gatk_ug_avgCpuUsage"/>
+            <Operation MetricSourceMonitoredElementLevel="VM" type="AVG">
+                <ReferenceMetric type="RESOURCE" name="gatk_ug_avgCpuUsage"/>
+            </Operation>
+        </CompositionRule>
+        <CompositionRule TargetMonitoredElementLevel="SERVICE_UNIT">
+            <ResultingMetric type="RESOURCE" measurementUnit="" name="gatk_ug_avgMemoryUsage"/>
+            <Operation MetricSourceMonitoredElementLevel="VM" type="AVG">
+                <ReferenceMetric type="RESOURCE" name="gatk_ug_avgMemoryUsage"/>
+            </Operation>
+        </CompositionRule>
+                
+        <CompositionRule TargetMonitoredElementLevel="SERVICE_UNIT">
+            <ResultingMetric type="RESOURCE" measurementUnit="" name="gatk_ug_queueLength"/>
+            <Operation MetricSourceMonitoredElementLevel="VM" type="AVG">
+                <ReferenceMetric type="RESOURCE" name="gatk_ug_queueLength"/>
+            </Operation>
+        </CompositionRule>
+        
+        <CompositionRule TargetMonitoredElementLevel="SERVICE_UNIT">
+            <ResultingMetric type="RESOURCE" measurementUnit="" name="gatk_ug_total_queueLength"/>
+            <Operation MetricSourceMonitoredElementLevel="VM" type="SUM">
+                <ReferenceMetric type="RESOURCE" name="gatk_ug_queueLength"/>
+            </Operation>
+        </CompositionRule>
+
+        <CompositionRule TargetMonitoredElementLevel="SERVICE_UNIT">
+            <ResultingMetric type="RESOURCE" measurementUnit="" name="gatk_ug_workPerHour"/>
+            <Operation MetricSourceMonitoredElementLevel="VM" type="AVG">
+                <ReferenceMetric type="RESOURCE" name="gatk_ug_workPerHour"/>
+            </Operation>
+        </CompositionRule>
+
+        <CompositionRule TargetMonitoredElementLevel="SERVICE_UNIT">
+            <ResultingMetric type="RESOURCE" measurementUnit="" name="gatk_ug_workerUtilisation"/>
+            <Operation MetricSourceMonitoredElementLevel="VM" type="AVG">
+                <ReferenceMetric type="RESOURCE" name="gatk_ug_workerUtilisation"/>
+            </Operation>
+        </CompositionRule>
+        <!--        
+         gatk_ug_gather_avgCpuUsage 
+        gatk_ug_gather_avgMemoryUsage 
+        gatk_ug_gather_queueLength 
+        gatk_ug_gather_workPerHour 
+        gatk_ug_gather_workerUtilisation -->
+        
+        
+        <CompositionRule TargetMonitoredElementLevel="SERVICE_UNIT">
+            <ResultingMetric type="RESOURCE" measurementUnit="" name="gatk_ug_gather_avgCpuUsage"/>
+            <Operation MetricSourceMonitoredElementLevel="VM" type="AVG">
+                <ReferenceMetric type="RESOURCE" name="gatk_ug_gather_avgCpuUsage"/>
+            </Operation>
+        </CompositionRule>
+        <CompositionRule TargetMonitoredElementLevel="SERVICE_UNIT">
+            <ResultingMetric type="RESOURCE" measurementUnit="" name="gatk_ug_gather_avgMemoryUsage"/>
+            <Operation MetricSourceMonitoredElementLevel="VM" type="AVG">
+                <ReferenceMetric type="RESOURCE" name="gatk_ug_gather_avgMemoryUsage"/>
+            </Operation>
+        </CompositionRule>
+                
+        <CompositionRule TargetMonitoredElementLevel="SERVICE_UNIT">
+            <ResultingMetric type="RESOURCE" measurementUnit="" name="gatk_ug_gather_queueLength"/>
+            <Operation MetricSourceMonitoredElementLevel="VM" type="AVG">
+                <ReferenceMetric type="RESOURCE" name="gatk_ug_gather_queueLength"/>
+            </Operation>
+        </CompositionRule>
+        
+        <CompositionRule TargetMonitoredElementLevel="SERVICE_UNIT">
+            <ResultingMetric type="RESOURCE" measurementUnit="" name="gatk_ug_gather_total_queueLength"/>
+            <Operation MetricSourceMonitoredElementLevel="VM" type="SUM">
+                <ReferenceMetric type="RESOURCE" name="gatk_ug_gather_queueLength"/>
+            </Operation>
+        </CompositionRule>
+
+        <CompositionRule TargetMonitoredElementLevel="SERVICE_UNIT">
+            <ResultingMetric type="RESOURCE" measurementUnit="" name="gatk_ug_gather_workPerHour"/>
+            <Operation MetricSourceMonitoredElementLevel="VM" type="AVG">
+                <ReferenceMetric type="RESOURCE" name="gatk_ug_gather_workPerHour"/>
+            </Operation>
+        </CompositionRule>
+
+        <CompositionRule TargetMonitoredElementLevel="SERVICE_UNIT">
+            <ResultingMetric type="RESOURCE" measurementUnit="" name="gatk_ug_gather_workerUtilisation"/>
+            <Operation MetricSourceMonitoredElementLevel="VM" type="AVG">
+                <ReferenceMetric type="RESOURCE" name="gatk_ug_gather_workerUtilisation"/>
+            </Operation>
+        </CompositionRule>
+        
+        <!--        
+         gatk_ve_avgCpuUsage 
+        gatk_ve_avgMemoryUsage 
+        gatk_ve_queueLength 
+        gatk_ve_workPerHour 
+        gatk_ve_workerUtilisation -->
+        <CompositionRule TargetMonitoredElementLevel="SERVICE_UNIT">
+            <ResultingMetric type="RESOURCE" measurementUnit="" name="gatk_ve_avgCpuUsage"/>
+            <Operation MetricSourceMonitoredElementLevel="VM" type="AVG">
+                <ReferenceMetric type="RESOURCE" name="gatk_ve_avgCpuUsage"/>
+            </Operation>
+        </CompositionRule>
+        <CompositionRule TargetMonitoredElementLevel="SERVICE_UNIT">
+            <ResultingMetric type="RESOURCE" measurementUnit="" name="gatk_ve_avgMemoryUsage"/>
+            <Operation MetricSourceMonitoredElementLevel="VM" type="AVG">
+                <ReferenceMetric type="RESOURCE" name="gatk_ve_avgMemoryUsage"/>
+            </Operation>
+        </CompositionRule>
+                
+        <CompositionRule TargetMonitoredElementLevel="SERVICE_UNIT">
+            <ResultingMetric type="RESOURCE" measurementUnit="" name="gatk_ve_queueLength"/>
+            <Operation MetricSourceMonitoredElementLevel="VM" type="AVG">
+                <ReferenceMetric type="RESOURCE" name="gatk_ve_queueLength"/>
+            </Operation>
+        </CompositionRule>
+        
+        <CompositionRule TargetMonitoredElementLevel="SERVICE_UNIT">
+            <ResultingMetric type="RESOURCE" measurementUnit="" name="gatk_ve_total_queueLength"/>
+            <Operation MetricSourceMonitoredElementLevel="VM" type="SUM">
+                <ReferenceMetric type="RESOURCE" name="gatk_ve_queueLength"/>
+            </Operation>
+        </CompositionRule>
+
+        <CompositionRule TargetMonitoredElementLevel="SERVICE_UNIT">
+            <ResultingMetric type="RESOURCE" measurementUnit="" name="gatk_ve_workPerHour"/>
+            <Operation MetricSourceMonitoredElementLevel="VM" type="AVG">
+                <ReferenceMetric type="RESOURCE" name="gatk_ve_workPerHour"/>
+            </Operation>
+        </CompositionRule>
+
+        <CompositionRule TargetMonitoredElementLevel="SERVICE_UNIT">
+            <ResultingMetric type="RESOURCE" measurementUnit="" name="gatk_ve_workerUtilisation"/>
+            <Operation MetricSourceMonitoredElementLevel="VM" type="AVG">
+                <ReferenceMetric type="RESOURCE" name="gatk_ve_workerUtilisation"/>
+            </Operation>
+        </CompositionRule>
+        
+        
+        <!--        
+         gatk_vf_avgCpuUsage 
+        gatk_vf_avgMemoryUsage 
+        gatk_vf_queueLength 
+        gatk_vf_workPerHour 
+        gatk_vf_workerUtilisation-->
+        
+        <CompositionRule TargetMonitoredElementLevel="SERVICE_UNIT">
+            <ResultingMetric type="RESOURCE" measurementUnit="" name="gatk_vf_avgCpuUsage"/>
+            <Operation MetricSourceMonitoredElementLevel="VM" type="AVG">
+                <ReferenceMetric type="RESOURCE" name="gatk_vf_avgCpuUsage"/>
+            </Operation>
+        </CompositionRule>
+        <CompositionRule TargetMonitoredElementLevel="SERVICE_UNIT">
+            <ResultingMetric type="RESOURCE" measurementUnit="" name="gatk_vf_avgMemoryUsage"/>
+            <Operation MetricSourceMonitoredElementLevel="VM" type="AVG">
+                <ReferenceMetric type="RESOURCE" name="gatk_vf_avgMemoryUsage"/>
+            </Operation>
+        </CompositionRule>
+                
+        <CompositionRule TargetMonitoredElementLevel="SERVICE_UNIT">
+            <ResultingMetric type="RESOURCE" measurementUnit="" name="gatk_vf_queueLength"/>
+            <Operation MetricSourceMonitoredElementLevel="VM" type="AVG">
+                <ReferenceMetric type="RESOURCE" name="gatk_vf_queueLength"/>
+            </Operation>
+        </CompositionRule>
+        
+        <CompositionRule TargetMonitoredElementLevel="SERVICE_UNIT">
+            <ResultingMetric type="RESOURCE" measurementUnit="" name="gatk_vf_total_queueLength"/>
+            <Operation MetricSourceMonitoredElementLevel="VM" type="SUM">
+                <ReferenceMetric type="RESOURCE" name="gatk_vf_queueLength"/>
+            </Operation>
+        </CompositionRule>
+
+        <CompositionRule TargetMonitoredElementLevel="SERVICE_UNIT">
+            <ResultingMetric type="RESOURCE" measurementUnit="" name="gatk_vf_workPerHour"/>
+            <Operation MetricSourceMonitoredElementLevel="VM" type="AVG">
+                <ReferenceMetric type="RESOURCE" name="gatk_vf_workPerHour"/>
+            </Operation>
+        </CompositionRule>
+
+        <CompositionRule TargetMonitoredElementLevel="SERVICE_UNIT">
+            <ResultingMetric type="RESOURCE" measurementUnit="" name="gatk_vf_workerUtilisation"/>
+            <Operation MetricSourceMonitoredElementLevel="VM" type="AVG">
+                <ReferenceMetric type="RESOURCE" name="gatk_vf_workerUtilisation"/>
+            </Operation>
+        </CompositionRule>
+        <!--        
+         gatk_vf_gather_avgCpuUsage 
+        gatk_vf_gather_avgMemoryUsage 
+        gatk_vf_gather_queueLength 
+        gatk_vf_gather_workPerHour 
+        gatk_vf_gather_workerUtilisation -->
+        
+        <CompositionRule TargetMonitoredElementLevel="SERVICE_UNIT">
+            <ResultingMetric type="RESOURCE" measurementUnit="" name="gatk_vf_gather_gather_avgCpuUsage"/>
+            <Operation MetricSourceMonitoredElementLevel="VM" type="AVG">
+                <ReferenceMetric type="RESOURCE" name="gatk_vf_gather_gather_avgCpuUsage"/>
+            </Operation>
+        </CompositionRule>
+        <CompositionRule TargetMonitoredElementLevel="SERVICE_UNIT">
+            <ResultingMetric type="RESOURCE" measurementUnit="" name="gatk_vf_gather_gather_avgMemoryUsage"/>
+            <Operation MetricSourceMonitoredElementLevel="VM" type="AVG">
+                <ReferenceMetric type="RESOURCE" name="gatk_vf_gather_gather_avgMemoryUsage"/>
+            </Operation>
+        </CompositionRule>
+                
+        <CompositionRule TargetMonitoredElementLevel="SERVICE_UNIT">
+            <ResultingMetric type="RESOURCE" measurementUnit="" name="gatk_vf_gather_gather_queueLength"/>
+            <Operation MetricSourceMonitoredElementLevel="VM" type="AVG">
+                <ReferenceMetric type="RESOURCE" name="gatk_vf_gather_gather_queueLength"/>
+            </Operation>
+        </CompositionRule>
+        
+        <CompositionRule TargetMonitoredElementLevel="SERVICE_UNIT">
+            <ResultingMetric type="RESOURCE" measurementUnit="" name="gatk_vf_gather_gather_total_queueLength"/>
+            <Operation MetricSourceMonitoredElementLevel="VM" type="SUM">
+                <ReferenceMetric type="RESOURCE" name="gatk_vf_gather_gather_queueLength"/>
+            </Operation>
+        </CompositionRule>
+
+        <CompositionRule TargetMonitoredElementLevel="SERVICE_UNIT">
+            <ResultingMetric type="RESOURCE" measurementUnit="" name="gatk_vf_gather_gather_workPerHour"/>
+            <Operation MetricSourceMonitoredElementLevel="VM" type="AVG">
+                <ReferenceMetric type="RESOURCE" name="gatk_vf_gather_gather_workPerHour"/>
+            </Operation>
+        </CompositionRule>
+
+        <CompositionRule TargetMonitoredElementLevel="SERVICE_UNIT">
+            <ResultingMetric type="RESOURCE" measurementUnit="" name="gatk_vf_gather_gather_workerUtilisation"/>
+            <Operation MetricSourceMonitoredElementLevel="VM" type="AVG">
+                <ReferenceMetric type="RESOURCE" name="gatk_vf_gather_gather_workerUtilisation"/>
+            </Operation>
+        </CompositionRule>
+        
+                
+        <!--Common metrics-->
+        <CompositionRule TargetMonitoredElementLevel="SERVICE_UNIT">
+            
+            <ResultingMetric type="RESOURCE" measurementUnit="%" name="memUsedPercent"/>
+            <Operation MetricSourceMonitoredElementLevel="VM" type="AVG">
+                <ReferenceMetric type="RESOURCE" name="memUsedPercent"/>
+            </Operation>
+        </CompositionRule>
+
+        <CompositionRule TargetMonitoredElementLevel="SERVICE_UNIT">
+            
+            <ResultingMetric type="RESOURCE" measurementUnit="%" name="memUsedPercent"/>
+            <Operation MetricSourceMonitoredElementLevel="VM" type="AVG">
+                <ReferenceMetric type="RESOURCE" name="memUsedPercent"/>
+            </Operation>
+        </CompositionRule>
+
+
+        <CompositionRule TargetMonitoredElementLevel="VM">
+            
+            <ResultingMetric type="RESOURCE" measurementUnit="MB/s" name="dataTransfer"/>
+            <Operation type="DIV" value="1048576">
+                <Operation MetricSourceMonitoredElementLevel="VM" type="SUM">
+                    <Operation MetricSourceMonitoredElementLevel="VM" type="SUM">
+                        <ReferenceMetric type="RESOURCE" name="netBytesIN" />
+                    </Operation>
+                    <Operation MetricSourceMonitoredElementLevel="VM" type="SUM">
+                        <ReferenceMetric type="RESOURCE" name="netBytesOUT" />
+                    </Operation>
+                </Operation>
+            </Operation>
+        </CompositionRule>
+
+        <CompositionRule TargetMonitoredElementLevel="SERVICE_UNIT">
+            
+            <ResultingMetric type="RESOURCE" measurementUnit="#" name="activeSessions"/>
+            <Operation MetricSourceMonitoredElementLevel="VM" type="SUM">
+                <ReferenceMetric type="RESOURCE" name="activeSessions"/>
+            </Operation>
+        </CompositionRule>
+
+ 
+        <CompositionRule TargetMonitoredElementLevel="SERVICE_UNIT">
+            
+            <ResultingMetric type="RESOURCE" measurementUnit="ms" name="avgResponseTime"/>
+            <Operation MetricSourceMonitoredElementLevel="VM" type="AVG">
+                <ReferenceMetric type="RESOURCE" name="avgResponseTime"/>
+            </Operation>
+        </CompositionRule>
+
+ 	
+        <CompositionRule TargetMonitoredElementLevel="SERVICE_UNIT">
+            
+            <ResultingMetric type="RESOURCE" measurementUnit="req/s" name="requestRate"/>
+            <Operation MetricSourceMonitoredElementLevel="VM" type="SUM">
+                <ReferenceMetric type="RESOURCE" name="requestRate"/>
+            </Operation>
+        </CompositionRule>
+
+
+
+        <CompositionRule TargetMonitoredElementLevel="SERVICE">
+            
+            <ResultingMetric type="RESOURCE" measurementUnit="MB/s" name="dataTransfer"/>
+               
+            <Operation MetricSourceMonitoredElementLevel="VM" type="SUM">
+				 
+                <ReferenceMetric type="RESOURCE" name="dataTransfer" />
+ 
+
+            </Operation>
+         
+        </CompositionRule>
+	
+ 
+            
+        <CompositionRule TargetMonitoredElementLevel="SERVICE_UNIT">
+            
+            <ResultingMetric type="RESOURCE" measurementUnit="ms" name="responseTime"/>
+            <Operation MetricSourceMonitoredElementLevel="VM" type="AVG">
+                <ReferenceMetric type="RESOURCE" name="responseTime"/>
+            </Operation>
+        </CompositionRule>
+ 
+ 
+        
+        <CompositionRule TargetMonitoredElementLevel="SERVICE_TOPOLOGY">
+             
+            <ResultingMetric type="QUALITY" measurementUnit="ms" name="latency"/>
+            <Operation MetricSourceMonitoredElementLevel="SERVICE_UNIT" type="KEEP">
+                <ReferenceMetric type="QUALITY" measurementUnit="ms" name="latency"/>
+            </Operation>
+        </CompositionRule>
+        <CompositionRule TargetMonitoredElementLevel="SERVICE_TOPOLOGY">
+             
+            <ResultingMetric type="RESOURCE" measurementUnit="%" name="cpuUsage"/>
+            <Operation MetricSourceMonitoredElementLevel="SERVICE_UNIT" type="AVG">
+                <ReferenceMetric type="RESOURCE" measurementUnit="%" name="cpuUsage"/>
+            </Operation>
+        </CompositionRule>
+        <CompositionRule TargetMonitoredElementLevel="SERVICE_TOPOLOGY">
+           
+            <ResultingMetric type="RESOURCE" measurementUnit="ms" name="responseTime"/>
+            <Operation MetricSourceMonitoredElementLevel="SERVICE_UNIT" type="AVG">
+                <ReferenceMetric type="RESOURCE" name="responseTime"/>
+                 
+            </Operation>
+        </CompositionRule>
+        <CompositionRule TargetMonitoredElementLevel="SERVICE_TOPOLOGY">
+             
+            <ResultingMetric type="RESOURCE" measurementUnit="operations/s" name="throughput"/>
+            <Operation MetricSourceMonitoredElementLevel="SERVICE_UNIT" type="SUM">
+                <ReferenceMetric type="RESOURCE" name="throughput"/>
+                 
+            </Operation>
+        </CompositionRule>
+
+        <CompositionRule TargetMonitoredElementLevel="VM">
+            <ResultingMetric type="RESOURCE" measurementUnit="#" name="numberOfVMs"/>
+            <Operation value="1" type="SET_VALUE"/>
+        </CompositionRule>
+
+ 
+        <CompositionRule TargetMonitoredElementLevel="SERVICE_UNIT">
+            <ResultingMetric type="RESOURCE" measurementUnit="#" name="instances"/>
+            <Operation MetricSourceMonitoredElementLevel="VM" type="SUM">
+                <ReferenceMetric type="RESOURCE" name="numberOfVMs"/>
+            </Operation>
+        </CompositionRule>
+
+
+        <CompositionRule TargetMonitoredElementLevel="SERVICE">
+            <ResultingMetric type="RESOURCE" measurementUnit="#" name="vmsUsed"/>
+            <Operation MetricSourceMonitoredElementLevel="SERVICE_UNIT" type="SUM">
+                <ReferenceMetric type="RESOURCE" name="instances"/>
+            </Operation>
+        </CompositionRule>
+ 
+        
+
+    </MetricsCompositionRules>
+     
+</CompositionRulesConfiguration>
+
