@@ -673,7 +673,6 @@
                 <ReferenceMetric type="RESOURCE" name="node_load"/>
             </Operation>
         </CompositionRule>
-        
  
         <CompositionRule TargetMonitoredElementLevel="SERVICE_TOPOLOGY">
             
@@ -695,7 +694,14 @@
                     <ReferenceMetric type="RESOURCE" name="avgNodeLoad" />
                 </Operation> 
             </Operation>
-        </CompositionRule>                            
+        </CompositionRule>     
+                               
+        <CompositionRule TargetMonitoredElementLevel="SERVICE">
+            <ResultingMetric type="RESOURCE" measurementUnit="" name="dataInbalanceRatio"/>
+            <Operation MetricSourceMonitoredElementLevel="SERVICE_TOPOLOGY" type="KEEP">
+                <ReferenceMetric type="RESOURCE" name="dataInbalanceRatio" />
+            </Operation>
+        </CompositionRule>                          
                                                     
         <!--Common metrics-->
         <CompositionRule TargetMonitoredElementLevel="SERVICE_UNIT">
