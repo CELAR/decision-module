@@ -61,6 +61,18 @@
         requestRate
         servers-->
 
+        <CompositionRule TargetMonitoredElementLevel="SERVICE">
+            
+            <ResultingMetric type="RESOURCE" measurementUnit="%" name="masterAvgCPUUsage"/>
+             
+            <Operation MetricSourceMonitoredElementLevel="SERVICE_UNIT" type="KEEP">
+                <ReferenceMetric type="RESOURCE" measurementUnit="%"  name="cpuUsage"/>
+                <SourceMonitoredElementID>Master</SourceMonitoredElementID> 
+            </Operation>
+
+        </CompositionRule>
+        
+        
         <CompositionRule TargetMonitoredElementLevel="SERVICE_UNIT">
             
             <ResultingMetric type="RESOURCE" measurementUnit="#" name="activeSessions"/>
@@ -76,6 +88,25 @@
                 <ReferenceMetric type="RESOURCE" name="avgResponseTime"/>
             </Operation>
         </CompositionRule>
+        
+        
+        <CompositionRule TargetMonitoredElementLevel="SERVICE_UNIT">
+            
+            <ResultingMetric type="RESOURCE" measurementUnit="err/s" name="errorRate"/>
+            <Operation MetricSourceMonitoredElementLevel="VM" type="AVG">
+                <ReferenceMetric type="RESOURCE" name="errorRate"/>
+            </Operation>
+        </CompositionRule>
+        
+         <CompositionRule TargetMonitoredElementLevel="SERVICE">
+            
+            <ResultingMetric type="RESOURCE" measurementUnit="err/s" name="errorRate"/>
+            <Operation MetricSourceMonitoredElementLevel="SERVICE_UNIT" type="AVG">
+                <ReferenceMetric type="RESOURCE" name="errorRate"/>
+            </Operation>
+        </CompositionRule>
+        
+         
         
         <CompositionRule TargetMonitoredElementLevel="SERVICE_UNIT">
             
@@ -194,6 +225,24 @@
                 <ReferenceMetric type="RESOURCE" name="gatk_ir_queueLength"/>
             </Operation>
         </CompositionRule>
+        
+        
+        <CompositionRule TargetMonitoredElementLevel="SERVICE_UNIT">
+            <ResultingMetric type="RESOURCE" measurementUnit="" name="gatk_ir_queueLength"/>
+            <Operation MetricSourceMonitoredElementLevel="VM" type="AVG">
+                <ReferenceMetric type="RESOURCE" name="gatk_ir_queueLength"/>
+            </Operation>
+        </CompositionRule>
+        
+        
+        <CompositionRule TargetMonitoredElementLevel="SERVICE">
+            <ResultingMetric type="RESOURCE" measurementUnit="" name="gatk_ir_queueLength"/>
+            <Operation MetricSourceMonitoredElementLevel="SERVICE_UNIT" type="AVG">
+                <ReferenceMetric type="RESOURCE" name="gatk_ir_queueLength"/>
+            </Operation>
+        </CompositionRule>
+        
+        
 
         <CompositionRule TargetMonitoredElementLevel="SERVICE_UNIT">
             <ResultingMetric type="RESOURCE" measurementUnit="" name="gatk_ir_workPerHour"/>
@@ -208,6 +257,18 @@
                 <ReferenceMetric type="RESOURCE" name="gatk_ir_workerUtilisation"/>
             </Operation>
         </CompositionRule>
+        
+        
+        
+        <CompositionRule TargetMonitoredElementLevel="SERVICE">
+            <ResultingMetric type="RESOURCE" measurementUnit="" name="gatk_ir_workerUtilisation"/>
+            <Operation MetricSourceMonitoredElementLevel="SERVICE_UNIT" type="AVG">
+                <ReferenceMetric type="RESOURCE" name="gatk_ir_workerUtilisation"/>
+            </Operation>
+        </CompositionRule>
+        
+        
+        
         
         <!--        gatk_ir_gather_avgCpuUsage 
         gatk_ir_gather_avgMemoryUsage 
@@ -379,6 +440,20 @@
             </Operation>
         </CompositionRule>
         
+        <CompositionRule TargetMonitoredElementLevel="SERVICE">
+            <ResultingMetric type="RESOURCE" measurementUnit="" name="gatk_rtc_queueLength"/>
+            <Operation MetricSourceMonitoredElementLevel="SERVICE_UNIT" type="AVG">
+                <ReferenceMetric type="RESOURCE" name="gatk_rtc_queueLength"/>
+            </Operation>
+        </CompositionRule>
+        
+        <CompositionRule TargetMonitoredElementLevel="SERVICE_UNIT">
+            <ResultingMetric type="RESOURCE" measurementUnit="" name="gatk_rtc_queueLength"/>
+            <Operation MetricSourceMonitoredElementLevel="VM" type="AVG">
+                <ReferenceMetric type="RESOURCE" name="gatk_rtc_queueLength"/>
+            </Operation>
+        </CompositionRule>
+        
         <CompositionRule TargetMonitoredElementLevel="SERVICE_UNIT">
             <ResultingMetric type="RESOURCE" measurementUnit="" name="gatk_rtc_total_queueLength"/>
             <Operation MetricSourceMonitoredElementLevel="VM" type="SUM">
@@ -396,6 +471,13 @@
         <CompositionRule TargetMonitoredElementLevel="SERVICE_UNIT">
             <ResultingMetric type="RESOURCE" measurementUnit="" name="gatk_rtc_workerUtilisation"/>
             <Operation MetricSourceMonitoredElementLevel="VM" type="AVG">
+                <ReferenceMetric type="RESOURCE" name="gatk_rtc_workerUtilisation"/>
+            </Operation>
+        </CompositionRule>
+
+        <CompositionRule TargetMonitoredElementLevel="SERVICE">
+            <ResultingMetric type="RESOURCE" measurementUnit="" name="gatk_rtc_workerUtilisation"/>
+            <Operation MetricSourceMonitoredElementLevel="SERVICE_UNIT" type="AVG">
                 <ReferenceMetric type="RESOURCE" name="gatk_rtc_workerUtilisation"/>
             </Operation>
         </CompositionRule>
@@ -846,4 +928,5 @@
     </MetricsCompositionRules>
      
 </CompositionRulesConfiguration>
+
 
