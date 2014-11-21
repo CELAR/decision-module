@@ -91,12 +91,18 @@ public class EnforcementPluginCELAR implements EnforcementInterface {
             Logger.getLogger(EnforcementPluginCELAR.class.getName()).log(Level.INFO, "Connecting to "
                     + resizingActionsClient.getConfiguration().getHost() + ":"
                     + resizingActionsClient.getConfiguration().getPort());
-            for (ResizingAction action : resizingActionsClient.listResizingActions().getResizingActions()) {
+            ResizingActionList actionList=resizingActionsClient.listResizingActions();
+            for (ResizingAction action : actionList.getResizingActions()) {
                 this.actionsAvailable.put(action.getId(), action);
             }
         } catch (ConnectException ex) {
-            Logger.getLogger(EnforcementPluginCELAR.class.getName()).log(Level.SEVERE, "Rncountered error connecting to orchestrator", ex);
+            Logger.getLogger(EnforcementPluginCELAR.class.getName()).log(Level.SEVERE, "Encountered error connecting to orchestrator " +  ex.getMessage());
             Logger.getLogger(EnforcementPluginCELAR.class.getName()).log(Level.SEVERE, "Retrying connection to orchestrator");
+            try {
+                Thread.sleep(5000);
+            } catch (InterruptedException ex1) {
+                Logger.getLogger(EnforcementPluginCELAR.class.getName()).log(Level.SEVERE, null, ex1);
+            }
             refreshElasticityActionsList();
         } catch (IOException ex) {
             Logger.getLogger(EnforcementPluginCELAR.class.getName()).log(Level.SEVERE, null, ex);
