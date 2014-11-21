@@ -16,6 +16,20 @@
             </Operation>
         </CompositionRule>
         
+            <CompositionRule TargetMonitoredElementLevel="VM">
+            <ResultingMetric type="RESOURCE" measurementUnit="#" name="numberOfVMs"/>
+            <Operation value="1" type="SET_VALUE"/>
+        </CompositionRule>
+
+ 
+        <CompositionRule TargetMonitoredElementLevel="SERVICE_UNIT">
+            <ResultingMetric type="RESOURCE" measurementUnit="#" name="instances"/>
+            <Operation MetricSourceMonitoredElementLevel="VM" type="SUM">
+                <ReferenceMetric type="RESOURCE" name="numberOfVMs"/>
+            </Operation>
+        </CompositionRule>
+
+        
         <!--        
         Postgres:
         pgActiveConnections
@@ -159,9 +173,26 @@
         gatk_br_queueLength 
         gatk_br_workPerHour 
         gatk_br_workerUtilisation 
+  -->
   
+  
+       <CompositionRule TargetMonitoredElementLevel="SERVICE_UNIT">
+            <ResultingMetric type="RESOURCE" measurementUnit="" name="workerUtilisation"/>
+            
+            <Operation type="DIV">
+                <Operation MetricSourceMonitoredElementLevel="VM" type="SUM">
+                    <ReferenceMetric type="RESOURCE" name="busy"/>
+               </Operation>
+      
+                <Operation MetricSourceMonitoredElementLevel="SERVICE_UNIT" type="KEEP">
+                    <ReferenceMetric type="RESOURCE" name="instances" />
+                </Operation> 
+            </Operation>
+            
+        </CompositionRule>
         
         
+       <!--  
         br
         
         <CompositionRule TargetMonitoredElementLevel="SERVICE_UNIT">
@@ -243,15 +274,15 @@
         </CompositionRule>
         
         
-
+<!--
         <CompositionRule TargetMonitoredElementLevel="SERVICE_UNIT">
             <ResultingMetric type="RESOURCE" measurementUnit="" name="gatk_ir_workPerHour"/>
             <Operation MetricSourceMonitoredElementLevel="VM" type="AVG">
                 <ReferenceMetric type="RESOURCE" name="gatk_ir_workPerHour"/>
             </Operation>
-        </CompositionRule>
+        </CompositionRule>-->
 
-        <CompositionRule TargetMonitoredElementLevel="SERVICE_UNIT">
+<!--        <CompositionRule TargetMonitoredElementLevel="SERVICE_UNIT">
             <ResultingMetric type="RESOURCE" measurementUnit="" name="gatk_ir_workerUtilisation"/>
             <Operation MetricSourceMonitoredElementLevel="VM" type="AVG">
                 <ReferenceMetric type="RESOURCE" name="gatk_ir_workerUtilisation"/>
@@ -265,7 +296,7 @@
             <Operation MetricSourceMonitoredElementLevel="SERVICE_UNIT" type="AVG">
                 <ReferenceMetric type="RESOURCE" name="gatk_ir_workerUtilisation"/>
             </Operation>
-        </CompositionRule>
+        </CompositionRule>-->
         
         
         
@@ -461,13 +492,13 @@
             </Operation>
         </CompositionRule>
 
-        <CompositionRule TargetMonitoredElementLevel="SERVICE_UNIT">
+<!--        <CompositionRule TargetMonitoredElementLevel="SERVICE_UNIT">
             <ResultingMetric type="RESOURCE" measurementUnit="" name="gatk_rtc_workPerHour"/>
             <Operation MetricSourceMonitoredElementLevel="VM" type="AVG">
                 <ReferenceMetric type="RESOURCE" name="gatk_rtc_workPerHour"/>
             </Operation>
-        </CompositionRule>
-
+        </CompositionRule>-->
+<!--
         <CompositionRule TargetMonitoredElementLevel="SERVICE_UNIT">
             <ResultingMetric type="RESOURCE" measurementUnit="" name="gatk_rtc_workerUtilisation"/>
             <Operation MetricSourceMonitoredElementLevel="VM" type="AVG">
@@ -480,7 +511,7 @@
             <Operation MetricSourceMonitoredElementLevel="SERVICE_UNIT" type="AVG">
                 <ReferenceMetric type="RESOURCE" name="gatk_rtc_workerUtilisation"/>
             </Operation>
-        </CompositionRule>
+        </CompositionRule>-->
         
 <!--                
         gatk_ug_avgCpuUsage 
@@ -902,19 +933,7 @@
             </Operation>
         </CompositionRule>
 
-        <CompositionRule TargetMonitoredElementLevel="VM">
-            <ResultingMetric type="RESOURCE" measurementUnit="#" name="numberOfVMs"/>
-            <Operation value="1" type="SET_VALUE"/>
-        </CompositionRule>
-
- 
-        <CompositionRule TargetMonitoredElementLevel="SERVICE_UNIT">
-            <ResultingMetric type="RESOURCE" measurementUnit="#" name="instances"/>
-            <Operation MetricSourceMonitoredElementLevel="VM" type="SUM">
-                <ReferenceMetric type="RESOURCE" name="numberOfVMs"/>
-            </Operation>
-        </CompositionRule>
-
+    
 
         <CompositionRule TargetMonitoredElementLevel="SERVICE">
             <ResultingMetric type="RESOURCE" measurementUnit="#" name="vmsUsed"/>
@@ -928,5 +947,6 @@
     </MetricsCompositionRules>
      
 </CompositionRulesConfiguration>
+
 
 
