@@ -42,6 +42,7 @@ import java.util.HashMap;
 import java.util.Map.Entry;
 import com.sixsq.slipstream.statemachine.States;
 import gr.ntua.cslab.orchestrator.client.conf.ClientConfiguration;
+import java.net.ConnectException;
 import java.util.Random;
 
 public class EnforcementPluginCELAR implements EnforcementInterface {
@@ -65,18 +66,45 @@ public class EnforcementPluginCELAR implements EnforcementInterface {
         refreshElasticityActionsList();
     }
 
-    public void refreshElasticityActionsList() {
-        actionsAvailable = new HashMap<Integer, ResizingAction>();
+    public static void main(String[] args) {
+        String IP = "83.212.119.109";
+        int port = 80;
+
+        ClientConfiguration clientConfiguration = new ClientConfiguration();
+        clientConfiguration.setHost(IP);
+        clientConfiguration.setPort(port);
+        ResizingActionsClient r = new ResizingActionsClient();
+        r.setConfiguration(clientConfiguration);
         try {
-            for (ResizingAction action : resizingActionsClient.listResizingActions().getResizingActions()) {
-                this.actionsAvailable.put(action.getId(), action);
+            for (ResizingAction action : r.listResizingActions().getResizingActions()) {
+                System.out.println(action.getName());
             }
         } catch (IOException ex) {
             Logger.getLogger(EnforcementPluginCELAR.class.getName()).log(Level.SEVERE, null, ex);
         }
 
     }
-    public boolean balance(Node node){
+
+    public void refreshElasticityActionsList() {
+        actionsAvailable = new HashMap<Integer, ResizingAction>();
+        try {
+            Logger.getLogger(EnforcementPluginCELAR.class.getName()).log(Level.INFO, "Connecting to "
+                    + resizingActionsClient.getConfiguration().getHost() + ":"
+                    + resizingActionsClient.getConfiguration().getPort());
+            for (ResizingAction action : resizingActionsClient.listResizingActions().getResizingActions()) {
+                this.actionsAvailable.put(action.getId(), action);
+            }
+        } catch (ConnectException ex) {
+            Logger.getLogger(EnforcementPluginCELAR.class.getName()).log(Level.SEVERE, "Rncountered error connecting to orchestrator", ex);
+            Logger.getLogger(EnforcementPluginCELAR.class.getName()).log(Level.SEVERE, "Retrying connection to orchestrator");
+            refreshElasticityActionsList();
+        } catch (IOException ex) {
+            Logger.getLogger(EnforcementPluginCELAR.class.getName()).log(Level.SEVERE, null, ex);
+        }
+
+    }
+
+    public boolean balance(Node node) {
         boolean ok = false;
         DependencyGraph dependencyGraph = new DependencyGraph();
         dependencyGraph.setCloudService(cloudService);
@@ -92,12 +120,12 @@ public class EnforcementPluginCELAR implements EnforcementInterface {
                     //TODO : Assume we have value IP returned
                     String ip = getIP(executedResizingAction.getUniqueId(), node.getId());
                     if (!ip.equalsIgnoreCase("")) {
-                         RuntimeLogger.logger.debug("Balanced nodes " + node.getId() );
-                       
+                        RuntimeLogger.logger.debug("Balanced nodes " + node.getId());
+
                         monitoringAPI.refreshServiceStructure(cloudService);
-                        ok=true;
+                        ok = true;
                     } else {
-                         RuntimeLogger.logger.error("No IP was remove dafter scaling in node  " + node.getId());
+                        RuntimeLogger.logger.error("No IP was remove dafter scaling in node  " + node.getId());
                     }
                 }
 
@@ -105,8 +133,9 @@ public class EnforcementPluginCELAR implements EnforcementInterface {
             }
         }
         return ok;
-        
+
     }
+
     public boolean scaleIn(Node node) {
         boolean ok = true;
         DependencyGraph dependencyGraph = new DependencyGraph();
@@ -123,11 +152,11 @@ public class EnforcementPluginCELAR implements EnforcementInterface {
                     //TODO : Assume we have value IP returned
                     String ip = getIP(executedResizingAction.getUniqueId(), node.getId());
                     if (!ip.equalsIgnoreCase("")) {
-                         RuntimeLogger.logger.debug("Removing from node " + node.getId() + " IP " + ip);
+                        RuntimeLogger.logger.debug("Removing from node " + node.getId() + " IP " + ip);
                         toBeScaled.removeNode(ip);
                         monitoringAPI.refreshServiceStructure(cloudService);
                     } else {
-                         RuntimeLogger.logger.error("No IP was remove dafter scaling in node  " + node.getId());
+                        RuntimeLogger.logger.error("No IP was remove dafter scaling in node  " + node.getId());
                     }
                 }
 
@@ -363,42 +392,41 @@ public class EnforcementPluginCELAR implements EnforcementInterface {
 
     }
 
-    public static void main(String[] args) {
-        Node cloudService = new Node();
-        cloudService.setId("myCloudServ");
-        cloudService.setNodeType(NodeType.CLOUD_SERVICE);
-        Node servTop = new Node();
-        servTop.setId("servTop");
-        servTop.setNodeType(NodeType.SERVICE_TOPOLOGY);
-        SimpleRelationship relationship = new SimpleRelationship();
-        relationship.setId("rel1");
-        relationship.setSourceElement(cloudService.getId());
-        relationship.setTargetElement(servTop.getId());
-        relationship.setType(RelationshipType.COMPOSITION_RELATIONSHIP);
-        cloudService.addNode(servTop, relationship);
-
-        Node node = new Node();
-
-        node.setId("name1=2");
-        node.setNodeType(NodeType.SERVICE_UNIT);
-        relationship = new SimpleRelationship();
-        relationship.setId("rel");
-        relationship.setSourceElement(servTop.getId());
-        relationship.setTargetElement(node.getId());
-        relationship.setType(RelationshipType.COMPOSITION_RELATIONSHIP);
-        servTop.addNode(node, relationship);
-        DependencyGraph dependencyGraph = new DependencyGraph();
-        dependencyGraph.setCloudService(cloudService);
-        System.out.println(dependencyGraph.graphToString());
-        EnforcementPluginCELAR enforcementPluginCELAR = new EnforcementPluginCELAR(cloudService);
-        enforcementPluginCELAR.refreshElasticityActionsList();
-        for (String action : enforcementPluginCELAR.getElasticityCapabilities()) {
-            System.out.println(action);
-
-        }
-        enforcementPluginCELAR.scaleIn(node);
-    }
-
+//    public static void main(String[] args) {
+//        Node cloudService = new Node();
+//        cloudService.setId("myCloudServ");
+//        cloudService.setNodeType(NodeType.CLOUD_SERVICE);
+//        Node servTop = new Node();
+//        servTop.setId("servTop");
+//        servTop.setNodeType(NodeType.SERVICE_TOPOLOGY);
+//        SimpleRelationship relationship = new SimpleRelationship();
+//        relationship.setId("rel1");
+//        relationship.setSourceElement(cloudService.getId());
+//        relationship.setTargetElement(servTop.getId());
+//        relationship.setType(RelationshipType.COMPOSITION_RELATIONSHIP);
+//        cloudService.addNode(servTop, relationship);
+//
+//        Node node = new Node();
+//
+//        node.setId("name1=2");
+//        node.setNodeType(NodeType.SERVICE_UNIT);
+//        relationship = new SimpleRelationship();
+//        relationship.setId("rel");
+//        relationship.setSourceElement(servTop.getId());
+//        relationship.setTargetElement(node.getId());
+//        relationship.setType(RelationshipType.COMPOSITION_RELATIONSHIP);
+//        servTop.addNode(node, relationship);
+//        DependencyGraph dependencyGraph = new DependencyGraph();
+//        dependencyGraph.setCloudService(cloudService);
+//        System.out.println(dependencyGraph.graphToString());
+//        EnforcementPluginCELAR enforcementPluginCELAR = new EnforcementPluginCELAR(cloudService);
+//        enforcementPluginCELAR.refreshElasticityActionsList();
+//        for (String action : enforcementPluginCELAR.getElasticityCapabilities()) {
+//            System.out.println(action);
+//
+//        }
+//        enforcementPluginCELAR.scaleIn(node);
+//    }
     public List<String> getElasticityCapabilities() {
         // TODO Auto-generated method stub
         List<String> avActions = new ArrayList<String>();
