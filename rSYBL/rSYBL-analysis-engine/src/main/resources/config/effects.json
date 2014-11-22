@@ -35,7 +35,7 @@
 	  "scaleInEffectForWorker_IR": {
    "targetUnit":"gatk_ir",
    "effects":{
-    "gatk_rtc": {
+    "gatk_ir: {
       "cost":-0.12,
       },
 	       }
