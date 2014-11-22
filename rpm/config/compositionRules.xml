@@ -941,11 +941,33 @@
                 <ReferenceMetric type="RESOURCE" name="instances"/>
             </Operation>
         </CompositionRule>
- 
         
+        
+        
+        <CompositionRule TargetMonitoredElementLevel="SERVICE_UNIT">
+            <ResultingMetric type="RESOURCE" measurementUnit="$/h" name="cost"/>
+            <Operation MetricSourceMonitoredElementLevel="SERVICE_UNIT" value="0.12" type="MUL">
+                <ReferenceMetric type="RESOURCE" name="instances"/>
+            </Operation>
+        </CompositionRule>
+        
+        <CompositionRule TargetMonitoredElementLevel="SERVICE_TOPOLOGY">
+            <ResultingMetric type="RESOURCE" measurementUnit="$/h" name="cost"/>
+            <Operation MetricSourceMonitoredElementLevel="SERVICE_UNIT" type="SUM">
+                <ReferenceMetric type="COST" name="cost"/>
+            </Operation>
+        </CompositionRule>
+
+        <CompositionRule TargetMonitoredElementLevel="SERVICE">
+            <ResultingMetric type="RESOURCE" measurementUnit="$/h" name="cost"/>
+            <Operation MetricSourceMonitoredElementLevel="SERVICE_TOPOLOGY" type="SUM">
+                <ReferenceMetric type="COST" name="cost"/>
+            </Operation>
+        </CompositionRule>
 
     </MetricsCompositionRules>
-     
+
 </CompositionRulesConfiguration>
+
 
 
