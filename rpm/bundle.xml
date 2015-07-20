@@ -25,7 +25,7 @@
                         <directory>${project.basedir}</directory>
                         <outputDirectory>/</outputDirectory>
                         <includes>
-                                <include>dmm-service</include>
+                                <include>decision-module</include>
                         </includes>
                         <fileMode>0755</fileMode>
                         <lineEnding>unix</lineEnding>

@@ -67,12 +67,10 @@ public class EnforcementPluginCELAR implements EnforcementInterface {
     }
 
     public static void main(String[] args) {
-        String IP = "83.212.119.109";
-        int port = 80;
 
         ClientConfiguration clientConfiguration = new ClientConfiguration();
-        clientConfiguration.setHost(IP);
-        clientConfiguration.setPort(port);
+        clientConfiguration.setHost(Configuration.getOrchestratorHost());
+        clientConfiguration.setPort(Integer.parseInt(Configuration.getOrchestratorPort()));
         ResizingActionsClient r = new ResizingActionsClient();
         r.setConfiguration(clientConfiguration);
         try {
@@ -91,12 +89,12 @@ public class EnforcementPluginCELAR implements EnforcementInterface {
             Logger.getLogger(EnforcementPluginCELAR.class.getName()).log(Level.INFO, "Connecting to "
                     + resizingActionsClient.getConfiguration().getHost() + ":"
                     + resizingActionsClient.getConfiguration().getPort());
-            ResizingActionList actionList=resizingActionsClient.listResizingActions();
+            ResizingActionList actionList = resizingActionsClient.listResizingActions();
             for (ResizingAction action : actionList.getResizingActions()) {
                 this.actionsAvailable.put(action.getId(), action);
             }
         } catch (ConnectException ex) {
-            Logger.getLogger(EnforcementPluginCELAR.class.getName()).log(Level.SEVERE, "Encountered error connecting to orchestrator " +  ex.getMessage());
+            Logger.getLogger(EnforcementPluginCELAR.class.getName()).log(Level.SEVERE, "Encountered error connecting to orchestrator " + ex.getMessage());
             Logger.getLogger(EnforcementPluginCELAR.class.getName()).log(Level.SEVERE, "Retrying connection to orchestrator");
             try {
                 Thread.sleep(5000);
@@ -481,4 +479,15 @@ public class EnforcementPluginCELAR implements EnforcementInterface {
     public void undeployService(Node serviceID) {
         RuntimeLogger.logger.info("Undeploy service not implemented yet");
     }
+
+    @Override
+    public boolean enforceAction(String actionName, String parameter) {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
+    @Override
+    public boolean enforceAction(String actionName, String parameter1, String parameter2) {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
 }

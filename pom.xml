@@ -39,12 +39,29 @@
 
     <repositories>
         <repository>
-            <id>maven-restlet</id>
+            <id>maven-restlet-repo</id>
             <name>Public online Restlet repository</name>
             <url>http://maven.restlet.org</url>
         </repository>
-
+ 
+        <repository>
+            <id>dsg_repo_central</id>
+            <url>http://repo.infosys.tuwien.ac.at/artifactory/comot</url>
+            <snapshots>
+                <enabled>false</enabled>
+            </snapshots>
+        </repository>
+        <repository>
+            <id>dsg_repo_snapshots</id>
+            <url>http://repo.infosys.tuwien.ac.at/artifactory/comot</url>
+            <releases>
+                <enabled>false</enabled>
+            </releases>
+        </repository>
+        
     </repositories>
+    
+ 
 
     <reporting>
         <plugins>
@@ -55,5 +72,7 @@
             </plugin>
         </plugins>
     </reporting>
+    
+    
 
 </project>

@@ -6,6 +6,7 @@
         <groupId>eu.celar.multilevel-metrics-evaluation</groupId>
         <artifactId>MELA-Pom</artifactId>
         <version>1.0-SNAPSHOT</version>
+        <!--<relativePath>../pom.xml</relativePath>-->
     </parent>
     
     <artifactId>MELA-AnalysisService</artifactId>
@@ -20,5 +21,26 @@
         <module>MELA-SpaceAndPathwayAnalysisService-tar</module>
         <module>MELA-SpaceAndPathwayAnalysisService-rpm</module>
     </modules>
+ 
+ 
+    <repositories>
+ 
+        <repository>
+            <id>dsg_repo_central</id>
+            <url>http://repo.infosys.tuwien.ac.at/artifactory/comot</url>
+            <snapshots>
+                <enabled>false</enabled>
+            </snapshots>
+        </repository>
+        <repository>
+            <id>dsg_repo_snapshots</id>
+            <url>http://repo.infosys.tuwien.ac.at/artifactory/comot</url>
+            <releases>
+                <enabled>false</enabled>
+            </releases>
+        </repository>
+        
+    </repositories>
+    
 
 </project>

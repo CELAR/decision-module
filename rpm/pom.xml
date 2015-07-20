@@ -106,7 +106,7 @@
                     <description>Decision making module</description>
                     <mappings>
                         <mapping>
-                            <directory>/opt/dmm-service</directory>
+                            <directory>/opt/decision-module</directory>
                             <!--              <directory>${rpm.install.basedir}</directory> -->
                             <filemode>664</filemode>
                             <username>root</username>
@@ -127,7 +127,7 @@
                             <directoryIncluded>false</directoryIncluded>
                             <sources>
                                 <source>
-                                    <location>${project.build.directory}/decision-making-rpm-1.0-SNAPSHOT/decision-making-rpm-1.0-SNAPSHOT/dmm-service</location>
+                                    <location>${project.build.directory}/decision-making-rpm-1.0-SNAPSHOT/decision-making-rpm-1.0-SNAPSHOT/decision-module</location>
                                 </source>
                             </sources>
                         </mapping>
@@ -149,8 +149,8 @@
 
                     <postinstallScriptlet>
                         <script>
-                            chkconfig dmm-service on
-                            service dmm-service start
+                            chkconfig decision-module on
+                            service decision-module start
                         </script>
                     </postinstallScriptlet>
                 </configuration>

@@ -2,17 +2,18 @@
 <DeploymentDescription CloudServiceID="hello" AccessIP="localhost">
 	<DeploymentUnit serviceUnitID="cassandraSeedNode"
 		defaultFlavor="m1.tiny" defaultImage="a4fe953e-d4c8-40a5-9c73-d9fee3f00c08" >
-	        <AssociatedVM IP="109.231.121.13"/>
+	        <AssociatedVM IP="109.231.121.132"/>
 	</DeploymentUnit>
 	<DeploymentUnit serviceUnitID="cassandraNode"
 		defaultFlavor="m1.tiny" defaultImage="99960b2e-7ddd-428f-a85f-6167fceca98d" >
-                        <AssociatedVM IP="109.231.121.100"/>
+                        <AssociatedVM IP="109.231.121.78"/>
+                        <AssociatedVM IP="109.231.121.103"/>
 			<ElasticityCapability Name="scaleOut" PrimitiveOperationsSequence="scaleOut" Endpoint="" Type=""/>
 			<ElasticityCapability Name="scaleIn" PrimitiveOperationsSequence="scaleIn" Endpoint="" Type=""/>
 		</DeploymentUnit>
 	<DeploymentUnit serviceUnitID="ycsbClient"
 		defaultFlavor="m1.tiny" defaultImage="9ac8c332-69e7-4ea1-87c2-8c5c8ad0ec92" >
-	        <AssociatedVM IP="109.231.121.103"/>
+	        <AssociatedVM IP="109.231.121.126"/>
 			
 	</DeploymentUnit>
 	

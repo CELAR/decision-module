@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <tosca:Definitions xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:elasticity="http://www.example.org/NewXMLSchema" xmlns:sybl="http://www.example.org/SYBL" xmlns:tosca="http://docs.oasis-open.org/tosca/ns/2011/12" id="hi">
-  <tosca:ServiceTemplate xsi:type="elasticity:TServiceTemplateExtension" id="hello" name="CassandraPoliciesDescription">
+  <tosca:ServiceTemplate xsi:type="elasticity:TServiceTemplateExtension" id="hello" name="CassandraYCSBElasticity">
     <tosca:BoundaryDefinitions xsi:type="elasticity:TBoundaryDefinitionsExtension">
       <tosca:Properties>
         <elasticity:ServiceProperties>
@@ -9,76 +9,66 @@
       </tosca:Properties>
     </tosca:BoundaryDefinitions>
     <tosca:TopologyTemplate>
-      <tosca:NodeTemplate xsi:type="elasticity:TNodeTemplateExtension" id="C1738709374" maxInstances="1" minInstances="1" name="cassandraSeedNode" initInstances="1" x="110" y="130">
+      <tosca:NodeTemplate xsi:type="elasticity:TNodeTemplateExtension" id="C939960850" maxInstances="1" minInstances="1" name="cassandraSeedNode" initInstances="1" x="90" y="140">
         <tosca:Properties>
           <elasticity:NodeProperties>
-            <elasticity:Flavor>vcpus:2 ram:4096 disk:40</elasticity:Flavor>
+            <elasticity:Flavor>vcpus:4 ram:1024 disk:20</elasticity:Flavor>
+          </elasticity:NodeProperties>
+        </tosca:Properties>
+        <tosca:DeploymentArtifacts>
+          <tosca:DeploymentArtifact artifactRef="cassandraSeedNodeImage" artifactType="VMI" name="fe31fced-a3cf-49c6-b43b-f58f5235ba45"/>
+        </tosca:DeploymentArtifacts>
+      </tosca:NodeTemplate>
+      <tosca:NodeTemplate xsi:type="elasticity:TNodeTemplateExtension" id="C388004187" maxInstances="1" minInstances="1" name="cassandraNode" initInstances="1" x="300" y="130">
+        <tosca:Properties>
+          <elasticity:NodeProperties>
+            <elasticity:Flavor>vcpus:2 ram:4096 disk:20</elasticity:Flavor>
           </elasticity:NodeProperties>
         </tosca:Properties>
         <tosca:Policies>
-          <tosca:Policy name="CONSTRAINT  cpuUser&amp;gt;35" policyRef="C73181693" policyType="sybl:Constraint"/>
-          <tosca:Policy name="CONSTRAINT  cpuUser&amp;lt;75" policyRef="C1625676242" policyType="sybl:Constraint"/>
+          <tosca:Policy name="CONSTRAINT  cpuUsage&amp;gt;30" policyRef="C18719205450" policyType="sybl:Constraint"/>
         </tosca:Policies>
         <tosca:DeploymentArtifacts>
-          <tosca:DeploymentArtifact artifactRef="cassandraSeedNodeScript" artifactType="SD" name="seedNode.sh"/>
-          <tosca:DeploymentArtifact artifactRef="cassandraSeedNodeImage" artifactType="VMI" name="Ubuntu 12.04.1 LTS"/>
+          <tosca:DeploymentArtifact artifactRef="cassandraNodeImage" artifactType="VMI" name="fe31fced-a3cf-49c6-b43b-f58f5235ba45"/>
         </tosca:DeploymentArtifacts>
       </tosca:NodeTemplate>
-      <tosca:NodeTemplate xsi:type="elasticity:TNodeTemplateExtension" id="C1783206868" maxInstances="1" minInstances="1" name="cassandraNode" initInstances="1" x="350" y="120">
+      <tosca:NodeTemplate xsi:type="elasticity:TNodeTemplateExtension" id="C1495527405" maxInstances="1" minInstances="1" name="ycsbNode" initInstances="1" x="560" y="140">
         <tosca:Properties>
           <elasticity:NodeProperties>
-            <elasticity:Flavor>vcpus:2 ram:2048 disk:40</elasticity:Flavor>
+            <elasticity:Flavor>vcpus:2 ram:1024 disk:20</elasticity:Flavor>
           </elasticity:NodeProperties>
         </tosca:Properties>
         <tosca:DeploymentArtifacts>
-          <tosca:DeploymentArtifact artifactRef="cassandraNodeScript" artifactType="SD" name="node.sh"/>
-          <tosca:DeploymentArtifact artifactRef="cassandraNodeImage" artifactType="VMI" name="Ubuntu 12.04.1 LTS"/>
-        </tosca:DeploymentArtifacts>
-      </tosca:NodeTemplate>
-      <tosca:NodeTemplate xsi:type="elasticity:TNodeTemplateExtension" id="C2100466386" maxInstances="1" minInstances="1" name="ycsbClient" initInstances="1" x="580" y="140">
-        <tosca:Properties>
-          <elasticity:NodeProperties>
-            <elasticity:Flavor>vcpus:2 ram:1024 disk:40</elasticity:Flavor>
-          </elasticity:NodeProperties>
-        </tosca:Properties>
-        <tosca:DeploymentArtifacts>
-          <tosca:DeploymentArtifact artifactRef="ycsbClientScript" artifactType="SD" name="ycsbClient.sh"/>
-          <tosca:DeploymentArtifact artifactRef="ycsbClientImage" artifactType="VMI" name="Ubuntu 12.04.1 LTS"/>
+          <tosca:DeploymentArtifact artifactRef="ycsbNodeImage" artifactType="VMI" name="fe31fced-a3cf-49c6-b43b-f58f5235ba45"/>
         </tosca:DeploymentArtifacts>
       </tosca:NodeTemplate>
     </tosca:TopologyTemplate>
   </tosca:ServiceTemplate>
-  <tosca:ArtifactTemplate id="ycsbClientScript">
+  <tosca:ArtifactTemplate id="ycsbNodeImage">
     <tosca:Properties>
-      <elasticity:ScriptArtifactProperties>
-        <elasticity:Language>Shell</elasticity:Language>
-      </elasticity:ScriptArtifactProperties>
+      <elasticity:ImageArtifactProperties>
+        <elasticity:Description>not_specified</elasticity:Description>
+        <elasticity:Id>fe31fced-a3cf-49c6-b43b-f58f5235ba45</elasticity:Id>
+      </elasticity:ImageArtifactProperties>
     </tosca:Properties>
-    <tosca:ArtifactReferences>
-      <tosca:ArtifactReference reference="Scripts\ycsbClient.sh"/>
-    </tosca:ArtifactReferences>
   </tosca:ArtifactTemplate>
-  <tosca:NodeTypeImplementation nodeType="ycsbClient">
-    <tosca:ImplementationArtifacts>
-      <tosca:ImplementationArtifact artifactRef="ycsbClientScript" artifactType="ScriptArtifact" interfaceName="Lifecycle" operationName="execute"/>
-    </tosca:ImplementationArtifacts>
-  </tosca:NodeTypeImplementation>
-  <tosca:ArtifactTemplate id="cassandraSeedNodeScript">
+  <tosca:ArtifactTemplate id="cassandraNodeImage">
     <tosca:Properties>
-      <elasticity:ScriptArtifactProperties>
-        <elasticity:Language>Shell</elasticity:Language>
-      </elasticity:ScriptArtifactProperties>
+      <elasticity:ImageArtifactProperties>
+        <elasticity:Description>not_specified</elasticity:Description>
+        <elasticity:Id>fe31fced-a3cf-49c6-b43b-f58f5235ba45</elasticity:Id>
+      </elasticity:ImageArtifactProperties>
     </tosca:Properties>
-    <tosca:ArtifactReferences>
-      <tosca:ArtifactReference reference="Scripts\seedNode.sh"/>
-    </tosca:ArtifactReferences>
   </tosca:ArtifactTemplate>
-  <tosca:NodeTypeImplementation nodeType="cassandraSeedNode">
-    <tosca:ImplementationArtifacts>
-      <tosca:ImplementationArtifact artifactRef="cassandraSeedNodeScript" artifactType="ScriptArtifact" interfaceName="Lifecycle" operationName="execute"/>
-    </tosca:ImplementationArtifacts>
-  </tosca:NodeTypeImplementation>
-  <tosca:ArtifactTemplate id="cassandraNodeScript">
+  <tosca:ArtifactTemplate id="cassandraSeedNodeImage">
+    <tosca:Properties>
+      <elasticity:ImageArtifactProperties>
+        <elasticity:Description>not_specified</elasticity:Description>
+        <elasticity:Id>fe31fced-a3cf-49c6-b43b-f58f5235ba45</elasticity:Id>
+      </elasticity:ImageArtifactProperties>
+    </tosca:Properties>
+  </tosca:ArtifactTemplate>
+  <tosca:ArtifactTemplate id="cassandraNodeScript" type="ScriptArtifact" name="SDnode.sh">
     <tosca:Properties>
       <elasticity:ScriptArtifactProperties>
         <elasticity:Language>Shell</elasticity:Language>
@@ -93,68 +83,34 @@
       <tosca:ImplementationArtifact artifactRef="cassandraNodeScript" artifactType="ScriptArtifact" interfaceName="Lifecycle" operationName="execute"/>
     </tosca:ImplementationArtifacts>
   </tosca:NodeTypeImplementation>
-  <tosca:ArtifactTemplate id="ycsbClientImage">
+  <tosca:ArtifactTemplate id="ycsbNodeScript" type="ScriptArtifact" name="SDycsbClient.sh">
     <tosca:Properties>
-      <elasticity:ImageArtifactProperties>
-        <elasticity:Description>not_specified</elasticity:Description>
-        <elasticity:Id>Ubuntu 12.04.1 LTS</elasticity:Id>
-      </elasticity:ImageArtifactProperties>
+      <elasticity:ScriptArtifactProperties>
+        <elasticity:Language>Shell</elasticity:Language>
+      </elasticity:ScriptArtifactProperties>
     </tosca:Properties>
+    <tosca:ArtifactReferences>
+      <tosca:ArtifactReference reference="Scripts\ycsbClient.sh"/>
+    </tosca:ArtifactReferences>
   </tosca:ArtifactTemplate>
-  <tosca:ArtifactTemplate id="cassandraNodeImage">
+  <tosca:NodeTypeImplementation nodeType="ycsbNode">
+    <tosca:ImplementationArtifacts>
+      <tosca:ImplementationArtifact artifactRef="ycsbNodeScript" artifactType="ScriptArtifact" interfaceName="Lifecycle" operationName="execute"/>
+    </tosca:ImplementationArtifacts>
+  </tosca:NodeTypeImplementation>
+  <tosca:ArtifactTemplate id="cassandraSeedNodeScript" type="ScriptArtifact" name="SDseedNode.sh">
     <tosca:Properties>
-      <elasticity:ImageArtifactProperties>
-        <elasticity:Description>not_specified</elasticity:Description>
-        <elasticity:Id>Ubuntu 12.04.1 LTS</elasticity:Id>
-      </elasticity:ImageArtifactProperties>
+      <elasticity:ScriptArtifactProperties>
+        <elasticity:Language>Shell</elasticity:Language>
+      </elasticity:ScriptArtifactProperties>
     </tosca:Properties>
+    <tosca:ArtifactReferences>
+      <tosca:ArtifactReference reference="Scripts\seedNode.sh"/>
+    </tosca:ArtifactReferences>
   </tosca:ArtifactTemplate>
-  <tosca:ArtifactTemplate id="cassandraSeedNodeImage">
-    <tosca:Properties>
-      <elasticity:ImageArtifactProperties>
-        <elasticity:Description>not_specified</elasticity:Description>
-        <elasticity:Id>Ubuntu 12.04.1 LTS</elasticity:Id>
-      </elasticity:ImageArtifactProperties>
-    </tosca:Properties>
-  </tosca:ArtifactTemplate>
-  <tosca:PolicyTemplate id="C73181693" type="sybl:Constraint">
-    <tosca:Properties>
-      <sybl:SYBLElasticityRequirementsDescription>
-        <SYBLSpecification>
-          <Constraint Id="hi">
-            <ToEnforce>
-              <BinaryRestrictionsConjunction Type=">">
-                <LeftHandSide>
-                  <Metric> cpuUser</Metric>
-                </LeftHandSide>
-                <RightHandSide>
-                  <Number>35</Number>
-                </RightHandSide>
-              </BinaryRestrictionsConjunction>
-            </ToEnforce>
-          </Constraint>
-        </SYBLSpecification>
-      </sybl:SYBLElasticityRequirementsDescription>
-    </tosca:Properties>
-  </tosca:PolicyTemplate>
-  <tosca:PolicyTemplate id="C1625676242" type="sybl:Constraint">
-    <tosca:Properties>
-      <sybl:SYBLElasticityRequirementsDescription>
-        <SYBLSpecification>
-          <Constraint Id="hi">
-            <ToEnforce>
-              <BinaryRestrictionsConjunction Type="&lt;">
-                <LeftHandSide>
-                  <Metric> cpuUser</Metric>
-                </LeftHandSide>
-                <RightHandSide>
-                  <Number>75</Number>
-                </RightHandSide>
-              </BinaryRestrictionsConjunction>
-            </ToEnforce>
-          </Constraint>
-        </SYBLSpecification>
-      </sybl:SYBLElasticityRequirementsDescription>
-    </tosca:Properties>
-  </tosca:PolicyTemplate>
+  <tosca:NodeTypeImplementation nodeType="cassandraSeedNode">
+    <tosca:ImplementationArtifacts>
+      <tosca:ImplementationArtifact artifactRef="cassandraSeedNodeScript" artifactType="ScriptArtifact" interfaceName="Lifecycle" operationName="execute"/>
+    </tosca:ImplementationArtifacts>
+  </tosca:NodeTypeImplementation>
 </tosca:Definitions>
