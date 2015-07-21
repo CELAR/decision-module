@@ -24,10 +24,10 @@
         <jaxrs:features>
             <cxf:logging/>
         </jaxrs:features>
-        <jaxrs:providers>
+<!--        <jaxrs:providers>
             <bean class="com.wordnik.swagger.jaxrs.listing.ResourceListingProvider"/>
             <bean class="com.wordnik.swagger.jaxrs.listing.ApiDeclarationProvider"/>
-        </jaxrs:providers>
+        </jaxrs:providers>-->
     </jaxrs:server><!--
 
     <bean id="swaggerConfig" class="com.wordnik.swagger.jaxrs.config.BeanConfig">

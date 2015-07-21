@@ -68,16 +68,14 @@
             <artifactId>jsch</artifactId>
             <version>0.1.50</version>
         </dependency>
-        
-       
-        
+ 
         <!-- Apache CXF JAX-RS -->
         <dependency>
             <groupId>org.apache.cxf</groupId>
             <artifactId>cxf-rt-frontend-jaxrs</artifactId>
-            <version>3.0.1</version>
+            <version>2.6.0</version>
         </dependency>
-        
+       
         <!-- Swagger API documentation -->
         <dependency>
             <groupId>com.wordnik</groupId>
@@ -92,15 +90,16 @@
         <dependency>
             <groupId>org.glassfish.jersey.containers</groupId>
             <artifactId>jersey-container-servlet</artifactId>
-            <version>2.0</version>
+            <version>2.17</version>
         </dependency>
         <dependency>
             <groupId>org.glassfish.jersey.core</groupId>
             <artifactId>jersey-client</artifactId>
-            <version>2.0</version>
+            <version>2.17</version>
         </dependency>
+
         
-        <!-- Dependencies on other deciion module  -->
+        <!-- Dependencies on other decision module  -->
         <dependency>
             <groupId>at.ac.tuwien.rSYBL.control-service</groupId>
             <artifactId>rSYBL-analysis-engine</artifactId>
