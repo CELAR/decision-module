@@ -1,0 +1,68 @@
+
+{
+    "attachDisk":{
+        "attachDiskForWorker_IR":{
+            "targetUnit":"gatk_ir",
+            "effects":{
+                "gatk_ir":{
+                    "cost":0.05,
+                    "diskUsage":-30.0
+                }
+            }
+        }
+    },
+    "dettachDisk":{
+        "dettachDiskForWorker_IR":{
+            "targetUnit":"gatk_ir",
+            "effects":{
+                "gatk_ir":{
+                    "cost":-0.05,
+                    "diskUsage":10.0
+                }
+            }
+        }
+    },
+    "scaleout":{
+"scaleoutEffectForWorker_RTC": {
+"targetUnit":"gatk_rtc",
+        "effects":{
+        "gatk_rtc": {
+        "cost":0.12
+        },
+  
+                "SCAN":{
+                "gatk_rtc_queueLength": - 15.0
+                }
+        }
+},
+        "scaleoutEffectForWorker_IR": {
+        "targetUnit":"gatk_ir",
+                "effects":{
+                "gatk_ir": {
+                "cost":0.12
+                },
+                        "SCAN":{
+                        "gatk_ir_queueLength": - 15.0
+                        }
+                }
+        }
+},
+        "scalein":{
+        "scaleInEffectForWorker_RTC": {
+        "targetUnit":"gatk_rtc",
+                "effects":{
+                "gatk_rtc": {
+                "cost": - 0.12
+                }
+                }
+        },
+                "scaleInEffectForWorker_IR": {
+                "targetUnit":"gatk_ir",
+                        "effects":{
+                        "gatk_rtc": {
+                        "cost": - 0.12
+                        }
+                        }
+                }
+                }
+}

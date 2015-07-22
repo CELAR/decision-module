@@ -32,7 +32,6 @@ import gr.ntua.cslab.orchestrator.beans.Parameters;
 import gr.ntua.cslab.orchestrator.beans.ResizingAction;
 import gr.ntua.cslab.orchestrator.beans.ResizingActionList;
 import gr.ntua.cslab.orchestrator.beans.ResizingActionType;
-import gr.ntua.cslab.orchestrator.beans.ResizingExecutionStatus;
 import gr.ntua.cslab.orchestrator.client.ResizingActionsClient;
 import java.io.IOException;
 import java.io.OutputStream;
@@ -53,7 +52,7 @@ public class EnforcementPluginCELAR implements EnforcementInterface {
     boolean cleanupNecessary = true;
     private HashMap<Integer, ResizingAction> actionsAvailable = new HashMap<Integer, ResizingAction>();
     private static ResizingActionsClient resizingActionsClient = new ResizingActionsClient();
-
+    private HashMap<String, ArrayList<String> > disks = new HashMap<String, ArrayList<String>>();
     public EnforcementPluginCELAR(Node cloudService) {
 
         this.cloudService = cloudService;
@@ -122,7 +121,7 @@ public class EnforcementPluginCELAR implements EnforcementInterface {
 
                 if (status == States.Ready) {
                     //TODO : Assume we have value IP returned
-                    String ip = getIP(executedResizingAction.getUniqueId(), node.getId());
+                    String ip = getEffect(executedResizingAction.getUniqueId(), node.getId());
                     if (!ip.equalsIgnoreCase("")) {
                         RuntimeLogger.logger.debug("Balanced nodes " + node.getId());
 
@@ -139,7 +138,206 @@ public class EnforcementPluginCELAR implements EnforcementInterface {
         return ok;
 
     }
+    public boolean attachDisk(Node node){
+        boolean ok = true;
+        DependencyGraph dependencyGraph = new DependencyGraph();
+        dependencyGraph.setCloudService(cloudService);
+        Node toBeScaled = dependencyGraph.getNodeWithID(node.getId());
+        
+        for (Entry<Integer, ResizingAction> actionE : actionsAvailable.entrySet()) {
+            ResizingAction action = actionE.getValue();
+            System.out.println(action.getModuleName());
+            if (action.getType() == ResizingActionType.ATTACH_DISK && toBeScaled.getId().equalsIgnoreCase(action.getModuleName())) {
 
+                 Parameters parameters = new Parameters();
+                List<Parameter> param = new ArrayList<>();
+                Parameter p1 = new Parameter();
+                p1.setKey("vm_id");
+                Double maxUsage=-20.0;
+                Node maxUsageNode = null;
+
+                for (Node n : node.getAllRelatedNodesOfType(RelationshipType.HOSTED_ON_RELATIONSHIP, NodeType.VIRTUAL_MACHINE)){
+                    List<String> avMetrics=monitoringAPI.getAvailableMetrics(n);
+                    if (avMetrics==null || avMetrics.size()==0){
+                        Double current=0.0;
+                        try {
+                            current = monitoringAPI.getMetricValue("diskUsage", n);
+                        } catch (Exception ex) {
+                               RuntimeLogger.logger.error("Could not get usage information for "+ n.getId()+" and metric diskUsage "+" when trying to attach disk.");
+                        }
+                                if (current> maxUsage){
+                                    maxUsage=current;
+                                    maxUsageNode=n;
+                                }
+                    }
+                    for (String metric:avMetrics){
+                        if (metric.contains("diskUsage")){
+                            try {
+                                Double current = monitoringAPI.getMetricValue(metric, n);
+                                if (current> maxUsage){
+                                    maxUsage=current;
+                                    maxUsageNode=n;
+                                }
+                            } catch (Exception ex) {
+                               RuntimeLogger.logger.error("Could not get usage information for "+ n.getId()+" and metric "+metric+" when trying to attach disk.");
+                            }
+                                
+                        }
+                    }
+                }
+                p1.setValue(maxUsageNode.getId());
+                Parameter p2 = new Parameter();
+                p2.setKey("disk_size");
+                p2.setValue("50");
+                
+                
+                parameters.addParameter(p1);
+                parameters.addParameter(p2);
+                
+                
+                ExecutedResizingAction executedResizingAction = executeResizingCommand(action.getId(),parameters);
+                States status = checkForAction(executedResizingAction.getUniqueId());
+
+                if (status == States.Ready) {
+                    String id = getEffect(executedResizingAction.getUniqueId(), node.getId());
+                    if (!id.equalsIgnoreCase("")) {
+                        RuntimeLogger.logger.debug("Attaching to node disk with " + node.getId() + " ID " + id);
+                        
+                        if (!disks.containsKey(node.getId())){
+                            disks.put(node.getId(), new ArrayList<String>());
+                        }
+                        disks.get(node.getId()).add(id);
+                    } else {
+                        RuntimeLogger.logger.error("No IP was remove dafter scaling in node  " + node.getId());
+                    }
+                }
+
+                break;
+            }
+        }
+        return ok;
+    }
+    public boolean scaleUp(Node node, double violationDegree){
+        boolean ok = true;
+        
+        return ok;
+    }
+    public boolean scaleUp(Node node){
+          boolean ok=true;
+        DependencyGraph dependencyGraph = new DependencyGraph();
+        dependencyGraph.setCloudService(cloudService);
+        Node toBeScaled = dependencyGraph.getNodeWithID(node.getId());
+        for (Entry<Integer, ResizingAction> actionE : actionsAvailable.entrySet()) {
+            ResizingAction action = actionE.getValue();
+            System.out.println(action.getModuleName());
+            if (action.getType() == ResizingActionType.SCALE_UP && toBeScaled.getId().equalsIgnoreCase(action.getModuleName())) {
+
+                Parameters flavors = null;
+                ExecutedResizingAction executedResizingAction = executeResizingCommand(action.getId(),flavors);
+                States status = checkForAction(executedResizingAction.getUniqueId());
+                
+                if (status == States.Ready) {
+
+                        RuntimeLogger.logger.debug("Scaling up from node disk with " + node.getId());
+                        
+                }
+
+                break;
+            }
+        }
+
+        return ok;
+    }
+      public boolean scaleDown(Node node, double violationDegree){
+        boolean ok = true;
+        
+        return ok;
+    }
+    public boolean scaleDown(Node node){
+        boolean ok=true;
+        DependencyGraph dependencyGraph = new DependencyGraph();
+        dependencyGraph.setCloudService(cloudService);
+        Node toBeScaled = dependencyGraph.getNodeWithID(node.getId());
+        for (Entry<Integer, ResizingAction> actionE : actionsAvailable.entrySet()) {
+            ResizingAction action = actionE.getValue();
+            System.out.println(action.getModuleName());
+            if (action.getType() == ResizingActionType.SCALE_DOWN && toBeScaled.getId().equalsIgnoreCase(action.getModuleName())) {
+
+                Parameters flavors = null;
+                ExecutedResizingAction executedResizingAction = executeResizingCommand(action.getId(),flavors);
+                States status = checkForAction(executedResizingAction.getUniqueId());
+                
+                if (status == States.Ready) {
+
+                        RuntimeLogger.logger.debug("Scaling down from node disk with " + node.getId());
+                        
+                }
+
+                break;
+            }
+        }
+
+        return ok;
+    }
+   
+    public boolean dettachDisk(Node node){
+        boolean ok = true;
+        DependencyGraph dependencyGraph = new DependencyGraph();
+        dependencyGraph.setCloudService(cloudService);
+        Node toBeScaled = dependencyGraph.getNodeWithID(node.getId());
+        for (Entry<Integer, ResizingAction> actionE : actionsAvailable.entrySet()) {
+            ResizingAction action = actionE.getValue();
+            System.out.println(action.getModuleName());
+            if (action.getType() == ResizingActionType.DETTACH_DISK && toBeScaled.getId().equalsIgnoreCase(action.getModuleName())) {
+                Parameters parameters = new Parameters();
+                List<Parameter> param = new ArrayList<>();
+                Parameter p1 = new Parameter();
+                p1.setKey("vm_id");
+                Double minUsage=300000.0;
+                Node minUsageNode = null;
+                for (Node n : node.getAllRelatedNodesOfType(RelationshipType.HOSTED_ON_RELATIONSHIP, NodeType.VIRTUAL_MACHINE)){
+                    List<String> avMetrics=monitoringAPI.getAvailableMetrics(n);
+                    for (String metric:avMetrics){
+                        if (metric.contains("diskUsage")){
+                            try {
+                                Double current = monitoringAPI.getMetricValue(metric, n);
+                                if (current<minUsage){
+                                    minUsage=current;
+                                    minUsageNode=n;
+                                }
+                            } catch (Exception ex) {
+                               RuntimeLogger.logger.error("Could not get usage information for "+ n.getId()+" and metric "+metric+" when trying to dettach disk.");
+                            }
+                                
+                        }
+                    }
+                }
+                p1.setValue(minUsageNode.getId());
+                Parameter p2 = new Parameter();
+                p2.setKey("disk_id");
+                String diskID =disks.get(minUsageNode.getId()).get(0); 
+                p2.setValue(diskID);
+                
+                
+                parameters.addParameter(p1);
+                parameters.addParameter(p2);
+                
+//                ExecutedResizingAction executedResizingAction = executeResizingCommand(action.getId(),parameters);
+//                States status = checkForAction(executedResizingAction.getUniqueId());
+//                
+//                if (status == States.Ready) {
+//
+//                        RuntimeLogger.logger.debug("Dettaching from node disk with " + node.getId() + " ID " + diskID);
+//                        
+//                        disks.get(node.getId()).remove(diskID);
+//                }
+
+                break;
+            }
+        }
+        return ok;
+    }
+    @Override
     public boolean scaleIn(Node node) {
         boolean ok = true;
         DependencyGraph dependencyGraph = new DependencyGraph();
@@ -154,7 +352,7 @@ public class EnforcementPluginCELAR implements EnforcementInterface {
 
                 if (status == States.Ready) {
                     //TODO : Assume we have value IP returned
-                    String ip = getIP(executedResizingAction.getUniqueId(), node.getId());
+                    String ip = getEffect(executedResizingAction.getUniqueId(), node.getId());
                     if (!ip.equalsIgnoreCase("")) {
                         RuntimeLogger.logger.debug("Removing from node " + node.getId() + " IP " + ip);
                         toBeScaled.removeNode(ip);
@@ -242,14 +440,14 @@ public class EnforcementPluginCELAR implements EnforcementInterface {
         return null;
     }
 
-    public static String getIP(String uniqueActionID, String moduleName) {
-        String ip = "";
+    public static String getEffect(String uniqueActionID, String moduleName) {
+        String effect = "";
         try {
             HashMap<String, String> effects = resizingActionsClient.getActionEffect(uniqueActionID);
             for (String domainID : effects.keySet()) {
                 if (domainID.toLowerCase().contains(moduleName.toLowerCase())) {
                     if (!effects.get(domainID).equalsIgnoreCase("") && effects.get(domainID) != null) {
-                        ip = effects.get(domainID);
+                        effect = effects.get(domainID);
                         break;
                     }
                 }
@@ -258,9 +456,9 @@ public class EnforcementPluginCELAR implements EnforcementInterface {
             Logger.getLogger(EnforcementPluginCELAR.class.getName()).log(Level.SEVERE, null, ex);
         }
 
-        return ip;
+        return effect;
     }
-
+    
     public boolean scaleOut(Node node) {
         boolean ok = true;
         DependencyGraph dependencyGraph = new DependencyGraph();
@@ -279,7 +477,7 @@ public class EnforcementPluginCELAR implements EnforcementInterface {
                     // Parameter p = (Parameter) par.getParameters().get(0);
 
 //                     String ip = "10.0.0." + new Random().nextInt(10);
-                    String ip = getIP(executedResizingAction.getUniqueId(), node.getId());
+                    String ip = getEffect(executedResizingAction.getUniqueId(), node.getId());
                     if (!ip.equalsIgnoreCase("err") && !ip.equalsIgnoreCase("")) {
                         Node artifact = null;
                         Node container = null;
@@ -332,7 +530,7 @@ public class EnforcementPluginCELAR implements EnforcementInterface {
         }
         return ok;
     }
-
+    
     public static ExecutedResizingAction executeResizingCommand(Integer actionID, Parameters pars) {
         try {
 
@@ -367,35 +565,9 @@ public class EnforcementPluginCELAR implements EnforcementInterface {
         }
 
         return null;
-//		try{
-//		Process p = Runtime.getRuntime().exec(command);                                                                                                                                                     
-//		BufferedReader stdInput = new BufferedReader(new InputStreamReader(p.getInputStream()));
-//		String s ="";
-//		while ((s = stdInput.readLine()) != null) {
-//	        if (s.contains("Adding")){
-//	        	String[] x=s.split("[ :]");
-//	        	if (x.length>=2)
-//	        	if (x[1].charAt(0)>='0'&&x[1].charAt(0)<='9'){
-//	        		ip=x[1];
-//	        	}
-//	        }
-//	        RuntimeLogger.logger.info("From scaling command " +s);
-//		}
-//		
-//		if (ip.length()>0 && ip.charAt(0)>='0'&&ip.charAt(0)<='9'){
-//			return ip;}
-//		else
-//		{
-//			RuntimeLogger.logger.info("Answer from scale command "+ip+" ");
-//			return "";
-//		}
-//		}catch(Exception e ){
-//			RuntimeLogger.logger.info("Answer from scale command "+ip+" "+e.getMessage());
-//			return "";
-//		}
 
     }
-
+    
 //    public static void main(String[] args) {
 //        Node cloudService = new Node();
 //        cloudService.setId("myCloudServ");
@@ -454,14 +626,14 @@ public class EnforcementPluginCELAR implements EnforcementInterface {
     }
 
     public boolean containsElasticityCapability(Node entity, String capability) {
-        switch (capability.toLowerCase()) {
-            case "scalein":
-                return true;
-            case "scaleout":
-                return true;
-            default:
-                return false;
+        boolean found= false;
+        
+        for (ResizingAction action : actionsAvailable.values()){
+           if ( action.getName().toLowerCase().contains(capability.toLowerCase())){
+               return true;
+           }
         }
+        return found;
     }
 
     @Override

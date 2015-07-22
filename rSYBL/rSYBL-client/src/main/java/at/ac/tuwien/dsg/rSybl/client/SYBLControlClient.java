@@ -50,15 +50,16 @@ public class SYBLControlClient {
 
     public static void main(String[] args) {
         try {
-            String applicationID = "CassandraPoliciesDescription";
-            String tosca = readFile("Application.tosca", Charset.defaultCharset());
-            String deployment = readFile("deployment.xml", Charset.defaultCharset());
-            SYBLControlClient sYBLControlClient = new SYBLControlClient("http://localhost:8080/rSYBL/restWS");
+            String applicationID = "DataPlay";
+            String tosca = readFile("DataPlay.tosca", Charset.defaultCharset());
+            String deployment = readFile("deployment_DataPlay.xml", Charset.defaultCharset());
+            SYBLControlClient sYBLControlClient = new SYBLControlClient("http://localhost:8280/rSYBL/restWS");
             sYBLControlClient.prepareControl(applicationID);
             sYBLControlClient.setApplicationDescription(applicationID, tosca);
             sYBLControlClient.setApplicationDeployment(applicationID, deployment);
             sYBLControlClient.startTest(applicationID);
-            sYBLControlClient.testElasticityCapability(applicationID, "cassandraNode", "scaleOut");
+            sYBLControlClient.testElasticityCapability(applicationID, "Master", "attachDisk");
+              sYBLControlClient.testElasticityCapability(applicationID, "Master", "dettachDisk");
 //            sYBLControlClient.prepareControl(applicationID);
 //            sYBLControlClient.setApplicationDescription(applicationID, tosca);
 //            sYBLControlClient.setApplicationDeployment(applicationID, deployment);
