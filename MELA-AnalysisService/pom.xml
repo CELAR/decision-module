@@ -12,16 +12,29 @@
     <artifactId>MELA-AnalysisService</artifactId>
     <name>MELA-AnalysisService</name>
     <version>1.0-SNAPSHOT</version>
-    <description> MELA Service profiding elasticity analysis to the decision module </description>
+    <description> MELA Service providing elasticity analysis to the decision module </description>
 
     <packaging>pom</packaging>
 
     <modules>
         <module>MELA-SpaceAndPathwayAnalysisService</module>
         <module>MELA-SpaceAndPathwayAnalysisService-tar</module>
-        <module>MELA-SpaceAndPathwayAnalysisService-rpm</module>
+      
     </modules>
  
+ <profiles>
+     <profile>
+         <id>build-server-rpm</id>
+         <activation>
+             <file>
+                 <exists>/usr/bin/rpmbuild</exists>
+             </file>
+         </activation>
+         <modules>
+             <module>MELA-SpaceAndPathwayAnalysisService-rpm</module>
+         </modules>
+     </profile>
+ </profiles>
  
     <repositories>
  
