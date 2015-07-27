@@ -219,7 +219,7 @@ public class EnforcementPluginCELAR implements EnforcementInterface {
     }
     public boolean scaleUp(Node node, double violationDegree){
         boolean ok = true;
-        
+        scaleUp(node);
         return ok;
     }
     public boolean scaleUp(Node node){
@@ -250,7 +250,7 @@ public class EnforcementPluginCELAR implements EnforcementInterface {
     }
       public boolean scaleDown(Node node, double violationDegree){
         boolean ok = true;
-        
+        scaleDown(node);
         return ok;
     }
     public boolean scaleDown(Node node){
@@ -636,30 +636,22 @@ public class EnforcementPluginCELAR implements EnforcementInterface {
         return found;
     }
 
-    @Override
-    public boolean scaleOut(double violationDegree, Node toBeScaled) {
-        return scaleOut(toBeScaled);
-    }
-
-    @Override
-    public boolean enforceAction(String actionName, Node entity) {
-        RuntimeLogger.logger.info("Generic data not implemetned for CELAR ");
-        return false;
-    }
+   
 
     @Override
     public void undeployService(Node serviceID) {
         RuntimeLogger.logger.info("Undeploy service not implemented yet");
     }
 
+   
     @Override
-    public boolean enforceAction(String actionName, String parameter) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    public boolean scaleOut(Node toBeScaled, double violationDegree) {
+       return scaleOut(toBeScaled);
     }
 
     @Override
-    public boolean enforceAction(String actionName, String parameter1, String parameter2) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-    }
+    public boolean scaleIn(Node toBeScaled, double violationDegree) {
+        return scaleIn(toBeScaled);
+   }
 
 }
