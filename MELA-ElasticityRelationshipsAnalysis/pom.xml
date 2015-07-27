@@ -1,0 +1,40 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    
+    <parent>
+        <groupId>eu.celar.multilevel-metrics-evaluation</groupId>
+        <artifactId>MELA-Pom</artifactId>
+        <version>1.0-SNAPSHOT</version>
+        <!--<relativePath>../pom.xml</relativePath>-->
+    </parent>
+    
+    <artifactId>MELA-ElasticityDependencyAnalysisService</artifactId>
+    <name>MELA-ElasticityDependencyAnalysisService</name>
+    <version>1.0-SNAPSHOT</version>
+    <description> MELA Service providing elasticity analysis to the decision module </description>
+
+    <packaging>pom</packaging>
+
+    <modules>
+        <module>MELA-ElasticityDependencyAnalysisService</module>
+        <module>MELA-ElasticityDependencyAnalysisService-tar</module>
+      
+    </modules>
+ 
+ <profiles>
+     <profile>
+         <id>build-server-rpm</id>
+         <activation>
+             <file>
+                 <exists>/usr/bin/rpmbuild</exists>
+             </file>
+         </activation>
+         <modules>
+             <module>MELA-ElasticityDependencyAnalysisService-rpm</module>
+         </modules>
+     </profile>
+ </profiles>
+  
+
+</project>
