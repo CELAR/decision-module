@@ -6,3 +6,10 @@
 /rSYBL/rSYBL-sybl-processing-unit/target/
 /rSYBL/rSYBL-analysis-engine-tar/target/
 /rSYBL/rSYBL-client/target/
+/MELA-AnalysisService (copy)/MELA-SpaceAndPathwayAnalysisService-rpm/target/
+/MELA-AnalysisService (copy)/MELA-SpaceAndPathwayAnalysisService-tar/target/
+/MELA-AnalysisService (copy)/MELA-SpaceAndPathwayAnalysisService/target/
+/MELA-ElasticityRelationshipsAnalysis/MELA-SpaceAndPathwayAnalysisService-rpm/target/
+/MELA-ElasticityRelationshipsAnalysis/MELA-SpaceAndPathwayAnalysisService-tar/target/
+/MELA-ElasticityRelationshipsAnalysis/MELA-SpaceAndPathwayAnalysisService/target/
+/MELA-ElasticityRelationshipsAnalysis/MELA-ElasticityDependencyAnalysisService/target/

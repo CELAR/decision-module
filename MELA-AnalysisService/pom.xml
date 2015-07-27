@@ -19,7 +19,9 @@
     <modules>
         <module>MELA-SpaceAndPathwayAnalysisService</module>
         <module>MELA-SpaceAndPathwayAnalysisService-tar</module>
-      
+        
+        <module>MELA-ElasticityDependencyAnalysisService</module>
+        <module>MELA-ElasticityDependencyAnalysisService-tar</module>
     </modules>
  
  <profiles>
@@ -32,28 +34,11 @@
          </activation>
          <modules>
              <module>MELA-SpaceAndPathwayAnalysisService-rpm</module>
+             <module>MELA-ElasticityDependencyAnalysisService-rpm</module>
          </modules>
      </profile>
  </profiles>
  
-    <repositories>
- 
-        <repository>
-            <id>dsg_repo_central</id>
-            <url>http://repo.infosys.tuwien.ac.at/artifactory/comot</url>
-            <snapshots>
-                <enabled>false</enabled>
-            </snapshots>
-        </repository>
-        <repository>
-            <id>dsg_repo_snapshots</id>
-            <url>http://repo.infosys.tuwien.ac.at/artifactory/comot</url>
-            <releases>
-                <enabled>false</enabled>
-            </releases>
-        </repository>
-        
-    </repositories>
     
 
 </project>
