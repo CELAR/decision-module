@@ -42,14 +42,7 @@
             <version>2.12.2</version>
             <type>jar</type>
         </dependency>
-        <!--
-        <dependency>
-            <groupId>at.ac.tuwien.dsg.cloud.salsa</groupId>
-            <artifactId>salsa-common</artifactId>
-            <version>0.0.1-SNAPSHOT</version>
-            <type>jar</type>
-        </dependency>
--->
+
         
         <dependency>
             <groupId>mysql</groupId>
@@ -82,21 +75,13 @@
             <version>1.17.1</version>
             <type>jar</type>
         </dependency>
-        <!--
-    <dependency>
-      <groupId>tosca</groupId>
-      <artifactId>tosca-description</artifactId>
-      <version>1.0</version>
-      <type>jar</type>
-    </dependency>
-    
-    -->
-    <dependency>
-      <groupId>tosca</groupId>
-      <artifactId>tosca-description</artifactId>
-      <version>1.0</version>
-      <type>jar</type>
-    </dependency>
+
+        <dependency>
+            <groupId>at.ac.tuwien.dsg</groupId>
+            <artifactId>tosca-description</artifactId>
+            <version>1.0</version>
+            <type>jar</type>
+        </dependency>
   </dependencies>
   
   
