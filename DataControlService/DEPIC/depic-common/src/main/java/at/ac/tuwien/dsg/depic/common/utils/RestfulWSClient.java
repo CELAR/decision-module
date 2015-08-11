@@ -133,8 +133,68 @@ public class RestfulWSClient {
         return output;
     }
     
+    public String callJcatascopiaAgentIDWS(String agentIP, String uri){
+         String agentID = "";
+        try {
+
+
+            
+            Client client = Client.create();
+          
+            WebResource webResource = client.resource(uri);
+            
+            ClientResponse response = webResource
+                   
+                    .accept("application/json")
+                    .get(ClientResponse.class);
+            if (response.getStatus() != 200) {
+                throw new RuntimeException("Failed : HTTP error code : " + response.getStatus());
+            }
+
+            String output = response.getEntity(String.class);
+            System.out.println("\n============getResponse============");
+            System.out.println(output);
+            
+      
+           
+            JSONObject json = (JSONObject)new JSONParser().parse(output);
+            String allMetricsStr = json.get("agents").toString();
+            
+            System.out.println(allMetricsStr);
+            
+             try {
+
+                JSONArray nameArray =(JSONArray)new JSONParser().parse(allMetricsStr);
+                 System.out.println(nameArray.size());
+                 for(Object js : nameArray){
+                     JSONObject element = (JSONObject)js;
+                     
+                     if (agentIP.equals(element.get("agentIP"))) {
+                         agentID = element.get("agentID").toString();
+                     }
+                     
+                 }
+
+
+            } catch (Exception e) {
+                   
+            }
+             
+             System.out.println("FOUND ID: " + agentID);
+            
+            
+   
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        
+        
+        return agentID;
+    }
     
-    public String callJcatascopiaMetricWS(String metricName, String uri){
+    
+    public String callJcatascopiaMetricWS(String metricName, String uri, String agentID){
         
         String metricID = "";
         
@@ -146,6 +206,9 @@ public class RestfulWSClient {
           
            
             //WebResource webResource = client.resource("http://128.130.172.230:8080/JCatascopia-Web/restAPI/metrics/29e6550085ae4ee193532cd51fae39c1:pgActiveConnections");
+            uri = uri.replaceAll("AGENTID", agentID);
+            
+            System.out.println("CALLING: " + uri);
             
             WebResource webResource = client.resource(uri);
 
