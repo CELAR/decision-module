@@ -21,6 +21,7 @@ import at.ac.tuwien.dsg.csdg.elasticityInformation.elasticityRequirements.SYBLSp
 import at.ac.tuwien.dsg.depic.common.entity.dataanalyticsfunction.DataAnalyticsFunction;
 import at.ac.tuwien.dsg.depic.common.entity.eda.elasticprocess.DataElasticityManagementProcess;
 import at.ac.tuwien.dsg.depic.common.entity.qor.QoRModel;
+import at.ac.tuwien.dsg.depic.common.entity.runtime.DBType;
 import at.ac.tuwien.dsg.depic.common.entity.runtime.ElasticService;
 import at.ac.tuwien.dsg.depic.common.entity.runtime.MonitoringSession;
 import at.ac.tuwien.dsg.depic.common.utils.Configuration;
@@ -80,6 +81,7 @@ public class DEPProcessesGeneratorService {
     public String startDepicService() {
         
         MonitoringSession monitoringSession = new MonitoringSession();
+        
 
         DataElasticityMonitor dataElasticityMonitor = new DataElasticityMonitor(monitoringSession);
         dataElasticityMonitor.startMonitoringService();

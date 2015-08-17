@@ -86,7 +86,16 @@ public class DataElasticityMonitor {
             String metricName = getMonitoringMetricName(monitoringServiceName);
 
             RestfulWSClient ws = new RestfulWSClient("");
-            String metricID = ws.callJcatascopiaMetricWS(metricName, cfg.getConfig("JCATASCOPIA.ALL.METRICS.REST"));
+            
+            String agentID = ws.callJcatascopiaAgentIDWS(
+                    cfg.getConfig("AGENT.IP"), 
+                    cfg.getConfig("JCATASCOPIA.AGENT.ID.REST"));
+            Logger.logInfo("Agent ID: " + agentID);
+            
+            
+            String metricID = ws.callJcatascopiaMetricWS(metricName, cfg.getConfig("JCATASCOPIA.ALL.METRICS.REST"), agentID);
+            Logger.logInfo("Metric ID: " + metricID);
+            
 
             String metricValue = ws.getJCMetricValue(metricID, cfg.getConfig("JCATASCOPIA.METRIC.VALUE.REST"));
 
@@ -116,8 +125,13 @@ public class DataElasticityMonitor {
 
             Logger.logInfo("FAIL VALIDATION");
             log = log + "FAIL" + "\t";
-            AdjustmentProcessExecution controller = new AdjustmentProcessExecution(listOfElasticStates, listOfAdjustmentProcess, monitoringSession, eDaaSType);
-            controller.startControlElasticState(currentElasticState);
+//            AdjustmentProcessExecution controller = new AdjustmentProcessExecution(listOfElasticStates, listOfAdjustmentProcess, monitoringSession, eDaaSType);
+//            controller.startControlElasticState(currentElasticState);
+            
+            ProcessExecutor processExecutor = new ProcessExecutor(listOfElasticStates, listOfAdjustmentProcess, monitoringSession, currentElasticState);
+            processExecutor.start();
+            
+            
 
         } else {
             Logger.logInfo("PASS VALIDATION");
@@ -229,21 +243,15 @@ public class DataElasticityMonitor {
         listOfAdjustmentProcess = elasticityProcess.getListOfAdjustmentProcesses();
 
         primitiveActionMetadata = depicDescription.getPrimitiveActionMetadata();
+        
+        monitoringSession.setDataAssetID(daaSDescription.getDaasName());
+        monitoringSession.setSessionID(daaSDescription.getDaasName());
+        monitoringSession.seteDaaSType(daaSDescription.getdBType());
+        monitoringSession.setEdaasName(daaSDescription.getDaasName());
 
     }
 
-    private void mappingExpectedEStateIDs(List<String> expectElasticStateIDs) {
-
-        listOfExpectedElasticStates = new ArrayList<ElasticState>();
-
-        for (String eStateID : expectElasticStateIDs) {
-            ElasticState elasticState = findElasticStateWithID(eStateID);
-            listOfExpectedElasticStates.add(elasticState);
-
-        }
-
-    }
-
+    
     private ElasticState findElasticStateWithID(String elasticStateID) {
 
         for (ElasticState elasticState : listOfElasticStates) {
