@@ -6,6 +6,7 @@ package at.ac.tuwien.dsg.rSybl.cloudInteractionUnit.celar;
 
 import at.ac.tuwien.dsg.csdg.Node;
 import at.ac.tuwien.dsg.rSybl.cloudInteractionUnit.celar.dbalancer.BalancerInfo;
+import at.ac.tuwien.dsg.rSybl.cloudInteractionUnit.celar.dbalancer.BalancerType;
 import at.ac.tuwien.dsg.rSybl.cloudInteractionUnit.celar.dbalancer.BalancingStatus;
 import at.ac.tuwien.dsg.rSybl.cloudInteractionUnit.celar.dbalancer.StartBalancer;
 import at.ac.tuwien.dsg.rSybl.cloudInteractionUnit.utils.Configuration;
@@ -107,9 +108,12 @@ public class ClusterBalancing {
         }
     }
 
-    private void startBalancing() {
+    private void startBalancingAccess(double load, double threshold) {
         URL url = null;
         StartBalancer startBalancer=new StartBalancer();
+        startBalancer.setType(BalancerType.ACCESS);
+        startBalancer.setThreshold(threshold);
+        startBalancer.setLoad(load);
         HttpURLConnection connection = null;
         try {
             url = new URL(API_URL + "balancer/start");
