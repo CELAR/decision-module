@@ -13,6 +13,8 @@
 			<outputDirectory>/</outputDirectory>
 			<includes>
 				<include>installer.sh</include>
+                                <include>decision-module</include>
+                                <include>config.properties/include>
 			</includes>
 			<fileMode>0755</fileMode>
 			<lineEnding>unix</lineEnding>
