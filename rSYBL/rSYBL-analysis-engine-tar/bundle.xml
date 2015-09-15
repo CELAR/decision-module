@@ -22,11 +22,15 @@
 
 		<fileSet>
 			<directory>${project.build.directory}</directory>
-			<outputDirectory>/war</outputDirectory>
+			<outputDirectory>/</outputDirectory>
 			<includes>
 				<include>rSYBL-analysis-engine-*.war</include>
 			</includes>
 		</fileSet>
+                <fileSet>
+                        <directory>${project.basedir}/config</directory>
+                        <outputDirectory>/config</outputDirectory>
+                </fileSet>
 
 	</fileSets>
 </assembly>
