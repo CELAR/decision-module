@@ -41,7 +41,7 @@ import javax.ws.rs.core.Response;
 
 public class SYBLControlClient {
 
-    protected String REST_API_URL = "http://localhost:8280/rSYBL/restWS";
+    protected static String REST_API_URL = "http://localhost:8280/rSYBL/restWS";
     protected String compRules;
 
     public SYBLControlClient(String rsyblurl) {
@@ -53,17 +53,17 @@ public class SYBLControlClient {
             String applicationID = "DataPlay";
             String tosca = readFile("DataPlay.tosca", Charset.defaultCharset());
             String deployment = readFile("deployment_DataPlay.xml", Charset.defaultCharset());
-            SYBLControlClient sYBLControlClient = new SYBLControlClient("http://localhost:8280/rSYBL/restWS");
+            SYBLControlClient sYBLControlClient = new SYBLControlClient(REST_API_URL);
             sYBLControlClient.prepareControl(applicationID);
             sYBLControlClient.setApplicationDescription(applicationID, tosca);
             sYBLControlClient.setApplicationDeployment(applicationID, deployment);
-            sYBLControlClient.startTest(applicationID);
-            sYBLControlClient.testElasticityCapability(applicationID, "Master", "attachDisk");
-              sYBLControlClient.testElasticityCapability(applicationID, "Master", "dettachDisk");
-//            sYBLControlClient.prepareControl(applicationID);
-//            sYBLControlClient.setApplicationDescription(applicationID, tosca);
-//            sYBLControlClient.setApplicationDeployment(applicationID, deployment);
-//            sYBLControlClient.startApplication(applicationID);
+//            sYBLControlClient.startTest(applicationID);
+//            sYBLControlClient.testElasticityCapability(applicationID, "Master", "attachDisk");
+//              sYBLControlClient.testElasticityCapability(applicationID, "Master", "dettachDisk");
+            sYBLControlClient.prepareControl(applicationID);
+            sYBLControlClient.setApplicationDescription(applicationID, tosca);
+            sYBLControlClient.setApplicationDeployment(applicationID, deployment);
+            sYBLControlClient.startApplication(applicationID);
 
         } catch (IOException ex) {
             Logger.getLogger(SYBLControlClient.class.getName()).log(Level.SEVERE, null, ex);
@@ -154,12 +154,14 @@ public class SYBLControlClient {
         c.getProperties().put(
                 ClientConfig.PROPERTY_FOLLOW_REDIRECTS, true);
         WebResource r = c.resource(REST_API_URL + "/" + methodName);
-        String response = r.accept(
+        
+         r.accept(
                 MediaType.APPLICATION_XML_TYPE).
                 header("Content-Type", "application/xml; charset=utf-8").
                 header("Accept", "application/xml, multipart/related").
                 put(String.class, body);
-        System.out.println(response);
+        
+        
     }
 
     private void callPOST(String body, String methodName) {
