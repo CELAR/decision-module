@@ -43,6 +43,8 @@ import com.sixsq.slipstream.statemachine.States;
 import gr.ntua.cslab.orchestrator.client.conf.ClientConfiguration;
 import java.net.ConnectException;
 import java.util.Random;
+import java.util.Timer;
+import java.util.TimerTask;
 
 public class EnforcementPluginCELAR implements EnforcementInterface {
 
@@ -63,6 +65,7 @@ public class EnforcementPluginCELAR implements EnforcementInterface {
         clientConfiguration.setPort(Integer.parseInt(Configuration.getOrchestratorPort()));
         resizingActionsClient.setConfiguration(clientConfiguration);
         refreshElasticityActionsList();
+        startDiskManagement();
     }
 
     public static void main(String[] args) {
@@ -81,7 +84,33 @@ public class EnforcementPluginCELAR implements EnforcementInterface {
         }
 
     }
+ private void startDiskManagement(){
+        TimerTask timerTask = new TimerTask(){
 
+            @Override
+            public void run() {
+                List<Node> vms = dependencyGraph.getAllVMs();
+                for (Node vm : vms){
+                    try {
+                        double val=monitoringAPI.getMetricValue("diskUsage", vm);
+                        if (val>92){
+                            attachDisk(vm);
+                        }else{
+                            if (val<13){
+                                attachDisk(vm);
+                            }
+                        }
+                    } catch (Exception ex) {
+                        Logger.getLogger(EnforcementPluginCELAR.class.getName()).log(Level.SEVERE, null, ex);
+                    }
+                    
+                }
+            }
+            
+        };
+        Timer timer = new Timer();
+        timer.scheduleAtFixedRate(timerTask, 20000, 120000);
+    }
     public void refreshElasticityActionsList() {
         actionsAvailable = new HashMap<Integer, ResizingAction>();
         try {
