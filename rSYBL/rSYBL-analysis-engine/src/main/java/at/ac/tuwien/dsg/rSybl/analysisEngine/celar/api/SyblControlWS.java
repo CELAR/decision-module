@@ -42,7 +42,6 @@ import javax.ws.rs.ext.Provider;
 import org.springframework.stereotype.Service;
 
 @Service
-@Provider
 @Path("/")
 public class SyblControlWS {
 

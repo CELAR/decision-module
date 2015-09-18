@@ -2,7 +2,7 @@
 # Provides:          mela-dependency-analysis-service
 # Required-Start: mysqld
 # Required-Stop:
-# Default-Start:      
+# Default-Start:     
 # Default-Stop:      0 1 6
 # Short-Description: Start MELA ElasticityRelationshipsAnalysisService daemon
 # Description:       To start-stop MELA-DS

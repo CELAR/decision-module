@@ -26,7 +26,8 @@
           </elasticity:NodeProperties>
         </tosca:Properties>
         <tosca:Policies>
-          <tosca:Policy name="CONSTRAINT cpuUsage &lt; 30" policyRef="C7946203460" policyType="sybl:Constraint"/>
+          <tosca:Policy name="CONSTRAINT responseTime &lt; 10" policyRef="C7946203460" policyType="sybl:Constraint"/>
+         
         </tosca:Policies>
         <tosca:DeploymentArtifacts>
           <tosca:DeploymentArtifact artifactRef="MasterImage" artifactType="VMI" name="b26d991d-f18b-3f25-8789-3f7b74aedfbf"/>

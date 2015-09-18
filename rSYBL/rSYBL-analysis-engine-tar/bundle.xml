@@ -13,6 +13,8 @@
 			<outputDirectory>/</outputDirectory>
 			<includes>
 				<include>installer.sh</include>
+                                <include>decision-module</include>
+                                <include>config.properties</include>
 			</includes>
 			<fileMode>0755</fileMode>
 			<lineEnding>unix</lineEnding>
@@ -20,11 +22,15 @@
 
 		<fileSet>
 			<directory>${project.build.directory}</directory>
-			<outputDirectory>/war</outputDirectory>
+			<outputDirectory>/</outputDirectory>
 			<includes>
-				<include>rSYBL-analysis-engine-*.war</include>
+				<include>rSYBL-analysis-engine-*.jar</include>
 			</includes>
 		</fileSet>
+                <fileSet>
+                        <directory>${project.basedir}/config</directory>
+                        <outputDirectory>/config</outputDirectory>
+                </fileSet>
 
 	</fileSets>
 </assembly>
