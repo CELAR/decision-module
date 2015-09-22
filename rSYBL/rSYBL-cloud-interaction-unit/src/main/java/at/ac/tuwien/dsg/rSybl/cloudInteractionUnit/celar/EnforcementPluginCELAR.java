@@ -68,7 +68,7 @@ public class EnforcementPluginCELAR implements EnforcementInterface {
     private HashMap<String, ArrayList<String>> disks = new HashMap<String, ArrayList<String>>();
     private ClientConfiguration clientConfiguration;
     private HashMap<String, ResourceInfo> flavors = new HashMap<String, ResourceInfo>();
-
+    private DependencyGraph dependencyGraph;
     public EnforcementPluginCELAR(Node cloudService) {
 
         this.cloudService = cloudService;
@@ -76,7 +76,8 @@ public class EnforcementPluginCELAR implements EnforcementInterface {
         clientConfiguration.setHost(Configuration.getOrchestratorHost());
         clientConfiguration.setPort(Integer.parseInt(Configuration.getOrchestratorPort()));
         resizingActionsClient.setConfiguration(clientConfiguration);
-
+        dependencyGraph = new DependencyGraph();
+        dependencyGraph.setCloudService(cloudService);
         refreshElasticityActionsList();
         startDiskManagement();
         findAllAvailableFlavors();
@@ -204,7 +205,6 @@ public class EnforcementPluginCELAR implements EnforcementInterface {
         return newFlavor;
     }
 
->>>>>>> 871813d5040ab0016df3d7da019dfd6ce46d04cf
     public void refreshElasticityActionsList() {
         actionsAvailable = new HashMap<Integer, ResizingAction>();
         try {
@@ -781,6 +781,15 @@ public class EnforcementPluginCELAR implements EnforcementInterface {
     @Override
     public boolean scaleIn(Node toBeScaled, double violationDegree) {
         return scaleIn(toBeScaled);
+    }
+
+    @Override
+    public void enforceAction(Node serviceID, String actionName) {
+         for (Integer id:this.actionsAvailable.keySet()){
+             if (actionsAvailable.get(id).getName().equalsIgnoreCase(actionName)){
+                 this.enforceAction(serviceID, actionName);
+             }
+         }
     }
 
 }
