@@ -791,5 +791,8 @@ public class EnforcementPluginCELAR implements EnforcementInterface {
              }
          }
     }
+    public void scaleDiagonally(Node serviceID, String upOrDown, String resourceRequirements){
+        
+    }
 
 }
