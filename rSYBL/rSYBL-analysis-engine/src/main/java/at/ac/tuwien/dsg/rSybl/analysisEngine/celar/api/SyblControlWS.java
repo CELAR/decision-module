@@ -32,6 +32,7 @@ import javax.ws.rs.core.UriInfo;
 
 import at.ac.tuwien.dsg.csdg.elasticityInformation.elasticityRequirements.SYBLAnnotation;
 import at.ac.tuwien.dsg.rSybl.analysisEngine.main.ControlCoordination;
+import at.ac.tuwien.dsg.rSybl.analysisEngine.utils.AnalysisLogger;
 import com.sun.jersey.api.client.ClientResponse.Status;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.PathParam;
@@ -86,7 +87,7 @@ public class SyblControlWS {
     @Path("/TOSCADescriptionAndStartControl")
     @Consumes("application/xml")
     public void setTOSCAAndStartControl(String tosca) {
-        tosca = tosca.replaceAll("&amp;", "&");
+//        tosca = tosca.replaceAll("&amp;", "&");
         controlCoordination.setAndStartToscaControl(tosca);
 
     }
@@ -96,7 +97,8 @@ public class SyblControlWS {
     @Consumes("application/xml")
     public Response setApplicationDescriptionTOSCA(@PathParam("id") String cloudServiceId, String celar) {
         try {
-            celar = celar.replaceAll("&amp;", "&");
+            AnalysisLogger.logger.info("The received description "+celar);
+//            celar = celar.replaceAll("&amp;", "&");
             controlCoordination.setApplicationDescriptionInfoTOSCA(celar, cloudServiceId);
             return Response.ok().build();
         } catch (Exception e) {
