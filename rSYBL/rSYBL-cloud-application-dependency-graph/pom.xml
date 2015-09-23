@@ -26,6 +26,8 @@
             <groupId>at.ac.tuwien.rSYBL.control-service</groupId>
             <artifactId>rSYBL-cloud-application-dependency-graph</artifactId>
             <version>1.0-SNAPSHOT</version>
+            <type>jar</type>
+            <classifier>sources</classifier>
         </dependency>
     </dependencies>
     <build>
