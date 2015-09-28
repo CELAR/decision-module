@@ -50,9 +50,9 @@ public class SYBLControlClient {
 
     public static void main(String[] args) {
         try {
-            String applicationID = "DataPlay";
-            String tosca = readFile("DataPlay.tosca", Charset.defaultCharset());
-            String deployment = readFile("deployment_DataPlay.xml", Charset.defaultCharset());
+            String applicationID = "SCAN";
+            String tosca = readFile("Application_SCAN.tosca", Charset.defaultCharset());
+            String deployment = readFile("deployment_SCAN.xml", Charset.defaultCharset());
             SYBLControlClient sYBLControlClient = new SYBLControlClient(REST_API_URL);
             sYBLControlClient.prepareControl(applicationID);
             sYBLControlClient.setApplicationDescription(applicationID, tosca);
@@ -63,7 +63,7 @@ public class SYBLControlClient {
             sYBLControlClient.prepareControl(applicationID);
             sYBLControlClient.setApplicationDescription(applicationID, tosca);
             sYBLControlClient.setApplicationDeployment(applicationID, deployment);
-            sYBLControlClient.startApplication(applicationID);
+           sYBLControlClient.startApplication(applicationID);
 
         } catch (IOException ex) {
             Logger.getLogger(SYBLControlClient.class.getName()).log(Level.SEVERE, null, ex);
@@ -163,52 +163,23 @@ public class SYBLControlClient {
         
         
     }
+  private void callPOST(String body, String methodName) {
 
-    private void callPOST(String body, String methodName) {
+        Client c = Client.create();
 
-        URL url = null;
-        HttpURLConnection connection = null;
-        try {
-            url = new URL(REST_API_URL + "/" + methodName);
-            connection = (HttpURLConnection) url.openConnection();
-            connection.setDoOutput(true);
-            connection.setInstanceFollowRedirects(false);
-            connection.setRequestMethod("POST");
-            connection.setRequestProperty("Content-Type", "application/xml");
-            connection.setRequestProperty("Accept", "application/json");
-
-            //write message body
-            OutputStream os = connection.getOutputStream();
-            os.write(body.getBytes(Charset.forName("UTF-8")));
-            os.flush();
-            os.close();
-
-            InputStream errorStream = connection.getErrorStream();
-            if (errorStream != null) {
-                BufferedReader reader = new BufferedReader(new InputStreamReader(errorStream));
-                String line;
-                while ((line = reader.readLine()) != null) {
-                    Logger.getLogger(SYBLControlClient.class.getName()).log(Level.SEVERE, line);
-                }
-            }
-
-            InputStream inputStream = connection.getInputStream();
-            if (inputStream != null) {
-                BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream));
-                String line;
-                while ((line = reader.readLine()) != null) {
-                    Logger.getLogger(SYBLControlClient.class.getName()).log(Level.SEVERE, line);
-                }
-            }
-
-        } catch (Exception e) {
-            Logger.getLogger(SYBLControlClient.class.getName()).log(Level.SEVERE, e.getMessage(), e);
-        } finally {
-            if (connection != null) {
-                connection.disconnect();
-            }
-        }
+        c.getProperties().put(
+                ClientConfig.PROPERTY_FOLLOW_REDIRECTS, true);
+        WebResource r = c.resource(REST_API_URL + "/" + methodName);
+        
+         r.accept(
+                MediaType.APPLICATION_XML_TYPE).
+                header("Content-Type", "application/xml; charset=utf-8").
+                header("Accept", "application/xml, multipart/related").
+                post(String.class, body);
+        
+        
     }
+    
 
     public void startApplication(String applicationID) {
         callPUT("", applicationID + "/startControl");

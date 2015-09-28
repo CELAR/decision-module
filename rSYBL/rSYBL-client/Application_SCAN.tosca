@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<tosca:Definitions xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:elasticity="http://www.example.org/NewXMLSchema" xmlns:sybl="http://www.example.org/SYBL" xmlns:tosca="http://docs.oasis-open.org/tosca/ns/2011/12" id="hi">
+  <tosca:ServiceTemplate xsi:type="elasticity:TServiceTemplateExtension" id="hello" name="SCANTest" height="296" width="516" x="5" y="5">
+    <tosca:BoundaryDefinitions xsi:type="elasticity:TBoundaryDefinitionsExtension">
+      <tosca:Properties>
+        <elasticity:ServiceProperties>
+          <elasticity:Version>1.0</elasticity:Version>
+          <elasticity:HostingEnvironment>Okeanos</elasticity:HostingEnvironment>
+        </elasticity:ServiceProperties>
+      </tosca:Properties>
+    </tosca:BoundaryDefinitions>
+    <tosca:TopologyTemplate>
+      <tosca:NodeTemplate xsi:type="elasticity:TNodeTemplateExtension" id="C408487074" maxInstances="100" minInstances="5" name="worker" x="235" y="55">
+        <tosca:Properties>
+          <elasticity:NodeProperties>
+            <elasticity:Flavor>vcpus:4 ram:4096 disk:40</elasticity:Flavor>
+          </elasticity:NodeProperties>
+        </tosca:Properties>
+        <tosca:Policies>
+          <tosca:Policy name="STRATEGY CASE violated(C15927995760) : scaleOut(worker)" policyRef="C1193552540" policyType="sybl:Strategy"/>
+          <tosca:Policy name="STRATEGY CASE violated(C14056815981) : scaleIn(worker)" policyRef="C1193552541" policyType="sybl:Strategy"/>
+          <tosca:Policy name="STRATEGY CASE violated(C15927995760) : attachDisk(worker)" policyRef="C1193552542" policyType="sybl:Strategy"/>
+          <tosca:Policy name="STRATEGY CASE violated(C15927995760) : attachDisk(worker)" policyRef="C1193552543" policyType="sybl:Strategy"/>
+        </tosca:Policies>
+        <tosca:DeploymentArtifacts>
+          <tosca:DeploymentArtifact artifactRef="5b1ac218-1cdf-4286-8000-09991bd07752" artifactType="elasticity:ImageArtifactPropertiesType" name="5b1ac218-1cdf-4286-8000-09991bd07752"/>
+          <tosca:DeploymentArtifact artifactType="MonitoringProbe" name="ScanWorkerProbe"/>
+          <tosca:DeploymentArtifact artifactRef="id_rsa.pub" artifactType="KeyPair" name="id_rsa.pub"/>
+        </tosca:DeploymentArtifacts>
+      </tosca:NodeTemplate>
+      <tosca:NodeTemplate xsi:type="elasticity:TNodeTemplateExtension" id="C1236456089" maxInstances="1" minInstances="1" name="scheduler" x="45" y="55">
+        <tosca:Properties>
+          <elasticity:NodeProperties>
+            <elasticity:Flavor>vcpus:4 ram:4096 disk:40</elasticity:Flavor>
+          </elasticity:NodeProperties>
+        </tosca:Properties>
+        <tosca:Policies>
+          <tosca:Policy name="CONSTRAINT queueLength&amp;lt;3" policyRef="C15927995760" policyType="sybl:Constraint"/>
+          <tosca:Policy name="CONSTRAINT workerUtilisation&amp;gt;0.75" policyRef="C14056815981" policyType="sybl:Constraint"/>
+        </tosca:Policies>
+        <tosca:DeploymentArtifacts>
+          <tosca:DeploymentArtifact artifactRef="5b1ac218-1cdf-4286-8000-09991bd07752" artifactType="elasticity:ImageArtifactPropertiesType" name="5b1ac218-1cdf-4286-8000-09991bd07752"/>
+          <tosca:DeploymentArtifact artifactType="MonitoringProbe" name="ScanProbe"/>
+          <tosca:DeploymentArtifact artifactRef="id_rsa.pub" artifactType="KeyPair" name="id_rsa.pub"/>
+          <tosca:DeploymentArtifact artifactRef="id_rsa.pub" artifactType="KeyPair" name="id_rsa.pub"/>
+        </tosca:DeploymentArtifacts>
+      </tosca:NodeTemplate>
+    </tosca:TopologyTemplate>
+  </tosca:ServiceTemplate>
+  <tosca:ArtifactTemplate id="5b1ac218-1cdf-4286-8000-09991bd07752">
+    <tosca:Properties>
+      <elasticity:ImageArtifactProperties>
+        <elasticity:Description>not_specified</elasticity:Description>
+        <elasticity:Id>5b1ac218-1cdf-4286-8000-09991bd07752</elasticity:Id>
+      </elasticity:ImageArtifactProperties>
+    </tosca:Properties>
+  </tosca:ArtifactTemplate>
+
+  <tosca:ArtifactTemplate id="handle_prescale.sh" type="RA" name="SDhandle_prescale.sh">
+    <tosca:Properties>
+      <elasticity:ScriptArtifactProperties>
+        <elasticity:Language>Shell</elasticity:Language>
+      </elasticity:ScriptArtifactProperties>
+    </tosca:Properties>
+    <tosca:ArtifactReferences>
+      <tosca:ArtifactReference reference="Scripts/handle_prescale.sh"/>
+    </tosca:ArtifactReferences>
+  </tosca:ArtifactTemplate>
+  <tosca:ArtifactTemplate id="handle_postscale.sh" type="RA" name="SDhandle_postscale.sh">
+    <tosca:Properties>
+      <elasticity:ScriptArtifactProperties>
+        <elasticity:Language>Shell</elasticity:Language>
+      </elasticity:ScriptArtifactProperties>
+    </tosca:Properties>
+    <tosca:ArtifactReferences>
+      <tosca:ArtifactReference reference="Scripts/handle_postscale.sh"/>
+    </tosca:ArtifactReferences>
+  </tosca:ArtifactTemplate>
+  <tosca:ArtifactTemplate id="init_gatk_worker.sh" type="elasticity:ScriptArtifactPropertiesType" name="SDinit_gatk_worker.sh">
+    <tosca:Properties>
+      <elasticity:ScriptArtifactProperties>
+        <elasticity:Language>Shell</elasticity:Language>
+      </elasticity:ScriptArtifactProperties>
+    </tosca:Properties>
+    <tosca:ArtifactReferences>
+      <tosca:ArtifactReference reference="Scripts/init_gatk_worker.sh"/>
+    </tosca:ArtifactReferences>
+  </tosca:ArtifactTemplate>
+  <tosca:ArtifactTemplate id="init_scheduler.sh" type="elasticity:ScriptArtifactPropertiesType" name="SDinit_scheduler.sh">
+    <tosca:Properties>
+      <elasticity:ScriptArtifactProperties>
+        <elasticity:Language>Shell</elasticity:Language>
+      </elasticity:ScriptArtifactProperties>
+    </tosca:Properties>
+    <tosca:ArtifactReferences>
+      <tosca:ArtifactReference reference="Scripts/init_scheduler.sh"/>
+    </tosca:ArtifactReferences>
+  </tosca:ArtifactTemplate>
+  <tosca:NodeTypeImplementation name="name" nodeType="scheduler">
+    <tosca:ImplementationArtifacts>
+      <tosca:ImplementationArtifact artifactRef="init_scheduler.sh" artifactType="elasticity:ScriptArtifactPropertiesType" interfaceName="Lifecycle" operationName="execute"/>
+    </tosca:ImplementationArtifacts>
+  </tosca:NodeTypeImplementation>
+</tosca:Definitions>

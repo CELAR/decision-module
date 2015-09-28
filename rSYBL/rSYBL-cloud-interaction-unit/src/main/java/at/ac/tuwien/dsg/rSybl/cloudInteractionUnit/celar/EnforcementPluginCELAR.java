@@ -406,7 +406,7 @@ public class EnforcementPluginCELAR implements EnforcementInterface {
         return ok;
     }
 
-    public boolean dettachDisk(Node node) {
+    public boolean detachDisk(Node node) {
         boolean ok = true;
         DependencyGraph dependencyGraph = new DependencyGraph();
         dependencyGraph.setCloudService(cloudService);
@@ -774,7 +774,7 @@ public class EnforcementPluginCELAR implements EnforcementInterface {
 
     @Override
     public boolean scaleOut(Node toBeScaled, double violationDegree) {
-        String flavorID = "";
+        String flavorID = (String) toBeScaled.getStaticInformation().get("defaultFlavor");
         return scaleOut(toBeScaled, flavorID);
     }
 
@@ -784,15 +784,44 @@ public class EnforcementPluginCELAR implements EnforcementInterface {
     }
 
     @Override
-    public void enforceAction(Node serviceID, String actionName) {
+    public boolean enforceAction(Node serviceID, String actionName) {
          for (Integer id:this.actionsAvailable.keySet()){
              if (actionsAvailable.get(id).getName().equalsIgnoreCase(actionName)){
                  this.enforceAction(serviceID, actionName);
              }
          }
+         return true;
     }
-    public void scaleDiagonally(Node serviceID, String upOrDown, String resourceRequirements){
-        
+    public String chooseNewFlavor(Node serviceID, String requirement){
+        String currentFlavor = (String) serviceID.getStaticInformation().get("defaultFlavor");
+        ResourceInfo resourceInfo=this.flavors.get(currentFlavor);
+        HashMap<String,Double> currentSpecs = new HashMap<String,Double>();
+        //resourceInfo.specs
+        for (ResourceInfo.ResourceSpec resourceSpec:resourceInfo.specs){
+            currentSpecs.put(resourceSpec.property, Double.parseDouble(resourceSpec.value));
+        }
+        double minResources=0.0;
+        String foundFlavor="";
+        for (ResourceInfo resInfo:flavors.values()){
+            double diff=0.0;
+            for (String resource:currentSpecs.keySet()){
+               //TODO scale to more or less
+                if  (((Double.parseDouble(resInfo.getFieldMap().get(resource))- currentSpecs.get(resource))>0) ){
+                    diff+=Double.parseDouble(resInfo.getFieldMap().get(resource))- currentSpecs.get(resource);
+                    
+                }
+                if (diff<minResources){
+                    diff=minResources;
+                    foundFlavor=resInfo.name;
+                }
+            }
+        }
+        return foundFlavor;
     }
+    
+    public void scaleDiagonally(Node serviceID,String requirement){
+        serviceID.getStaticInformation().put("defaultFlavor",chooseNewFlavor(serviceID, requirement));
+    }
+    
 
 }
