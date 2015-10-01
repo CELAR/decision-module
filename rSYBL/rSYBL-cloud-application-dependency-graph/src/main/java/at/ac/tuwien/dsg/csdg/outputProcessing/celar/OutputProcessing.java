@@ -6,7 +6,7 @@ package at.ac.tuwien.dsg.csdg.outputProcessing.celar;
 
 import at.ac.tuwien.csdg.utils.celar.Configuration;
 import at.ac.tuwien.dsg.csdg.Node;
-import at.ac.tuwien.dsg.csdg.elasticityInformation.ElasticityCapability;
+import at.ac.tuwien.dsg.csdg.elasticityInformation.ElasticityCapabilityInformation;
 import at.ac.tuwien.dsg.csdg.inputProcessing.multiLevelModel.deploymentDescription.DeploymentDescription;
 import at.ac.tuwien.dsg.csdg.outputProcessing.OutputProcessingInterface;
 
@@ -30,7 +30,7 @@ public class OutputProcessing implements OutputProcessingInterface {
     }
 
     @Override
-    public void saveActionPlan(HashMap<Node, ElasticityCapability> actionPlan) {
+    public void saveActionPlan(HashMap<Node, ElasticityCapabilityInformation> actionPlan) {
      //TODO: save action plan in celar data base through celar manager
 
     }
