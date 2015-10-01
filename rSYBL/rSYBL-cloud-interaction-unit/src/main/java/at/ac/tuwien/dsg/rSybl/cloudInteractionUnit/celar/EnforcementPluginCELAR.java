@@ -413,7 +413,7 @@ public class EnforcementPluginCELAR implements EnforcementInterface {
         Node toBeScaled = dependencyGraph.getNodeWithID(node.getId());
         for (Entry<Integer, ResizingAction> actionE : actionsAvailable.entrySet()) {
             ResizingAction action = actionE.getValue();
-            System.out.println(action.getModuleName());
+            RuntimeLogger.logger.info("Trying to detach ... "+action.getModuleName());
             if (action.getType() == ResizingActionType.DETTACH_DISK && toBeScaled.getId().equalsIgnoreCase(action.getModuleName())) {
                 Parameters parameters = new Parameters();
                 List<Parameter> param = new ArrayList<>();
@@ -726,6 +726,7 @@ public class EnforcementPluginCELAR implements EnforcementInterface {
                             }
                         }
                         newNode.getStaticInformation().put("IP", ip);
+                        newNode.getStaticInformation().put("UUID",ip);//
                         newNode.setId(ip);
                         newNode.setNodeType(NodeType.VIRTUAL_MACHINE);
 

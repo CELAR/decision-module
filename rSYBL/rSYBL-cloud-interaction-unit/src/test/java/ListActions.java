@@ -58,7 +58,11 @@ public class ListActions {
         try {
             ResizingActionList actionList = resizingActionsClient.listResizingActions();
             for (ResizingAction action:actionList.getResizingActions()){
-                System.out.println("Available action: "+action.getName());
+                System.err.println("Available action: "+action.getName()+" type "+action.getType());
+                System.out.println("with parameters...");
+                for (String param:action.getApplicablePatameters()){
+                    System.out.println(param);
+                }
             }
         } catch (IOException ex) {
             Logger.getLogger(ListActions.class.getName()).log(Level.SEVERE, null, ex);
