@@ -192,5 +192,7 @@ public class Configuration {
     {
         return configuration.getProperty("CELAROrchestrator_Host");
     }
-  
+  public static boolean resourceLevelControlEnabled(){
+    return Boolean.parseBoolean(configuration.getProperty("ResourceLevelControlEnabled"));
+}
 }
