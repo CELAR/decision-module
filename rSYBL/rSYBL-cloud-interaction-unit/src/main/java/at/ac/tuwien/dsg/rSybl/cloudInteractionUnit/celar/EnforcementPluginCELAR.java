@@ -502,7 +502,7 @@ public class EnforcementPluginCELAR implements EnforcementInterface {
 
                         RuntimeLogger.logger.debug("Dettaching from node disk with " + node.getId() + " ID " + diskID);
                         
-                        disks.get(node.getId()).remove(diskID);
+                        disks.get(minUsageNode.getId()).remove(diskID);
                 }
                 break;
             }
