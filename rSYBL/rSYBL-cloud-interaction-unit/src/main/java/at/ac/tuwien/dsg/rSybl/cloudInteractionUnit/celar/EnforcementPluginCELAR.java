@@ -30,6 +30,7 @@ import at.ac.tuwien.dsg.csdg.Node;
 import at.ac.tuwien.dsg.csdg.Node.NodeType;
 import at.ac.tuwien.dsg.csdg.Relationship.RelationshipType;
 import at.ac.tuwien.dsg.csdg.SimpleRelationship;
+import at.ac.tuwien.dsg.csdg.elasticityInformation.elasticityRequirements.Strategy;
 import at.ac.tuwien.dsg.rSybl.cloudInteractionUnit.celar.utils.Configuration;
 import at.ac.tuwien.dsg.rSybl.cloudInteractionUnit.enforcementPlugins.interfaces.EnforcementInterface;
 
@@ -51,7 +52,6 @@ import gr.ntua.cslab.orchestrator.beans.ResourceInfo;
 import gr.ntua.cslab.orchestrator.client.ProvidedResourcesClient;
 import gr.ntua.cslab.orchestrator.client.conf.ClientConfiguration;
 import java.net.ConnectException;
-import java.util.Random;
 import java.util.Timer;
 import java.util.TimerTask;
 import javax.xml.bind.JAXBException;
@@ -843,7 +843,8 @@ public class EnforcementPluginCELAR implements EnforcementInterface {
         return true;
     }
 
-    public String chooseNewFlavor(Node serviceID, String requirement) {
+    public String chooseNewFlavor(Node serviceID, Strategy strategy) {
+        
         String currentFlavor = (String) serviceID.getStaticInformation().get("defaultFlavor");
         ResourceInfo resourceInfo = this.flavors.get(currentFlavor);
         HashMap<String, Double> currentSpecs = new HashMap<String, Double>();
@@ -870,8 +871,8 @@ public class EnforcementPluginCELAR implements EnforcementInterface {
         return foundFlavor;
     }
 
-    public void scaleDiagonally(Node serviceID, String requirement) {
-        serviceID.getStaticInformation().put("defaultFlavor", chooseNewFlavor(serviceID, requirement));
+    public void scaleDiagonally(Node serviceID, Strategy strategy) {
+        serviceID.getStaticInformation().put("defaultFlavor", chooseNewFlavor(serviceID, strategy));
     }
 
 }
