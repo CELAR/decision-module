@@ -843,7 +843,7 @@ public class EnforcementPluginCELAR implements EnforcementInterface {
         return true;
     }
 
-    public String chooseNewFlavor(Node serviceID, Strategy strategy) {
+    public String chooseNewFlavorUp(Node serviceID, Strategy strategy) {
         
         String currentFlavor = (String) serviceID.getStaticInformation().get("defaultFlavor");
         ResourceInfo resourceInfo = this.flavors.get(currentFlavor);
@@ -870,9 +870,42 @@ public class EnforcementPluginCELAR implements EnforcementInterface {
         }
         return foundFlavor;
     }
+        public String chooseNewFlavorDown(Node serviceID, Strategy strategy) {
+        
+        String currentFlavor = (String) serviceID.getStaticInformation().get("defaultFlavor");
+        ResourceInfo resourceInfo = this.flavors.get(currentFlavor);
+        HashMap<String, Double> currentSpecs = new HashMap<String, Double>();
+        //resourceInfo.specs
+        for (ResourceInfo.ResourceSpec resourceSpec : resourceInfo.specs) {
+            currentSpecs.put(resourceSpec.property, Double.parseDouble(resourceSpec.value));
+        }
+        double minResources = 0.0;
+        String foundFlavor = "";
+        for (ResourceInfo resInfo : flavors.values()) {
+            double diff = 0.0;
+            for (String resource : currentSpecs.keySet()) {
+                //TODO scale to more or less
+                if (((Double.parseDouble(resInfo.getFieldMap().get(resource)) - currentSpecs.get(resource)) < 0)) {
+                    diff += Double.parseDouble(resInfo.getFieldMap().get(resource)) - currentSpecs.get(resource);
 
-    public void scaleDiagonally(Node serviceID, Strategy strategy) {
-        serviceID.getStaticInformation().put("defaultFlavor", chooseNewFlavor(serviceID, strategy));
+                }
+                if (diff < minResources) {
+                    diff = minResources;
+                    foundFlavor = resInfo.name;
+                }
+            }
+        }
+        return foundFlavor;
+    }
+
+    public void diagonallyScale(Node serviceID, Strategy strategy) {
+        serviceID.getStaticInformation().put("defaultFlavor", chooseNewFlavorUp(serviceID, strategy));
+    }
+     public void diagonallyScaleUp(Node serviceID, Strategy strategy) {
+        serviceID.getStaticInformation().put("defaultFlavor", chooseNewFlavorUp(serviceID, strategy));
+    }
+     public void diagonallyScaleDown(Node serviceID, Strategy strategy) {
+        serviceID.getStaticInformation().put("defaultFlavor", chooseNewFlavorDown(serviceID, strategy));
     }
 
 }
