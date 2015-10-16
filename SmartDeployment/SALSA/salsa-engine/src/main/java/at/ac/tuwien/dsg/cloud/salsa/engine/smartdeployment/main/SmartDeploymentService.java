@@ -78,7 +78,6 @@ import org.antlr.v4.runtime.CommonTokenStream;
 import org.antlr.v4.runtime.tree.ParseTreeWalker;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang.StringUtils;
-import org.aspectj.util.FileUtil;
 
 import org.eclipse.camf.carl.antlr4.CARLLexer;
 import org.eclipse.camf.carl.antlr4.CARLParser;
