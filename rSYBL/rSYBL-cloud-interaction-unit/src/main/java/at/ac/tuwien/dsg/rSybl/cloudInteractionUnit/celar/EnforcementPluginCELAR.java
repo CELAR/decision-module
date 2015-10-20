@@ -1,8 +1,7 @@
 /**
  * Copyright 2013 Technische Universitat Wien (TUW), Distributed SystemsGroup
- * E184.  *
- * This work was partially supported by the European Commission in terms of the
- * CELAR FP7 project (FP7-ICT-2011-8 #317790).
+ * E184. * This work was partially supported by the European Commission in terms
+ * of the CELAR FP7 project (FP7-ICT-2011-8 #317790).
  *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not
  * use this file except in compliance with the License. You may obtain a copy of
@@ -30,6 +29,7 @@ import at.ac.tuwien.dsg.csdg.Node;
 import at.ac.tuwien.dsg.csdg.Node.NodeType;
 import at.ac.tuwien.dsg.csdg.Relationship.RelationshipType;
 import at.ac.tuwien.dsg.csdg.SimpleRelationship;
+import at.ac.tuwien.dsg.csdg.elasticityInformation.ElasticityCapabilityInformation;
 import at.ac.tuwien.dsg.csdg.elasticityInformation.elasticityRequirements.Strategy;
 import at.ac.tuwien.dsg.rSybl.cloudInteractionUnit.celar.utils.Configuration;
 import at.ac.tuwien.dsg.rSybl.cloudInteractionUnit.enforcementPlugins.interfaces.EnforcementInterface;
@@ -49,6 +49,7 @@ import java.util.HashMap;
 import java.util.Map.Entry;
 import com.sixsq.slipstream.statemachine.States;
 import gr.ntua.cslab.orchestrator.beans.ResourceInfo;
+import gr.ntua.cslab.orchestrator.beans.ResourceInfo.ResourceSpec;
 import gr.ntua.cslab.orchestrator.client.ProvidedResourcesClient;
 import gr.ntua.cslab.orchestrator.client.conf.ClientConfiguration;
 import java.net.ConnectException;
@@ -60,6 +61,7 @@ public class EnforcementPluginCELAR implements EnforcementInterface {
 
     private MonitoringAPIInterface monitoringAPI;
     private Node cloudService;
+    private double MAKES_SENSE_TO_SCALE_VERTICALLY = 1;
     boolean cleanupGoingOn = false;
     boolean cleanupNecessary = true;
     private HashMap<Integer, ResizingAction> actionsAvailable = new HashMap<Integer, ResizingAction>();
@@ -69,6 +71,7 @@ public class EnforcementPluginCELAR implements EnforcementInterface {
     private HashMap<String, ResourceInfo> flavors = new HashMap<String, ResourceInfo>();
     private DependencyGraph dependencyGraph;
     private boolean executingAction = false;
+    private HashMap<String, Double> maxResourceValues = new HashMap<String, Double>();
 
     public EnforcementPluginCELAR(Node cloudService) {
 
@@ -92,11 +95,30 @@ public class EnforcementPluginCELAR implements EnforcementInterface {
             flavorsList = client.getFlavors();
             for (ResourceInfo rinfo : flavorsList) {
                 flavors.put(rinfo.name, rinfo);
+                System.out.println(rinfo.name);
+                for (ResourceSpec resourceSpec : rinfo.specs) {
+                    if ((maxResourceValues.containsKey(resourceSpec.property) && maxResourceValues.get(resourceSpec.property) < Double.parseDouble(resourceSpec.value))
+                            || !maxResourceValues.containsKey(resourceSpec.property)) {
+                        maxResourceValues.put(resourceSpec.property, Double.parseDouble(resourceSpec.value));
+                    }
+                }
             }
         } catch (IOException ex) {
             RuntimeLogger.logger.error("IOException when trying to find FLAVORS.");
         } catch (JAXBException ex) {
             RuntimeLogger.logger.error("JAXBException when trying to find FLAVORS.");
+        }
+        List<Node> nodes = dependencyGraph.getAllServiceUnits();
+        for (Node n : nodes) {
+            if (n.getStaticInformation().get("DefaultFlavor") == null || ((String) n.getStaticInformation().get("DefaultFlavor")).equalsIgnoreCase("")) {
+                n.getStaticInformation().put("DefaultFlavor", flavors.keySet().iterator().next());
+            }
+        }
+        nodes = dependencyGraph.getAllVMs();
+        for (Node n : nodes) {
+            if (n.getStaticInformation().get("flavor") == null || ((String) n.getStaticInformation().get("flavor")).equalsIgnoreCase("")) {
+                n.getStaticInformation().put("flavor", flavors.keySet().iterator().next());
+            }
         }
 
     }
@@ -178,7 +200,7 @@ public class EnforcementPluginCELAR implements EnforcementInterface {
         String flavorId = mapRequirementsNewUUID(node, cores, memory, disk, remainingCost);
         for (Entry<Integer, ResizingAction> actionE : actionsAvailable.entrySet()) {
             ResizingAction action = actionE.getValue();
-            System.out.println(action.getModuleName());
+
             if (action.getType() == ResizingActionType.SCALE_UP && node.getId().equalsIgnoreCase(action.getModuleName())) {
                 Parameters params = new Parameters();
                 List<Parameter> param = new ArrayList<>();
@@ -222,6 +244,10 @@ public class EnforcementPluginCELAR implements EnforcementInterface {
             ResizingActionList actionList = resizingActionsClient.listResizingActions();
             for (ResizingAction action : actionList.getResizingActions()) {
                 this.actionsAvailable.put(action.getId(), action);
+                ElasticityCapabilityInformation capability = new ElasticityCapabilityInformation();
+                capability.setName(action.getName());
+                capability.setPrimitiveOperations(action.getName());
+                dependencyGraph.getNodeWithID(action.getModuleName()).addElasticityCapability(capability);
             }
         } catch (ConnectException ex) {
             Logger.getLogger(EnforcementPluginCELAR.class.getName()).log(Level.SEVERE, "Encountered error connecting to orchestrator " + ex.getMessage());
@@ -246,7 +272,6 @@ public class EnforcementPluginCELAR implements EnforcementInterface {
         Node toBeScaled = dependencyGraph.getNodeWithID(node.getId());
         for (Entry<Integer, ResizingAction> actionE : actionsAvailable.entrySet()) {
             ResizingAction action = actionE.getValue();
-            System.out.println(action.getModuleName());
             if (action.getType() == ResizingActionType.BALANCE && toBeScaled.getId().equalsIgnoreCase(action.getModuleName())) {
                 ExecutedResizingAction executedResizingAction = executeResizingCommand(action.getId());
                 States status = checkForAction(executedResizingAction.getUniqueId());
@@ -287,7 +312,6 @@ public class EnforcementPluginCELAR implements EnforcementInterface {
 
         for (Entry<Integer, ResizingAction> actionE : actionsAvailable.entrySet()) {
             ResizingAction action = actionE.getValue();
-            System.out.println(action.getModuleName());
             if (action.getType() == ResizingActionType.ATTACH_DISK && toBeScaled.getId().equalsIgnoreCase(action.getModuleName())) {
 
                 Parameters parameters = new Parameters();
@@ -326,16 +350,16 @@ public class EnforcementPluginCELAR implements EnforcementInterface {
                         }
                     }
                 }
-                if (maxUsageNode==null){
+                if (maxUsageNode == null) {
                     String id = "";
-                    for (Node n : node.getAllRelatedNodesOfType(RelationshipType.HOSTED_ON_RELATIONSHIP, NodeType.VIRTUAL_MACHINE)){
-                        if (!disks.containsKey(n.getId())||id.equalsIgnoreCase("")){
-                            id=n.getId();
+                    for (Node n : node.getAllRelatedNodesOfType(RelationshipType.HOSTED_ON_RELATIONSHIP, NodeType.VIRTUAL_MACHINE)) {
+                        if (!disks.containsKey(n.getId()) || id.equalsIgnoreCase("")) {
+                            id = n.getId();
                         }
                     }
-                  //  maxUsageNode=node.getAllRelatedNodesOfType(RelationshipType.HOSTED_ON_RELATIONSHIP, NodeType.VIRTUAL_MACHINE).get(node.getAllRelatedNodesOfType(RelationshipType.HOSTED_ON_RELATIONSHIP, NodeType.VIRTUAL_MACHINE).size()-1);
-                    maxUsageNode= dependencyGraph.getNodeWithID(id);
-                
+                    //  maxUsageNode=node.getAllRelatedNodesOfType(RelationshipType.HOSTED_ON_RELATIONSHIP, NodeType.VIRTUAL_MACHINE).get(node.getAllRelatedNodesOfType(RelationshipType.HOSTED_ON_RELATIONSHIP, NodeType.VIRTUAL_MACHINE).size()-1);
+                    maxUsageNode = dependencyGraph.getNodeWithID(id);
+
                 }
                 p1.setValue(maxUsageNode.getId());
                 Parameter p2 = new Parameter();
@@ -352,7 +376,7 @@ public class EnforcementPluginCELAR implements EnforcementInterface {
                     String id;
                     try {
                         id = resizingActionsClient.getActionStatus(executedResizingAction.getUniqueId()).getDiskIdAttached();
-                        if (id!=null && !id.equalsIgnoreCase("")) {
+                        if (id != null && !id.equalsIgnoreCase("")) {
                             RuntimeLogger.logger.debug("Attaching to node disk for VM " + node.getId() + " ID " + id);
 
                             if (!disks.containsKey(node.getId())) {
@@ -375,13 +399,13 @@ public class EnforcementPluginCELAR implements EnforcementInterface {
         return ok;
     }
 
-    public boolean scaleUp(Node node, double violationDegree) {
+    public boolean scaleVerticallyUp(Node node, double violationDegree) {
         boolean ok = true;
-        scaleUp(node);
+        scaleVerticallyUp(node);
         return ok;
     }
 
-    public boolean scaleUp(Node node) {
+    public boolean scaleVerticallyUp(Node node) {
         boolean ok = true;
         executingAction = true;
         DependencyGraph dependencyGraph = new DependencyGraph();
@@ -389,19 +413,39 @@ public class EnforcementPluginCELAR implements EnforcementInterface {
         Node toBeScaled = dependencyGraph.getNodeWithID(node.getId());
         for (Entry<Integer, ResizingAction> actionE : actionsAvailable.entrySet()) {
             ResizingAction action = actionE.getValue();
-            System.out.println(action.getModuleName());
-            if (action.getType() == ResizingActionType.SCALE_UP && toBeScaled.getId().equalsIgnoreCase(action.getModuleName())) {
+            if (action.getType() == ResizingActionType.SCALE_VERTICALLY_UP && toBeScaled.getId().equalsIgnoreCase(action.getModuleName())) {
 
-                Parameters flavors = null;
-                ExecutedResizingAction executedResizingAction = executeResizingCommand(action.getId(), flavors);
-                States status = checkForAction(executedResizingAction.getUniqueId());
+                Parameters flavor = new Parameters();
 
-                if (status == States.Ready) {
+                Node virtualMachine = this.pickVMToScaleUp(toBeScaled);
+                if (virtualMachine != null) {
+                    String newFlavor = this.chooseNewFlavorUp(virtualMachine, null);
+                    if (newFlavor != null && !newFlavor.equalsIgnoreCase("")) {
+                        ResourceInfo myFlavor = this.flavors.get(newFlavor);
+                        List<ResourceSpec> specs = myFlavor.specs;
+                        for (ResourceSpec rs : specs) {
+                            if (!rs.property.equalsIgnoreCase("disk")) {
+                                Parameter parameter = new Parameter();
 
-                    RuntimeLogger.logger.debug("Scaling up from node disk with " + node.getId());
+                                parameter.setKey(rs.property);
+                                parameter.setValue(rs.value);
+                                flavor.addParameter(parameter);
+                            }
+                        }
+                        Parameter vm_ip = new Parameter();
+                        vm_ip.setKey("vm_ip");
+                        vm_ip.setValue(virtualMachine.getId());
+                        flavor.addParameter(vm_ip);
+                        ExecutedResizingAction executedResizingAction = executeResizingCommand(action.getId(), flavor);
+                        States status = checkForAction(executedResizingAction.getUniqueId());
 
+                        if (status == States.Ready) {
+                            System.out.println("The VM was scaled up from flavor " + virtualMachine.getStaticInformation().get("flavor") + " to " + myFlavor.name);
+                            RuntimeLogger.logger.debug("Scaling up from node disk with " + node.getId());
+
+                        }
+                    }
                 }
-
                 break;
             }
         }
@@ -409,13 +453,13 @@ public class EnforcementPluginCELAR implements EnforcementInterface {
         return ok;
     }
 
-    public boolean scaleDown(Node node, double violationDegree) {
+    public boolean scaleVerticallyDown(Node node, double violationDegree) {
         boolean ok = true;
-        scaleDown(node);
+        scaleVerticallyDown(node);
         return ok;
     }
 
-    public boolean scaleDown(Node node) {
+    public boolean scaleVerticallyDown(Node node) {
         boolean ok = true;
         executingAction = true;
         DependencyGraph dependencyGraph = new DependencyGraph();
@@ -423,19 +467,39 @@ public class EnforcementPluginCELAR implements EnforcementInterface {
         Node toBeScaled = dependencyGraph.getNodeWithID(node.getId());
         for (Entry<Integer, ResizingAction> actionE : actionsAvailable.entrySet()) {
             ResizingAction action = actionE.getValue();
-            System.out.println(action.getModuleName());
-            if (action.getType() == ResizingActionType.SCALE_DOWN && toBeScaled.getId().equalsIgnoreCase(action.getModuleName())) {
+            //  System.out.println(action.getModuleName());
+            if (action.getType() == ResizingActionType.SCALE_VERTICALLY_DOWN && toBeScaled.getId().equalsIgnoreCase(action.getModuleName())) {
 
-                Parameters flavors = null;
-                ExecutedResizingAction executedResizingAction = executeResizingCommand(action.getId(), flavors);
-                States status = checkForAction(executedResizingAction.getUniqueId());
+                Parameters flavor = new Parameters();
+                Node virtualMachine = this.pickVMToScaleDown(toBeScaled);
+                if (virtualMachine != null) {
+                    String newFlavor = this.chooseNewFlavorDown(virtualMachine, null);
+                    if (newFlavor != null && !newFlavor.equalsIgnoreCase("")) {
+                        ResourceInfo myFlavor = this.flavors.get(newFlavor);
+                        List<ResourceSpec> specs = myFlavor.specs;
+                        for (ResourceSpec rs : specs) {
+                            if (!rs.property.equalsIgnoreCase("disk")) {
+                                Parameter parameter = new Parameter();
+                                parameter.setKey(rs.property);
+                                parameter.setValue(rs.value);
+                                flavor.addParameter(parameter);
+                            }
+                        }
+                        Parameter vm_ip = new Parameter();
+                        vm_ip.setKey("vm_ip");
+                        vm_ip.setValue(virtualMachine.getId());
+                        flavor.addParameter(vm_ip);
+                        ExecutedResizingAction executedResizingAction = executeResizingCommand(action.getId(), flavor);
+                        States status = checkForAction(executedResizingAction.getUniqueId());
 
-                if (status == States.Ready) {
+                        if (status == States.Ready) {
+                            System.out.println("The VM was scaled down from flavor " + virtualMachine.getStaticInformation().get("flavor") + " to " + myFlavor.name);
 
-                    RuntimeLogger.logger.debug("Scaling down from node disk with " + node.getId());
+                            RuntimeLogger.logger.debug("Scaling down from node disk with " + node.getId());
 
+                        }
+                    }
                 }
-
                 break;
             }
         }
@@ -476,15 +540,14 @@ public class EnforcementPluginCELAR implements EnforcementInterface {
                         }
                     }
                 }
-                if (minUsageNode==null){
-                    if (disks.isEmpty())
-                    {
-                        executingAction=false;
+                if (minUsageNode == null) {
+                    if (disks.isEmpty()) {
+                        executingAction = false;
                         return false;
-                    }else{
-                        minUsageNode=dependencyGraph.getNodeWithID(disks.keySet().iterator().next());
+                    } else {
+                        minUsageNode = dependencyGraph.getNodeWithID(disks.keySet().iterator().next());
                     }
-                 
+
                 }
                 p1.setValue(minUsageNode.getId());
                 Parameter p2 = new Parameter();
@@ -495,14 +558,14 @@ public class EnforcementPluginCELAR implements EnforcementInterface {
                 parameters.addParameter(p1);
                 parameters.addParameter(p2);
 
-                ExecutedResizingAction executedResizingAction = executeResizingCommand(action.getId(),parameters);
+                ExecutedResizingAction executedResizingAction = executeResizingCommand(action.getId(), parameters);
                 States status = checkForAction(executedResizingAction.getUniqueId());
-                
+
                 if (status == States.Ready) {
 
-                        RuntimeLogger.logger.debug("Dettaching from node disk with " + node.getId() + " ID " + diskID);
-                        
-                        disks.get(minUsageNode.getId()).remove(diskID);
+                    RuntimeLogger.logger.debug("Dettaching from node disk with " + node.getId() + " ID " + diskID);
+
+                    disks.get(minUsageNode.getId()).remove(diskID);
                 }
                 break;
             }
@@ -548,6 +611,92 @@ public class EnforcementPluginCELAR implements EnforcementInterface {
         }
         executingAction = false;
         return ok;
+    }
+
+    public Node pickVMToScaleDown(Node toscale) {
+        String metricCPU = "cpuUsedPercent";
+        String metricMem = "memUsedPercent";
+        double smallestCPU = 100;
+        Node smallestCPUVM = null;
+        double smallestMem = 100;
+        Node smallestMemVM = null;
+        for (Node vm : toscale.getAllRelatedNodesOfType(RelationshipType.HOSTED_ON_RELATIONSHIP, NodeType.VIRTUAL_MACHINE)) {
+            double currentCPU;
+            try {
+                currentCPU = monitoringAPI.getMetricValue(metricCPU, vm);
+
+                double currentMem = monitoringAPI.getMetricValue(metricMem, vm);
+                if (currentCPU < smallestCPU) {
+                    smallestCPU = currentCPU;
+                    smallestCPUVM = vm;
+                }
+                if (currentMem < smallestMem) {
+                    smallestMem = currentMem;
+                    smallestMemVM = vm;
+                }
+            } catch (Exception ex) {
+                Logger.getLogger(EnforcementPluginCELAR.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        }
+        if (smallestCPUVM == null || smallestMemVM == null) {
+            if (smallestCPUVM != null) {
+                return smallestCPUVM;
+            } else {
+                if (smallestMemVM != null) {
+                    return smallestMemVM;
+                }
+            }
+        } else {
+            if (smallestCPU < smallestMem) {
+                return smallestCPUVM;
+            } else {
+                return smallestMemVM;
+            }
+        }
+        return null;
+    }
+
+    public Node pickVMToScaleUp(Node toscale) {
+        String metricCPU = "cpuUsedPercent";
+        String metricMem = "memUsedPercent";
+        double biggestCPU = 0;
+        Node biggestCPUVM = null;
+        double biggestMem = 0;
+        Node biggestMemVM = null;
+        for (Node vm : toscale.getAllRelatedNodesOfType(RelationshipType.HOSTED_ON_RELATIONSHIP, NodeType.VIRTUAL_MACHINE)) {
+            double currentCPU;
+            try {
+                currentCPU = monitoringAPI.getMetricValue(metricCPU, vm);
+
+                double currentMem = monitoringAPI.getMetricValue(metricMem, vm);
+                if (currentCPU > biggestCPU) {
+                    biggestCPU = currentCPU;
+                    biggestCPUVM = vm;
+                }
+                if (currentMem > biggestMem) {
+                    biggestMem = currentMem;
+                    biggestMemVM = vm;
+                }
+            } catch (Exception ex) {
+                Logger.getLogger(EnforcementPluginCELAR.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        }
+        if (biggestCPUVM == null || biggestMemVM == null) {
+            if (biggestCPUVM != null) {
+                return biggestCPUVM;
+            } else {
+                if (biggestMemVM != null) {
+                    return biggestMemVM;
+                }
+            }
+        } else {
+            if (biggestCPU < biggestMem) {
+                return biggestCPUVM;
+            } else {
+                return biggestMemVM;
+            }
+        }
+        return null;
     }
 
     public boolean scaleIn(Node node, String ip) {
@@ -752,7 +901,34 @@ public class EnforcementPluginCELAR implements EnforcementInterface {
         for (Entry<Integer, ResizingAction> actionE : actionsAvailable.entrySet()) {
             ResizingAction action = actionE.getValue();
             if (action.getType() == ResizingActionType.SCALE_OUT && toBeScaled.getId().equalsIgnoreCase(action.getModuleName())) {
-                ExecutedResizingAction executedResizingAction = executeResizingCommand(action.getId());
+                ExecutedResizingAction executedResizingAction = null;
+                if (!Configuration.resourceLevelControlEnabled()) {
+                    Parameters parameters = new Parameters();
+                    ResourceInfo defaultFlavor = null;
+                    if (flavorId.equalsIgnoreCase("")) {
+                        if (node.getStaticInformation().get("DefaultFlavor") != null && !((String) node.getStaticInformation().get("DefaultFlavor")).equalsIgnoreCase("")) {
+                            defaultFlavor = flavors.get((String) node.getStaticInformation().get("DefaultFlavor"));
+                        } else {
+                            defaultFlavor = flavors.values().iterator().next();
+                        }
+                    } else {
+                        defaultFlavor = flavors.get(flavorId);
+                    }
+                    List<ResourceSpec> specs = defaultFlavor.specs;
+                    for (ResourceSpec rs : specs) {
+                        if (!rs.property.equalsIgnoreCase("disk")) {
+                            Parameter parameter = new Parameter();
+                            parameter.setKey(rs.property);
+                            parameter.setValue(rs.value);
+                            parameters.addParameter(parameter);
+                        }
+                    }
+
+                    executedResizingAction = executeResizingCommand(action.getId(), parameters);
+
+                } else {
+                    executedResizingAction = executeResizingCommand(action.getId());
+                }
                 States status = checkForAction(executedResizingAction.getUniqueId());
 
                 executedResizingAction = refreshExecutedAction(executedResizingAction.getUniqueId());
@@ -824,7 +1000,7 @@ public class EnforcementPluginCELAR implements EnforcementInterface {
 
     @Override
     public boolean scaleOut(Node toBeScaled, double violationDegree) {
-        String flavorID = (String) toBeScaled.getStaticInformation().get("defaultFlavor");
+        String flavorID = (String) toBeScaled.getStaticInformation().get("DefaultFlavor");
         return scaleOut(toBeScaled, flavorID);
     }
 
@@ -844,68 +1020,128 @@ public class EnforcementPluginCELAR implements EnforcementInterface {
     }
 
     public String chooseNewFlavorUp(Node serviceID, Strategy strategy) {
-        
-        String currentFlavor = (String) serviceID.getStaticInformation().get("defaultFlavor");
+        String currentFlavor = "";
+        if (serviceID.getNodeType() == NodeType.VIRTUAL_MACHINE) {
+            currentFlavor = (String) serviceID.getStaticInformation().get("flavor");
+        } else {
+            currentFlavor = (String) serviceID.getStaticInformation().get("DefaultFlavor");
+        }
         ResourceInfo resourceInfo = this.flavors.get(currentFlavor);
         HashMap<String, Double> currentSpecs = new HashMap<String, Double>();
-        //resourceInfo.specs
         for (ResourceInfo.ResourceSpec resourceSpec : resourceInfo.specs) {
             currentSpecs.put(resourceSpec.property, Double.parseDouble(resourceSpec.value));
         }
-        double minResources = 0.0;
+        double minResources = 1000000.0;
         String foundFlavor = "";
         for (ResourceInfo resInfo : flavors.values()) {
             double diff = 0.0;
+            boolean ok = true;
             for (String resource : currentSpecs.keySet()) {
                 //TODO scale to more or less
-                if (((Double.parseDouble(resInfo.getFieldMap().get(resource)) - currentSpecs.get(resource)) > 0)) {
-                    diff += Double.parseDouble(resInfo.getFieldMap().get(resource)) - currentSpecs.get(resource);
+                HashMap<String, Double> diffSpecs = new HashMap<String, Double>();
+                for (ResourceInfo.ResourceSpec resourceSpec : resInfo.specs) {
+                    diffSpecs.put(resourceSpec.property, Double.parseDouble(resourceSpec.value));
+                }
+                if (diffSpecs.get(resource) / maxResourceValues.get(resource) - currentSpecs.get(resource) / maxResourceValues.get(resource)<0){
+                    ok=false;
+                }
+                diff += diffSpecs.get(resource) / maxResourceValues.get(resource) - currentSpecs.get(resource) / maxResourceValues.get(resource);
 
-                }
-                if (diff < minResources) {
-                    diff = minResources;
-                    foundFlavor = resInfo.name;
-                }
+            }
+            if (diff < minResources && diff != 0 && diff > 0 && diff > MAKES_SENSE_TO_SCALE_VERTICALLY) {
+                minResources = diff;
+                foundFlavor = resInfo.name;
             }
         }
         return foundFlavor;
     }
-        public String chooseNewFlavorDown(Node serviceID, Strategy strategy) {
-        
-        String currentFlavor = (String) serviceID.getStaticInformation().get("defaultFlavor");
+
+    public String chooseNewFlavorDown(Node serviceID, Strategy strategy) {
+        String currentFlavor = "";
+        if (serviceID.getNodeType() == NodeType.VIRTUAL_MACHINE) {
+            currentFlavor = (String) serviceID.getStaticInformation().get("flavor");
+        } else {
+            currentFlavor = (String) serviceID.getStaticInformation().get("DefaultFlavor");
+        }
         ResourceInfo resourceInfo = this.flavors.get(currentFlavor);
         HashMap<String, Double> currentSpecs = new HashMap<String, Double>();
-        //resourceInfo.specs
         for (ResourceInfo.ResourceSpec resourceSpec : resourceInfo.specs) {
             currentSpecs.put(resourceSpec.property, Double.parseDouble(resourceSpec.value));
         }
-        double minResources = 0.0;
+        double minResources = -100000.0;
         String foundFlavor = "";
         for (ResourceInfo resInfo : flavors.values()) {
             double diff = 0.0;
+            boolean ok = true;
             for (String resource : currentSpecs.keySet()) {
-                //TODO scale to more or less
-                if (((Double.parseDouble(resInfo.getFieldMap().get(resource)) - currentSpecs.get(resource)) < 0)) {
-                    diff += Double.parseDouble(resInfo.getFieldMap().get(resource)) - currentSpecs.get(resource);
+                HashMap<String, Double> diffSpecs = new HashMap<String, Double>();
+                for (ResourceInfo.ResourceSpec resourceSpec : resInfo.specs) {
+                    diffSpecs.put(resourceSpec.property, Double.parseDouble(resourceSpec.value));
+                }
+                if (diffSpecs.get(resource) / maxResourceValues.get(resource) - currentSpecs.get(resource) / maxResourceValues.get(resource)>0){
+                    ok=false;
+                }
+                diff += diffSpecs.get(resource) / maxResourceValues.get(resource) - currentSpecs.get(resource) / maxResourceValues.get(resource);
 
-                }
-                if (diff < minResources) {
-                    diff = minResources;
-                    foundFlavor = resInfo.name;
-                }
+            }
+            if (ok&&diff != 0 && diff > minResources && diff < 0 && diff < (-1.0) * MAKES_SENSE_TO_SCALE_VERTICALLY) {
+                minResources = diff;
+                foundFlavor = resInfo.name;
             }
         }
         return foundFlavor;
     }
 
     public void diagonallyScale(Node serviceID, Strategy strategy) {
-        serviceID.getStaticInformation().put("defaultFlavor", chooseNewFlavorUp(serviceID, strategy));
+        serviceID.getStaticInformation().put("DefaultFlavor", chooseNewFlavorUp(serviceID, strategy));
     }
-     public void diagonallyScaleUp(Node serviceID, Strategy strategy) {
-        serviceID.getStaticInformation().put("defaultFlavor", chooseNewFlavorUp(serviceID, strategy));
+
+    public boolean scaleDiagonallyUp(Node serviceID, Strategy strategy) {
+        try{
+        double prevValue = MAKES_SENSE_TO_SCALE_VERTICALLY;
+        this.MAKES_SENSE_TO_SCALE_VERTICALLY = 0.0001;
+        serviceID.getStaticInformation().put("DefaultFlavor", chooseNewFlavorUp(serviceID, strategy));
+        this.MAKES_SENSE_TO_SCALE_VERTICALLY = prevValue;
+        }catch(Exception e ){
+            RuntimeLogger.logger.error(e.getMessage());
+        }
+        return true;
     }
-     public void diagonallyScaleDown(Node serviceID, Strategy strategy) {
-        serviceID.getStaticInformation().put("defaultFlavor", chooseNewFlavorDown(serviceID, strategy));
+
+    public boolean scaleDiagonallyUp(Node serviceID) {
+        try{
+        double prevValue = MAKES_SENSE_TO_SCALE_VERTICALLY;
+        this.MAKES_SENSE_TO_SCALE_VERTICALLY = 0.0001;
+        serviceID.getStaticInformation().put("DefaultFlavor", chooseNewFlavorUp(serviceID, null));
+        this.MAKES_SENSE_TO_SCALE_VERTICALLY = prevValue;
+        }catch(Exception e){
+            RuntimeLogger.logger.error(e.getMessage());
+        }
+        return true;
+    }
+
+    public boolean scaleDiagonallyDown(Node serviceID, Strategy strategy) {
+        try{
+        double prevValue = MAKES_SENSE_TO_SCALE_VERTICALLY;
+        this.MAKES_SENSE_TO_SCALE_VERTICALLY = 0.00001;
+        serviceID.getStaticInformation().put("DefaultFlavor", chooseNewFlavorDown(serviceID, strategy));
+        this.MAKES_SENSE_TO_SCALE_VERTICALLY = prevValue;
+         }catch(Exception e){
+            RuntimeLogger.logger.error(e.getMessage());
+        }
+        return true;
+    }
+
+    public boolean scaleDiagonallyDown(Node serviceID) {
+        try{
+        double prevValue = MAKES_SENSE_TO_SCALE_VERTICALLY;
+        this.MAKES_SENSE_TO_SCALE_VERTICALLY = 0.00001;
+        serviceID.getStaticInformation().put("DefaultFlavor", chooseNewFlavorDown(serviceID, null));
+        this.MAKES_SENSE_TO_SCALE_VERTICALLY = prevValue;
+         }catch(Exception e){
+            RuntimeLogger.logger.error(e.getMessage());
+        }
+        return true;
     }
 
 }
