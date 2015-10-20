@@ -16,7 +16,7 @@
     <modules>
         <module>rSYBL</module>
         <module>MELA-AnalysisService</module>
-        <!--<module>SALSA</module>  -->
+        <module>salsa-core-pom</module>
     </modules>
     <properties>
         <spring.version>4.0.0.RELEASE</spring.version>
