@@ -6,17 +6,26 @@
     
         <CompositionRule TargetMonitoredElementLevel="SERVICE_UNIT">
             
-            <ResultingMetric type="RESOURCE" measurementUnit="%" name="cpuUsage"/>
+            <ResultingMetric type="RESOURCE" measurementUnit="%" name="cpuUsedPercent"/>
+            <Operation MetricSourceMonitoredElementLevel="VM" type="AVG">
+                <ReferenceMetric type="RESOURCE" measurementUnit="%"  name="cpuUsedPercent"/>
+            </Operation>
+        </CompositionRule>
+   
+         <CompositionRule TargetMonitoredElementLevel="VM">
+            
+            <ResultingMetric type="RESOURCE" measurementUnit="%" name="cpuUsedPercent"/>
             <Operation value="100" type="ADD">
                 <Operation value="-1" type="MUL">
-                    <Operation MetricSourceMonitoredElementLevel="VM" type="AVG">
+                    <Operation MetricSourceMonitoredElementLevel="VM" type="KEEP">
                         <ReferenceMetric type="RESOURCE" measurementUnit="%"  name="cpuIdle"/>
                     </Operation>
                 </Operation>
             </Operation>
         </CompositionRule>
+    
         
-            <CompositionRule TargetMonitoredElementLevel="VM">
+         <CompositionRule TargetMonitoredElementLevel="VM">
             <ResultingMetric type="RESOURCE" measurementUnit="#" name="numberOfVMs"/>
             <Operation value="1" type="SET_VALUE"/>
         </CompositionRule>
@@ -177,21 +186,53 @@
   
   
        <CompositionRule TargetMonitoredElementLevel="SERVICE_UNIT">
-            <ResultingMetric type="RESOURCE" measurementUnit="" name="workerUtilisation"/>
-            
-            <Operation type="DIV">
-                <Operation MetricSourceMonitoredElementLevel="VM" type="SUM">
-                    <ReferenceMetric type="RESOURCE" name="busy"/>
-               </Operation>
-      
-                <Operation MetricSourceMonitoredElementLevel="SERVICE_UNIT" type="KEEP">
-                    <ReferenceMetric type="RESOURCE" name="instances" />
-                </Operation> 
-            </Operation>
-            
+           <ResultingMetric type="RESOURCE" measurementUnit="%" name="workerUtilisation"/>
+           <Operation MetricSourceMonitoredElementLevel="VM" type="KEEP">
+             <ReferenceMetric type="RESOURCE" name="workerUtilisation" />
+           </Operation> 
+        </CompositionRule>
+
+       <CompositionRule TargetMonitoredElementLevel="SERVICE_UNIT">
+           <ResultingMetric type="RESOURCE" measurementUnit="number" name="queueLength"/>
+           <Operation MetricSourceMonitoredElementLevel="VM" type="KEEP">
+             <ReferenceMetric type="RESOURCE" name="queueLength" />
+           </Operation> 
         </CompositionRule>
         
-        
+<!--
+freeDiskProp
+idleCoresProp
+idleMemProp
+    -->    
+
+    <CompositionRule TargetMonitoredElementLevel="SERVICE_UNIT">
+           <ResultingMetric type="RESOURCE" measurementUnit="%" name="freeDiskProp"/>
+            <Operation type="MUL" value="100">
+                <Operation MetricSourceMonitoredElementLevel="VM" type="AVG">
+                    <ReferenceMetric type="RESOURCE" name="freeDiskProp" />
+                </Operation>
+            </Operation>
+    </CompositionRule>
+
+    <CompositionRule TargetMonitoredElementLevel="SERVICE_UNIT">
+           <ResultingMetric type="RESOURCE" measurementUnit="%" name="idleCoresProp"/>
+            <Operation type="MUL" value="100">
+                <Operation MetricSourceMonitoredElementLevel="VM" type="AVG">
+                    <ReferenceMetric type="RESOURCE" name="idleCoresProp" />
+                </Operation>
+            </Operation>
+    </CompositionRule>
+
+    <CompositionRule TargetMonitoredElementLevel="SERVICE_UNIT">
+           <ResultingMetric type="RESOURCE" measurementUnit="%" name="idleMemProp"/>
+            <Operation type="MUL" value="100">
+                <Operation MetricSourceMonitoredElementLevel="VM" type="AVG">
+                    <ReferenceMetric type="RESOURCE" name="idleMemProp" />
+                </Operation>
+            </Operation>
+    </CompositionRule>
+
+
        <!--  
         br
         
