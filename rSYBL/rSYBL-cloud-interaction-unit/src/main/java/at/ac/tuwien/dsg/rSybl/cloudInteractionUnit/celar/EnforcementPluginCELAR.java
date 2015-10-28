@@ -82,11 +82,31 @@ public class EnforcementPluginCELAR implements EnforcementInterface {
         resizingActionsClient.setConfiguration(clientConfiguration);
         dependencyGraph = new DependencyGraph();
         dependencyGraph.setCloudService(cloudService);
+         findAllAvailableFlavors();
+        initializeFlavors();
         refreshElasticityActionsList();
         startDiskManagement();
-        findAllAvailableFlavors();
+       
     }
-
+    private void initializeFlavors(){
+        List<Node> components = dependencyGraph.getAllServiceUnits();
+        for (Node n:components){
+            String flavor = "";
+            for (Node vm:n.getAllRelatedNodesOfType(RelationshipType.HOSTED_ON_RELATIONSHIP, NodeType.VIRTUAL_MACHINE)){
+                if (vm.getStaticInformation().get("flavor")!=null && !vm.getStaticInformation().get("flavor").equals("")){
+                    flavor = getFlavorID((String) vm.getStaticInformation().get("flavor"));
+                    vm.getStaticInformation().put("flavor", flavor);
+                }
+            }
+            if (!flavor.equalsIgnoreCase("") && (n.getStaticInformation().get("DefaultFlavor")==null || n.getStaticInformation().get("DefaultFlavor")=="")){
+                n.getStaticInformation().put("DefaultFlavor", flavor);
+            }else{
+                if (!flavor.equalsIgnoreCase("") && (n.getStaticInformation().get("DefaultFlavor")==null || n.getStaticInformation().get("DefaultFlavor")=="") ){
+                    n.getStaticInformation().put("DefaultFlavor", flavors.keySet().iterator().next());
+                }
+            }
+        }
+    }
     private void findAllAvailableFlavors() {
         ProvidedResourcesClient client = new ProvidedResourcesClient(clientConfiguration);
         List<ResourceInfo> flavorsList = null;
@@ -108,13 +128,7 @@ public class EnforcementPluginCELAR implements EnforcementInterface {
         } catch (JAXBException ex) {
             RuntimeLogger.logger.error("JAXBException when trying to find FLAVORS.");
         }
-        List<Node> nodes = dependencyGraph.getAllServiceUnits();
-        for (Node n : nodes) {
-            if (n.getStaticInformation().get("DefaultFlavor") == null || ((String) n.getStaticInformation().get("DefaultFlavor")).equalsIgnoreCase("")) {
-                n.getStaticInformation().put("DefaultFlavor", flavors.keySet().iterator().next());
-            }
-        }
-        nodes = dependencyGraph.getAllVMs();
+        List<Node> nodes = dependencyGraph.getAllVMs();
         for (Node n : nodes) {
             if (n.getStaticInformation().get("flavor") == null || ((String) n.getStaticInformation().get("flavor")).equalsIgnoreCase("")) {
                 n.getStaticInformation().put("flavor", flavors.keySet().iterator().next());
@@ -223,9 +237,24 @@ public class EnforcementPluginCELAR implements EnforcementInterface {
         String newFlavor = "";
         for (ResourceInfo ri : flavors.values()) {
             if (!ri.name.equalsIgnoreCase(oldFlavor)) {
-                double dist = Math.sqrt(Math.pow(disk - Double.parseDouble(ri.getFieldMap().get("disk")), 2)
-                        + Math.pow(memory - Double.parseDouble(ri.getFieldMap().get("ram")), 2)
-                        + Math.pow(cores - Double.parseDouble(ri.getFieldMap().get("cores")), 2));
+                double cdisk =0.0;
+                double cram=0.0;
+                double ccores=0.0;
+                 List<ResourceSpec> specs = ri.specs;
+                        for (ResourceSpec rs : specs) {
+                            if (rs.property.equalsIgnoreCase("disk")){
+                                cdisk=Double.parseDouble(rs.value);
+                            }
+                            if (rs.property.equalsIgnoreCase("ram")){
+                                cram=Double.parseDouble(rs.value);
+                            }
+                            if (rs.property.equalsIgnoreCase("cores")){
+                                ccores = Double.parseDouble(rs.value);
+                            }
+                        }
+                double dist = Math.sqrt(Math.pow(disk - cdisk, 2)
+                        + Math.pow(memory - cram, 2)
+                        + Math.pow(cores - ccores, 2));
                 if (dist < smallestDistance) {
                     smallestDistance = dist;
                     newFlavor = ri.name;
@@ -870,9 +899,30 @@ public class EnforcementPluginCELAR implements EnforcementInterface {
 
     public void setControlledService(Node controlledService) {
         cloudService = controlledService;
-
+   
     }
-
+    public String getFlavorID(String description){
+        String[] descriptionSplit = description.split(" ");
+        for (String flavor:this.flavors.keySet()){
+            List<ResourceSpec> specs = flavors.get(flavor).specs;
+            boolean ok = true;
+                        for (ResourceSpec rs : specs) {
+                            if (rs.property.equalsIgnoreCase("cores") && !descriptionSplit[0].split(":")[1].equalsIgnoreCase(rs.value)) {
+                                ok=false;
+                            }
+                            if (rs.property.equalsIgnoreCase("ram") && !descriptionSplit[1].split(":")[1].equalsIgnoreCase(rs.value)) {
+                                ok=false;
+                            }
+                            if (rs.property.equalsIgnoreCase("disk") && !descriptionSplit[2].split(":")[1].equalsIgnoreCase(rs.value)) {
+                                ok=false;
+                            }
+                            
+                        }
+                        
+            if (ok) return flavor;
+        }
+        return "";
+    }
     @Override
     public Node getControlledService() {
         return cloudService;
@@ -1143,5 +1193,6 @@ public class EnforcementPluginCELAR implements EnforcementInterface {
         }
         return true;
     }
+    
 
 }
