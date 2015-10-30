@@ -182,6 +182,9 @@
         gatk_br_queueLength 
         gatk_br_workPerHour 
         gatk_br_workerUtilisation 
+        rewardLostToQueueing
+        rewardLostToSmallWorkers
+        totalReward
   -->
   
   
@@ -198,6 +201,27 @@
              <ReferenceMetric type="RESOURCE" name="queueLength" />
            </Operation> 
         </CompositionRule>
+     
+      <CompositionRule TargetMonitoredElementLevel="SERVICE_UNIT">
+           <ResultingMetric type="RESOURCE" measurementUnit="number" name="rewardLostToQueueing"/>
+           <Operation MetricSourceMonitoredElementLevel="VM" type="KEEP">
+             <ReferenceMetric type="RESOURCE" name="rewardLostToQueueing" />
+           </Operation> 
+        </CompositionRule> 
+
+      <CompositionRule TargetMonitoredElementLevel="SERVICE_UNIT">
+           <ResultingMetric type="RESOURCE" measurementUnit="number" name="totalReward"/>
+           <Operation MetricSourceMonitoredElementLevel="VM" type="KEEP">
+             <ReferenceMetric type="RESOURCE" name="totalReward" />
+           </Operation> 
+        </CompositionRule> 
+
+      <CompositionRule TargetMonitoredElementLevel="SERVICE_UNIT">
+           <ResultingMetric type="RESOURCE" measurementUnit="number" name="rewardLostToSmallWorkers"/>
+           <Operation MetricSourceMonitoredElementLevel="VM" type="KEEP">
+             <ReferenceMetric type="RESOURCE" name="rewardLostToSmallWorkers" />
+           </Operation> 
+        </CompositionRule> 
         
 <!--
 freeDiskProp
