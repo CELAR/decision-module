@@ -14,7 +14,7 @@
                 </fileSet>
 
                  <fileSet>
-                        <directory>${project.basedir}</directory>
+                        <directory>${project.basedir}/scripts</directory>
                         <outputDirectory>/</outputDirectory>
                         <includes>
                                 <include>mela-dependency-analysis-service</include>
