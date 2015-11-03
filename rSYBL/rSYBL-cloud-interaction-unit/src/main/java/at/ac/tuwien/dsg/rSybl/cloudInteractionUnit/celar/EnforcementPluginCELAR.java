@@ -115,7 +115,6 @@ public class EnforcementPluginCELAR implements EnforcementInterface {
             flavorsList = client.getFlavors();
             for (ResourceInfo rinfo : flavorsList) {
                 flavors.put(rinfo.name, rinfo);
-                System.out.println(rinfo.name);
                 for (ResourceSpec resourceSpec : rinfo.specs) {
                     if ((maxResourceValues.containsKey(resourceSpec.property) && maxResourceValues.get(resourceSpec.property) < Double.parseDouble(resourceSpec.value))
                             || !maxResourceValues.containsKey(resourceSpec.property)) {
@@ -979,9 +978,15 @@ public class EnforcementPluginCELAR implements EnforcementInterface {
                 } else {
                     executedResizingAction = executeResizingCommand(action.getId());
                 }
-                States status = checkForAction(executedResizingAction.getUniqueId());
+                
+                States status=null;
+                        try{status = checkForAction(executedResizingAction.getUniqueId());
 
                 executedResizingAction = refreshExecutedAction(executedResizingAction.getUniqueId());
+                        }catch(Exception e){
+                            System.err.println("Error when scaling: "+e.getMessage());
+                            RuntimeLogger.logger.error(e.getMessage());
+                        }
                 if (status == States.Ready) {
                     //TODO : Assume we have value IP returned
                     Parameters par = executedResizingAction.getParameters();
