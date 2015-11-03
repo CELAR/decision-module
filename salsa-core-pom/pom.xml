@@ -13,11 +13,13 @@
         <slf4j.version>1.7.5</slf4j.version>
         <maven.compiler.source>1.7</maven.compiler.source>
         <maven.compiler.target>1.7</maven.compiler.target>
+        <timestamp>${maven.build.timestamp}</timestamp>
+        <maven.build.timestamp.format>yyyy-MM-dd HH:mm</maven.build.timestamp.format>
     </properties>
 
     <artifactId>salsa-core-pom</artifactId>
     <packaging>pom</packaging>
-    <version>2.0</version>
+    <version>1.0-SNAPSHOT</version>
 
     <name>SALSA</name>
     <url>http://maven.apache.org</url>

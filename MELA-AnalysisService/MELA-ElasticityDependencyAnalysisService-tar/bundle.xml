@@ -14,10 +14,11 @@
                 </fileSet>
 
                  <fileSet>
-                        <directory>${project.basedir}</directory>
+                        <directory>${project.basedir}/scripts</directory>
                         <outputDirectory>/</outputDirectory>
                         <includes>
                                 <include>mela-dependency-analysis-service</include>
+                                <include>installer.sh</include>
                         </includes>
                         <fileMode>0755</fileMode>
                         <lineEnding>unix</lineEnding>
@@ -35,7 +36,7 @@
                         <directory>${project.build.directory}</directory>
                         <outputDirectory>/</outputDirectory>
                         <includes>
-                                <include>MELA-ElasticityAnalysisService-*.jar</include>
+                                <include>MELA-ElasticityRelationshipsAnalysisService-*.jar</include>
                         </includes>
                 </fileSet>
 
