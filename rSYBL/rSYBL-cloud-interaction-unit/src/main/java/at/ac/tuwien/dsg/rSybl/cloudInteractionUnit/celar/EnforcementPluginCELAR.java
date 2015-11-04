@@ -613,7 +613,27 @@ public class EnforcementPluginCELAR implements EnforcementInterface {
             ResizingAction action = actionE.getValue();
             //System.out.println(action.getModuleName());
             if (action.getType() == ResizingActionType.SCALE_IN && toBeScaled.getId().equalsIgnoreCase(action.getModuleName())) {
-                ExecutedResizingAction executedResizingAction = executeResizingCommand(action.getId());
+                List<Node> nodes = node.getAllRelatedNodesOfType(RelationshipType.HOSTED_ON_RELATIONSHIP, NodeType.VIRTUAL_MACHINE);
+                Node found = null;
+                for (Node n:nodes){
+                    try {
+                        List<String> metrics= monitoringAPI.getAvailableMetrics(n);
+                        
+                        if (metrics.contains("busyness") && monitoringAPI.getMetricValue("busyness", n)==0){
+                            found=n;
+                        }
+                    } catch (Exception ex) {
+                        Logger.getLogger(EnforcementPluginCELAR.class.getName()).log(Level.SEVERE, null, ex);
+                        RuntimeLogger.logger.error("Error while trying to get the busy metric");
+                    }
+                }
+                if (found!=null){
+                  Parameters pars = new Parameters();
+                Parameter par = new Parameter();
+                par.setKey("vm_ip");
+                par.setValue(found.getId());
+                pars.addParameter(par);
+                ExecutedResizingAction executedResizingAction = executeResizingCommand(action.getId(),pars);
                 States status = checkForAction(executedResizingAction.getUniqueId());
 
                 if (status == States.Ready) {
@@ -633,7 +653,7 @@ public class EnforcementPluginCELAR implements EnforcementInterface {
                     }
 
                 }
-
+                }
                 break;
             }
         }
@@ -738,7 +758,7 @@ public class EnforcementPluginCELAR implements EnforcementInterface {
             if (action.getType() == ResizingActionType.SCALE_IN && toBeScaled.getId().equalsIgnoreCase(action.getModuleName())) {
                 Parameters pars = new Parameters();
                 Parameter par = new Parameter();
-                par.setKey("IP");
+                par.setKey("vm_ip");
                 par.setValue(ip);
                 pars.addParameter(par);
                 ExecutedResizingAction executedResizingAction = executeResizingCommand(action.getId(), pars);
