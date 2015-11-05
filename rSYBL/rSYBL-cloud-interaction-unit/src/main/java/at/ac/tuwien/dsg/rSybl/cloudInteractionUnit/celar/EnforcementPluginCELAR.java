@@ -1088,7 +1088,7 @@ public class EnforcementPluginCELAR implements EnforcementInterface {
     public boolean enforceAction(Node serviceID, String actionName) {
         for (Integer id : this.actionsAvailable.keySet()) {
             if (actionsAvailable.get(id).getName().equalsIgnoreCase(actionName)) {
-                this.enforceAction(serviceID, actionName);
+//                this.enforceAction(serviceID, actionName);
             }
         }
         return true;
