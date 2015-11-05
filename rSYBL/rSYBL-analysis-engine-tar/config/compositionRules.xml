@@ -256,7 +256,21 @@ idleMemProp
             </Operation>
     </CompositionRule>
 
-
+    <CompositionRule TargetMonitoredElementLevel="VM">
+            <ResultingMetric type="RESOURCE" measurementUnit="(0-1)" name="busyness"/>
+             <Operation type="ADD" value="1">
+		     <Operation type="DIV" value="-2">
+		        <Operation MetricSourceMonitoredElementLevel="VM" type="SUM">
+		            <Operation MetricSourceMonitoredElementLevel="VM" type="SUM">
+		                <ReferenceMetric type="RESOURCE" name="idleMemProp" />
+		            </Operation>
+		            <Operation MetricSourceMonitoredElementLevel="VM" type="SUM">
+		                <ReferenceMetric type="RESOURCE" name="idleCoresProp" />
+		            </Operation>
+		        </Operation>
+		    </Operation>
+            </Operation>
+    </CompositionRule>
        <!--  
         br
         
