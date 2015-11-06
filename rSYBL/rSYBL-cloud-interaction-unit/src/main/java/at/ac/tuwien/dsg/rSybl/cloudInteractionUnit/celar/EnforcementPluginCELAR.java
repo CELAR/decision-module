@@ -454,13 +454,13 @@ public class EnforcementPluginCELAR implements EnforcementInterface {
                         ResourceInfo myFlavor = this.flavors.get(newFlavor);
                         List<ResourceSpec> specs = myFlavor.specs;
                         for (ResourceSpec rs : specs) {
-                            if (!rs.property.equalsIgnoreCase("disk")) {
+//                            if (!rs.property.equalsIgnoreCase("disk")) {
                                 Parameter parameter = new Parameter();
 
                                 parameter.setKey(rs.property);
                                 parameter.setValue(rs.value);
                                 flavor.addParameter(parameter);
-                            }
+//                            }
                         }
                         Parameter vm_ip = new Parameter();
                         vm_ip.setKey("vm_ip");
@@ -508,12 +508,12 @@ public class EnforcementPluginCELAR implements EnforcementInterface {
                         ResourceInfo myFlavor = this.flavors.get(newFlavor);
                         List<ResourceSpec> specs = myFlavor.specs;
                         for (ResourceSpec rs : specs) {
-                            if (!rs.property.equalsIgnoreCase("disk")) {
+//                            if (!rs.property.equalsIgnoreCase("disk")) {
                                 Parameter parameter = new Parameter();
                                 parameter.setKey(rs.property);
                                 parameter.setValue(rs.value);
                                 flavor.addParameter(parameter);
-                            }
+//                            }
                         }
                         Parameter vm_ip = new Parameter();
                         vm_ip.setKey("vm_ip");
@@ -991,12 +991,12 @@ public class EnforcementPluginCELAR implements EnforcementInterface {
                     }
                     List<ResourceSpec> specs = defaultFlavor.specs;
                     for (ResourceSpec rs : specs) {
-                        if (!rs.property.equalsIgnoreCase("disk")) {
+//                        if (!rs.property.equalsIgnoreCase("disk")) {
                             Parameter parameter = new Parameter();
                             parameter.setKey(rs.property);
                             parameter.setValue(rs.value);
                             parameters.addParameter(parameter);
-                        }
+//                        }
                     }
 
                     executedResizingAction = executeResizingCommand(action.getId(), parameters);
@@ -1195,7 +1195,7 @@ public class EnforcementPluginCELAR implements EnforcementInterface {
              toBeScaled.getStaticInformation().put("DeafultFlavor", flavorId);
             for (Entry<Integer, ResizingAction> actionE : actionsAvailable.entrySet()) {
             ResizingAction action = actionE.getValue();
-            if (action.getType() == ResizingActionType.SCALE_DIAGONALLY_UP && node.getId().equalsIgnoreCase(action.getModuleName())) {
+            if (action.getType() == ResizingActionType.SCALE_OUT && node.getId().equalsIgnoreCase(action.getModuleName())) {
                 ExecutedResizingAction executedResizingAction = null;
                 if (!Configuration.resourceLevelControlEnabled()) {
                     Parameters parameters = new Parameters();
@@ -1211,12 +1211,12 @@ public class EnforcementPluginCELAR implements EnforcementInterface {
                     }
                     List<ResourceSpec> specs = defaultFlavor.specs;
                     for (ResourceSpec rs : specs) {
-                        if (!rs.property.equalsIgnoreCase("disk")) {
+//                        if (!rs.property.equalsIgnoreCase("disk")) {
                             Parameter parameter = new Parameter();
                             parameter.setKey(rs.property);
                             parameter.setValue(rs.value);
                             parameters.addParameter(parameter);
-                        }
+//                        }
                     }
 
                     executedResizingAction = executeResizingCommand(action.getId(), parameters);
@@ -1311,10 +1311,10 @@ public class EnforcementPluginCELAR implements EnforcementInterface {
 //            scaleOut(serviceID, flavorId);
              Node toBeScaled = dependencyGraph.getNodeWithID(node.getId());
                           toBeScaled.getStaticInformation().put("DeafultFlavor", flavorId);
-
+             
             for (Entry<Integer, ResizingAction> actionE : actionsAvailable.entrySet()) {
             ResizingAction action = actionE.getValue();
-            if (action.getType() == ResizingActionType.SCALE_DIAGONALLY_UP && node.getId().equalsIgnoreCase(action.getModuleName())) {
+            if (action.getType() == ResizingActionType.SCALE_OUT && node.getId().equalsIgnoreCase(action.getModuleName())) {
                 ExecutedResizingAction executedResizingAction = null;
                 if (!Configuration.resourceLevelControlEnabled()) {
                     Parameters parameters = new Parameters();
@@ -1330,12 +1330,12 @@ public class EnforcementPluginCELAR implements EnforcementInterface {
                     }
                     List<ResourceSpec> specs = defaultFlavor.specs;
                     for (ResourceSpec rs : specs) {
-                        if (!rs.property.equalsIgnoreCase("disk")) {
+//                        if (!rs.property.equalsIgnoreCase("disk")) {
                             Parameter parameter = new Parameter();
                             parameter.setKey(rs.property);
                             parameter.setValue(rs.value);
                             parameters.addParameter(parameter);
-                        }
+//                        }
                     }
 
                     executedResizingAction = executeResizingCommand(action.getId(), parameters);
@@ -1421,7 +1421,8 @@ public class EnforcementPluginCELAR implements EnforcementInterface {
         try {
             double prevValue = MAKES_SENSE_TO_SCALE_VERTICALLY;
             this.MAKES_SENSE_TO_SCALE_VERTICALLY = 0.00001;
-            serviceID.getStaticInformation().put("DefaultFlavor", chooseNewFlavorDown(serviceID, strategy));
+            Node toScale=dependencyGraph.getNodeWithID(serviceID.getId());
+            toScale.getStaticInformation().put("DefaultFlavor", chooseNewFlavorDown(serviceID, strategy));
             this.MAKES_SENSE_TO_SCALE_VERTICALLY = prevValue;
         } catch (Exception e) {
             RuntimeLogger.logger.error(e.getMessage());
@@ -1433,7 +1434,8 @@ public class EnforcementPluginCELAR implements EnforcementInterface {
         try {
             double prevValue = MAKES_SENSE_TO_SCALE_VERTICALLY;
             this.MAKES_SENSE_TO_SCALE_VERTICALLY = 0.00001;
-            serviceID.getStaticInformation().put("DefaultFlavor", chooseNewFlavorDown(serviceID, null));
+            Node toScale=dependencyGraph.getNodeWithID(serviceID.getId());
+            toScale.getStaticInformation().put("DefaultFlavor", chooseNewFlavorDown(serviceID, null));
             this.MAKES_SENSE_TO_SCALE_VERTICALLY = prevValue;
         } catch (Exception e) {
             RuntimeLogger.logger.error(e.getMessage());
