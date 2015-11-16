@@ -102,7 +102,7 @@
         </CompositionRule>-->
 
         <CompositionRule TargetMonitoredElementLevel="SERVICE_UNIT">
-            <TargetMonitoredElementID>Postgres</TargetMonitoredElementID> 
+            <TargetMonitoredElementID>postgresql</TargetMonitoredElementID> 
             <ResultingMetric type="RESOURCE" measurementUnit="%" name="iotime"/>
             <Operation MetricSourceMonitoredElementLevel="VM" type="AVG">
                 <ReferenceMetric type="RESOURCE" name="iotime"/>
