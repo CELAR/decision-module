@@ -38,7 +38,32 @@
             </Operation>
         </CompositionRule>
 
-        
+        <!--
+         Master:
+         mean
+         standev
+         variation
+        -->
+        <CompositionRule TargetMonitoredElementLevel="SERVICE_UNIT">
+            <ResultingMetric type="RESOURCE" measurementUnit="#" name="mean"/>
+            <Operation MetricSourceMonitoredElementLevel="VM" type="AVG">
+                <ReferenceMetric type="RESOURCE" name="mean"/>
+            </Operation>
+        </CompositionRule>
+
+        <CompositionRule TargetMonitoredElementLevel="SERVICE_UNIT">
+            <ResultingMetric type="RESOURCE" measurementUnit="#" name="standev"/>
+            <Operation MetricSourceMonitoredElementLevel="VM" type="AVG">
+                <ReferenceMetric type="RESOURCE" name="standev"/>
+            </Operation>
+        </CompositionRule>
+        <CompositionRule TargetMonitoredElementLevel="SERVICE_UNIT">
+            <ResultingMetric type="RESOURCE" measurementUnit="#" name="variation"/>
+            <Operation MetricSourceMonitoredElementLevel="VM" type="AVG">
+                <ReferenceMetric type="RESOURCE" name="variation"/>
+            </Operation>
+        </CompositionRule>
+
         <!--        
         Postgres:
         pgActiveConnections
@@ -144,7 +169,7 @@
         dataplay_load
         dataplay_readLatency
         dataplay_writeLatency
-        -->
+       
          
         <CompositionRule TargetMonitoredElementLevel="SERVICE_UNIT">
             
@@ -175,7 +200,7 @@
                     </Operation>
                 </Operation>
             </Operation>
-        </CompositionRule>
+        </CompositionRule>-->
         
 <!--                SCAN metrics
         gatk_br_avgMemoryUsage 
