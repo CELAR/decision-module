@@ -51,7 +51,7 @@
             </Operation>
         </CompositionRule>
 
-        <CompositionRule TargetMonitoredElementLevel="SERVICE_UNIT">
+        <!--<CompositionRule TargetMonitoredElementLevel="SERVICE_UNIT">
             <ResultingMetric type="RESOURCE" measurementUnit="#" name="standev"/>
             <Operation MetricSourceMonitoredElementLevel="VM" type="AVG">
                 <ReferenceMetric type="RESOURCE" name="standev"/>
@@ -62,7 +62,9 @@
             <Operation MetricSourceMonitoredElementLevel="VM" type="AVG">
                 <ReferenceMetric type="RESOURCE" name="variation"/>
             </Operation>
-        </CompositionRule>
+        </CompositionRule>-->
+
+       
 
         <!--        
         Postgres:
@@ -71,14 +73,14 @@
         pgBlocksDiskRead
         pgDBsizeKB
         -->
-        <CompositionRule TargetMonitoredElementLevel="SERVICE_UNIT">
+        <!--<CompositionRule TargetMonitoredElementLevel="SERVICE_UNIT">
             <ResultingMetric type="RESOURCE" measurementUnit="#" name="activeConnections"/>
             <Operation MetricSourceMonitoredElementLevel="VM" type="AVG">
                 <ReferenceMetric type="RESOURCE" name="pgActiveConnections"/>
             </Operation>
-        </CompositionRule>
+        </CompositionRule>-->
         
-        <CompositionRule TargetMonitoredElementLevel="SERVICE_UNIT">
+         <!--<CompositionRule TargetMonitoredElementLevel="SERVICE_UNIT">
             <ResultingMetric type="RESOURCE" measurementUnit="#" name="blocksDiskRead"/>
             <Operation MetricSourceMonitoredElementLevel="VM" type="AVG">
                 <ReferenceMetric type="RESOURCE" name="pgBlocksDiskRead"/>
@@ -97,7 +99,18 @@
             <Operation MetricSourceMonitoredElementLevel="VM" type="AVG">
                 <ReferenceMetric type="RESOURCE" name="pgDBsizeKB"/>
             </Operation>
+        </CompositionRule>-->
+
+        <CompositionRule TargetMonitoredElementLevel="SERVICE_UNIT">
+            <TargetMonitoredElementID>Postgres</TargetMonitoredElementID> 
+            <ResultingMetric type="RESOURCE" measurementUnit="%" name="iotime"/>
+            <Operation MetricSourceMonitoredElementLevel="VM" type="AVG">
+                <ReferenceMetric type="RESOURCE" name="iotime"/>
+            </Operation>
         </CompositionRule>
+
+
+       
                 
         <!--    
         HAProxy:
@@ -129,16 +142,16 @@
             </Operation>
         </CompositionRule>
         
-        <CompositionRule TargetMonitoredElementLevel="SERVICE_UNIT">
+        <!--<CompositionRule TargetMonitoredElementLevel="SERVICE_UNIT">
             
             <ResultingMetric type="RESOURCE" measurementUnit="ms" name="avgResponseTime"/>
             <Operation MetricSourceMonitoredElementLevel="VM" type="AVG">
                 <ReferenceMetric type="RESOURCE" name="avgResponseTime"/>
             </Operation>
-        </CompositionRule>
+        </CompositionRule>-->
         
         
-        <CompositionRule TargetMonitoredElementLevel="SERVICE_UNIT">
+        <!--<CompositionRule TargetMonitoredElementLevel="SERVICE_UNIT">
             
             <ResultingMetric type="RESOURCE" measurementUnit="err/s" name="errorRate"/>
             <Operation MetricSourceMonitoredElementLevel="VM" type="AVG">
@@ -152,7 +165,7 @@
             <Operation MetricSourceMonitoredElementLevel="SERVICE_UNIT" type="AVG">
                 <ReferenceMetric type="RESOURCE" name="errorRate"/>
             </Operation>
-        </CompositionRule>
+        </CompositionRule> -->
         
          
         
@@ -1048,7 +1061,7 @@ idleMemProp
         
         
         
-        <CompositionRule TargetMonitoredElementLevel="SERVICE_UNIT">
+       <!-- <CompositionRule TargetMonitoredElementLevel="SERVICE_UNIT">
             <ResultingMetric type="RESOURCE" measurementUnit="$/h" name="cost"/>
             <Operation MetricSourceMonitoredElementLevel="SERVICE_UNIT" value="0.12" type="MUL">
                 <ReferenceMetric type="RESOURCE" name="instances"/>
@@ -1067,7 +1080,7 @@ idleMemProp
             <Operation MetricSourceMonitoredElementLevel="SERVICE_TOPOLOGY" type="SUM">
                 <ReferenceMetric type="COST" name="cost"/>
             </Operation>
-        </CompositionRule>
+        </CompositionRule>-->
 
     </MetricsCompositionRules>
 
