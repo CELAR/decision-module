@@ -45,11 +45,27 @@
          variation
         -->
         <CompositionRule TargetMonitoredElementLevel="SERVICE_UNIT">
-            <ResultingMetric type="RESOURCE" measurementUnit="#" name="mean"/>
+            <ResultingMetric type="RESOURCE" measurementUnit="ms" name="avgResponseTime"/>
             <Operation MetricSourceMonitoredElementLevel="VM" type="AVG">
                 <ReferenceMetric type="RESOURCE" name="mean"/>
             </Operation>
         </CompositionRule>
+
+      <!-- <CompositionRule TargetMonitoredElementLevel="SERVICE">
+            <ResultingMetric type="RESOURCE" measurementUnit="#" name="connectedUsers"/>
+            <Operation MetricSourceMonitoredElementLevel="SERVICE_UNIT" type="KEEP">
+                <ReferenceMetric type="RESOURCE" name="activeSessions"  measurementUnit="#"/>
+                <SourceMonitoredElementID>loadbalancer</SourceMonitoredElementID> 
+            </Operation>
+        </CompositionRule>
+
+       <CompositionRule TargetMonitoredElementLevel="SERVICE">
+            <ResultingMetric type="RESOURCE" measurementUnit="ms" name="avgResponseTime"/>
+            <Operation MetricSourceMonitoredElementLevel="SERVICE_UNIT" type="KEEP">
+                <ReferenceMetric type="RESOURCE" name="avgResponseTime"  measurementUnit="ms"/>
+                <SourceMonitoredElementID>master</SourceMonitoredElementID> 
+            </Operation>
+        </CompositionRule>-->
 
         <!--<CompositionRule TargetMonitoredElementLevel="SERVICE_UNIT">
             <ResultingMetric type="RESOURCE" measurementUnit="#" name="standev"/>
@@ -122,17 +138,7 @@
         requestRate
         servers-->
 
-        <CompositionRule TargetMonitoredElementLevel="SERVICE">
-            
-            <ResultingMetric type="RESOURCE" measurementUnit="%" name="masterAvgCPUUsage"/>
-             
-            <Operation MetricSourceMonitoredElementLevel="SERVICE_UNIT" type="KEEP">
-                <ReferenceMetric type="RESOURCE" measurementUnit="%"  name="cpuUsage"/>
-                <SourceMonitoredElementID>Master</SourceMonitoredElementID> 
-            </Operation>
-
-        </CompositionRule>
-        
+       
         
         <CompositionRule TargetMonitoredElementLevel="SERVICE_UNIT">
             
@@ -383,12 +389,12 @@ idleMemProp
         </CompositionRule>
         
         
-        <CompositionRule TargetMonitoredElementLevel="SERVICE">
+        <!--<CompositionRule TargetMonitoredElementLevel="SERVICE">
             <ResultingMetric type="RESOURCE" measurementUnit="" name="gatk_ir_queueLength"/>
             <Operation MetricSourceMonitoredElementLevel="SERVICE_UNIT" type="AVG">
                 <ReferenceMetric type="RESOURCE" name="gatk_ir_queueLength"/>
             </Operation>
-        </CompositionRule>
+        </CompositionRule>-->
         
         
 <!--
@@ -588,12 +594,12 @@ idleMemProp
             </Operation>
         </CompositionRule>
         
-        <CompositionRule TargetMonitoredElementLevel="SERVICE">
+        <!--<CompositionRule TargetMonitoredElementLevel="SERVICE">
             <ResultingMetric type="RESOURCE" measurementUnit="" name="gatk_rtc_queueLength"/>
             <Operation MetricSourceMonitoredElementLevel="SERVICE_UNIT" type="AVG">
                 <ReferenceMetric type="RESOURCE" name="gatk_rtc_queueLength"/>
             </Operation>
-        </CompositionRule>
+        </CopositionRule>-->
         
         <CompositionRule TargetMonitoredElementLevel="SERVICE_UNIT">
             <ResultingMetric type="RESOURCE" measurementUnit="" name="gatk_rtc_queueLength"/>
@@ -926,12 +932,12 @@ idleMemProp
             </Operation>
         </CompositionRule>     
                                
-        <CompositionRule TargetMonitoredElementLevel="SERVICE">
+        <!--<CompositionRule TargetMonitoredElementLevel="SERVICE">
             <ResultingMetric type="RESOURCE" measurementUnit="" name="dataInbalanceRatio"/>
             <Operation MetricSourceMonitoredElementLevel="SERVICE_TOPOLOGY" type="KEEP">
                 <ReferenceMetric type="RESOURCE" name="dataInbalanceRatio" />
             </Operation>
-        </CompositionRule>                          
+        </CompositionRule>                          -->
                                                     
         <!--Common metrics-->
         <CompositionRule TargetMonitoredElementLevel="SERVICE_UNIT">
@@ -994,7 +1000,7 @@ idleMemProp
 
 
 
-        <CompositionRule TargetMonitoredElementLevel="SERVICE">
+        <!--<CompositionRule TargetMonitoredElementLevel="SERVICE">
             
             <ResultingMetric type="RESOURCE" measurementUnit="MB/s" name="dataTransfer"/>
                
@@ -1005,7 +1011,7 @@ idleMemProp
 
             </Operation>
          
-        </CompositionRule>
+        </CompositionRule>-->
 	
  
             
@@ -1052,12 +1058,12 @@ idleMemProp
 
     
 
-        <CompositionRule TargetMonitoredElementLevel="SERVICE">
+        <!--<CompositionRule TargetMonitoredElementLevel="SERVICE">
             <ResultingMetric type="RESOURCE" measurementUnit="#" name="vmsUsed"/>
             <Operation MetricSourceMonitoredElementLevel="SERVICE_UNIT" type="SUM">
                 <ReferenceMetric type="RESOURCE" name="instances"/>
             </Operation>
-        </CompositionRule>
+        </CompositionRule>-->
         
         
         
