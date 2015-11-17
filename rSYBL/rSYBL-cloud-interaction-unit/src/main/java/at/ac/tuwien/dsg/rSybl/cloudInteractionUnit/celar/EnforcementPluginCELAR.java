@@ -72,7 +72,8 @@ public class EnforcementPluginCELAR implements EnforcementInterface {
     private DependencyGraph dependencyGraph;
     private boolean executingAction = false;
     private HashMap<String, Double> maxResourceValues = new HashMap<String, Double>();
-
+    private String busyUnitMarkerMetric = "busyness";
+    
     public EnforcementPluginCELAR(Node cloudService) {
 
         this.cloudService = cloudService;
@@ -82,6 +83,8 @@ public class EnforcementPluginCELAR implements EnforcementInterface {
         resizingActionsClient.setConfiguration(clientConfiguration);
         dependencyGraph = new DependencyGraph();
         dependencyGraph.setCloudService(cloudService);
+        busyUnitMarkerMetric = Configuration.getBusyMetric();
+         
         findAllAvailableFlavors();
         initializeFlavors();
         refreshElasticityActionsList();
@@ -620,8 +623,11 @@ public class EnforcementPluginCELAR implements EnforcementInterface {
                 for (Node n : nodes) {
                     try {
                         List<String> metrics = monitoringAPI.getAvailableMetrics(n);
-
-                        if (metrics.contains("busyness") && monitoringAPI.getMetricValue("busyness", n) == 0) {
+                        
+                        
+                        if (!metrics.contains(busyUnitMarkerMetric)) {
+                            found = n;
+                        } else if (monitoringAPI.getMetricValue(busyUnitMarkerMetric, n) == 0) {
                             found = n;
                         }
                     } catch (Exception ex) {

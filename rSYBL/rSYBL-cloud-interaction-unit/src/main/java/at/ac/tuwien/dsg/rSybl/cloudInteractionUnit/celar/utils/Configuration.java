@@ -60,6 +60,12 @@ public class Configuration {
 
         }
     }
+    
+    public static String getBusyMetric()
+    {
+    	return (configuration.containsKey("busyUnitMarkerMetric"))? configuration.getProperty("busyUnitMarkerMetric"): "busyness";
+    }
+    
     public static String getUserEMailAddress()
     {
     	return configuration.getProperty("UserEmailAddress");
